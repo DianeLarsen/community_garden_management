@@ -26,9 +26,5 @@ sudo /etc/init.d/postgresql restart
 
 psql -U cgmadmin -d community_garden_management
 
-    user: "cgmadmin",
-    host: "localhost",
-    database: "community_garden_management",
-    password: 'cgmadmin',
-    port: 5432,
+https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944#:~:text=In%20the%20Outlook%20desktop%20app,Get%20a%20new%20app%20password.
 

@@ -18,7 +18,7 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('/api/community-garden/registration', {
+    const response = await fetch('/api/registration', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

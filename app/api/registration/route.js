@@ -19,13 +19,17 @@ export async function POST(request) {
     await client.release();
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
+        host: 'smtp-mail.outlook.com',
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+        tls: {
+            ciphers: 'SSLv3'
+        }
     });
-
     const mailOptions = {
       from: process.env.EMAIL,
       to: email,
