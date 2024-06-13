@@ -34,6 +34,12 @@ export default function RootLayout({ children }) {
             <Link href="/weather-updates" className="text-white px-4">
               Weather Updates
             </Link>
+            <Link href="/community-gardens" className="text-white px-4">
+              Community Gardens
+            </Link>
+            <Link href="/groups" className="text-white px-4">
+              Groups
+            </Link>
           </nav>
         </header>
         
