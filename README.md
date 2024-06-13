@@ -10,3 +10,25 @@ git push -u origin main
 git remote add origin git@github.com:DianeLarsen/community_garden_management.git
 git branch -M main
 git push -u origin main
+
+to start postgresql
+# Check the status of PostgreSQL
+sudo /etc/init.d/postgresql status
+
+# Start PostgreSQL
+sudo /etc/init.d/postgresql start
+
+# Stop PostgreSQL
+sudo /etc/init.d/postgresql stop
+
+# Restart PostgreSQL
+sudo /etc/init.d/postgresql restart
+
+psql -U cgmadmin -d community_garden_management
+
+    user: "cgmadmin",
+    host: "localhost",
+    database: "community_garden_management",
+    password: 'cgmadmin',
+    port: 5432,
+

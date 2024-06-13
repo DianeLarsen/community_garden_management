@@ -1,18 +1,27 @@
 import { NextResponse } from 'next/server';
+import pool from '@/utils/db';
 
-export async function GET(req) {
-  const { token } = req.nextUrl.searchParams;
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get('token');
 
-  // Find user with the verification token (pseudo-code)
-  // const user = await findUserByVerificationToken(token);
+  try {
+    const client = await pool.connect();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
+    const result = await client.query(
+      'UPDATE users SET verified = $1, verification_token = $2 WHERE verification_token = $3 RETURNING *',
+      [true, null, token]
+    );
+
+    await client.release();
+
+    if (result.rowCount === 0) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: 'Email verified successfully.' });
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    return NextResponse.json({ error: 'Error verifying email' }, { status: 500 });
   }
-
-  // Verify the user's email (pseudo-code)
-  // user.verified = true;
-  // saveUserToDatabase(user);
-
-  return NextResponse.json({ message: 'Email verified successfully' });
 }

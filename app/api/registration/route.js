@@ -1,48 +1,43 @@
 import { NextResponse } from 'next/server';
+import pool from '@/utils/db';
 import nodemailer from 'nodemailer';
-import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
-import path from 'path';
+import crypto from 'crypto';
 
-export async function POST(req) {
-  const { email, password } = await req.json();
-
-  // Perform server-side validation
-  if (!email || !password) {
-    return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
-  }
-
-  // Check if email is already registered (pseudo-code)
-  // const user = await findUserByEmail(email);
-  // if (user) {
-  //   return NextResponse.json({ error: 'Email is already registered' }, { status: 400 });
-  // }
-
-  // Save user to database with unverified status and generate verification token
-  const verificationToken = uuidv4();
-  const user = { email, password, verificationToken, verified: false };
-  // saveUserToDatabase(user); // Pseudo-code for saving user
-
-  // Send verification email
-  const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Email Verification',
-    text: `Please verify your email by clicking the following link: ${process.env.NEXT_PUBLIC_BASE_URL}/verify?token=${verificationToken}`
-  };
+export async function POST(request) {
+  const { email, password } = await request.json();
+  const token = crypto.randomBytes(32).toString('hex');
+  const role = 'member'; // default role
 
   try {
+    const client = await pool.connect();
+
+    await client.query(
+      'INSERT INTO users (email, password, verification_token, verified, role) VALUES ($1, $2, $3, $4, $5)',
+      [email, password, token, false, role]
+    );
+
+    await client.release();
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Email Verification',
+      text: `Please verify your email by clicking the following link: ${process.env.BASE_URL}/api/verify?token=${token}`,
+    };
+
     await transporter.sendMail(mailOptions);
-    return NextResponse.json({ message: 'Verification email sent' });
+
+    return NextResponse.json({ message: 'Registration successful. Please check your email to verify your account.' });
   } catch (error) {
-    return NextResponse.json({ error: 'Error sending verification email' }, { status: 500 });
+    console.error('Error registering user:', error);
+    return NextResponse.json({ error: 'Error registering user' }, { status: 500 });
   }
 }

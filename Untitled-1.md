@@ -48,5 +48,7 @@
     └── 📁public
     └── tailwind.config.js
     └── 📁utils
-        └── parsePdf.js
+        └── db.js
+    └── test_db.js
+    └── testConnection.js
 ```
