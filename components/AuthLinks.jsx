@@ -1,29 +1,69 @@
-"use client"
-import { useState, useEffect } from 'react';
-import SignInPopup from './SignInPopup';
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const AuthLinks = () => {
-  const [isSignInVisible, setIsSignInVisible] = useState(false);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     setIsAuthenticated(!!token);
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setIsAuthenticated(false);
   };
 
   return (
-    <div>
+    <div className="relative">
       {isAuthenticated ? (
-        <button onClick={handleSignOut}>Sign Out</button>
+        <button onClick={handleSignOut} className="bg-pink-500 text-white py-2 px-6 rounded-full">
+          Sign Out
+        </button>
       ) : (
-        <div>
-          <button onClick={() => setIsSignInVisible(true)}>Sign In</button>
-          <SignInPopup isVisible={isSignInVisible} onClose={() => setIsSignInVisible(false)} />
+        <div className="relative">
+          <button
+            onClick={() => setIsDropdownVisible(!isDropdownVisible)}
+            className="bg-pink-500 hover:bg-pink-700 duration-500 text-white py-2 px-6 rounded-full"
+          >
+            Sign In
+          </button>
+          {isDropdownVisible && (
+            <div className="absolute right-0 mt-2 w-64 bg-white border rounded-md shadow-lg">
+              <form className="p-4">
+                <div>
+                  <label>Email:</label>
+                  <input
+                    type="email"
+                    className="w-full border p-2 rounded"
+                    required
+                  />
+                </div>
+                <div className="mt-2">
+                  <label>Password:</label>
+                  <input
+                    type="password"
+                    className="w-full border p-2 rounded"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full mt-4 bg-blue-500 text-white p-2 rounded"
+                >
+                  Sign In
+                </button>
+              </form>
+              <Link
+                className="block p-2 text-center text-blue-500"
+                href="/register"
+              >
+                Not yet a member? Register here
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>
