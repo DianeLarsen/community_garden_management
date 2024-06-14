@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import AuthLinks from '@/components/AuthLinks';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,9 +15,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <header className="bg-blue-600 text-white p-4 flex justify-between">
+        <AuthLinks />
           <h1 className="text-2xl">Community Garden Management System</h1>
           <nav>
-            <Link href="/" className="text-white px-4">
+            {/* <Link href="/" className="text-white px-4">
               Home
             </Link>
             <Link className="text-white px-4" href="/register">
@@ -39,7 +41,7 @@ export default function RootLayout({ children }) {
             </Link>
             <Link href="/groups" className="text-white px-4">
               Groups
-            </Link>
+            </Link> */}
           </nav>
         </header>
         
