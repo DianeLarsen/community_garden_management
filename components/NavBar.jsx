@@ -47,17 +47,17 @@ const NavBar = () => {
               </Link>
             </li>
             <li>
-              <Link href="/plot-reservation" className="px-4">
+              <Link href="/plots" className="px-4">
                 Plots
               </Link>
             </li>
             <li>
-              <Link href="/event-calendar" className="px-4">
+              <Link href="/events" className="px-4">
                 Events
               </Link>
             </li>
             <li>
-              <Link href="/weather-updates" className="px-4">
+              <Link href="/weather" className="px-4">
                 Weather
               </Link>
             </li>
