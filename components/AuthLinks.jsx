@@ -17,21 +17,22 @@ const AuthLinks = () => {
   };
 
   return (
-    <div className="relative flex items-center gap-6">
+    <div className="relative flex flex-nowrap items-center gap-6">
       {isAuthenticated ? (
         <button onClick={handleSignOut} className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 duration-500 text-white py-2 px-6 rounded-full">
           Sign Out
         </button>
       ) : (
-        <div className="flex items-center gap-6">
+        <div className="relative flex flex-nowrap items-center gap-6">
           <button
             onClick={() => setIsDropdownVisible(!isDropdownVisible)}
-            className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 duration-500 text-white py-2 px-6 rounded-full"
+            type="button"
+            className="bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 duration-1000 text-white py-2 px-6 rounded-full whitespace-nowrap"
           >
             Sign In
           </button>
           {isDropdownVisible && (
-            <div className="absolute right-0 mt-2 w-64 bg-white border rounded-md shadow-lg">
+            <div className="absolute right-0 top-12 mt-2 w-64 bg-white border rounded-md shadow-lg">
               <form className="p-4">
                 <div>
                   <label>Email:</label>

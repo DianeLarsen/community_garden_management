@@ -26,10 +26,10 @@ const NavBar = () => {
         </Link>
       </div>
       <div
-        className={`nav-links md:static absolute bg-gray-800 duration-500  md:min-h-fit min-h-[60vh] md:right-0 ${
+        className={`nav-links md:static absolute bg-gray-800 duration-500  md:min-h-fit min-h-[40vh] md:right-0 ${
           menuToggle == "menu"
             ? "top-[-100%] right-0"
-            : "top-[9%] right-0 w-half"
+            : "top-[7%] right-0 w-half"
         } md:w-auto w-6/12 flex items-center px-6`}
       >
         <ul
@@ -68,13 +68,14 @@ const NavBar = () => {
         </ul>
       </div>
 
-      <div className="flex items-center gap-6">
-        <AuthLinks />
-        <IoMdMenu
+      <div className="flex flex-nowrap items-center gap-6">
+      <IoMdMenu
           className="text-3xl cursor-pointer md:hidden"
           name={menuToggle}
           onClick={() => setMenuToggle(menuToggle == "menu" ? "close" : "menu")}
         />
+        <AuthLinks />
+
       </div>
     </nav>
   );
