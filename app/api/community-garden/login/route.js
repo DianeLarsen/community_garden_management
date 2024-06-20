@@ -6,7 +6,7 @@ import pool from '../../../../utils/db';
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
-    
+    console.log("made it to sign in api")
     // Validate input
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });

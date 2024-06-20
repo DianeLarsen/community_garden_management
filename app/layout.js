@@ -4,6 +4,7 @@ import "./globals.css";
 
 import NavBar from "@/components/NavBar";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -19,7 +20,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
       <link rel="icon" href="/public/favicon.ico" sizes="any" />
-        <header className="bg-gray-800 text-white py-2">
+        <header className="bg-gray-800 text-white ">
          <NavBar />
         </header>
 

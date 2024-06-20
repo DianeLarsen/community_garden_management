@@ -1,12 +1,13 @@
 import React from "react";
-import Groups from "@/components/Groups";
 
-const Groups = () => {
+import GroupList from "@/components/GroupList";
+
+const GroupsPage = () => {
   return (
     <div>
-      <Groups />
+      <GroupList />
     </div>
   );
 };
 
-export default Groups;
+export default GroupsPage;

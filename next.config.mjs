@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-    reactStrictMode: true, 
-    images : { 
-      domains : ['media.gettyimages.com'] 
-    } 
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "media.gettyimages.com",
+        port: "",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

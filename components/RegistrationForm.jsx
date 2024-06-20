@@ -1,5 +1,6 @@
-"use client"
+"use client";
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -7,6 +8,8 @@ const RegistrationForm = () => {
     password: '',
     confirmPassword: '',
   });
+  const [data, setData] = useState();
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,16 +21,25 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setData({ error: 'Passwords do not match' });
+      return;
+    }
+
     const response = await fetch('/api/registration', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ email: formData.email, password: formData.password }),
     });
 
-    const data = await response.json();
-    console.log(data);
+    const results = await response.json();
+    if (response.ok) {
+      router.push('/profile_setup');
+    } else {
+      setData(results);
+    }
   };
 
   return (
@@ -72,6 +84,7 @@ const RegistrationForm = () => {
             Register
           </button>
         </form>
+        {data && <p className="mt-4 text-red-600">{data.error || data.message}</p>}
       </div>
     </div>
   );
