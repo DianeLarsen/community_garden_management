@@ -15,18 +15,18 @@ const NavBar = () => {
 
   return (
     <>
-      <nav className="flex bg-gray-800 text-white py-2 items-center justify-between w-[92%] mx-auto">
+      <nav className="flex bg-gray-800 text-white py-2 items-center justify-between w-[92%] mx-auto text-lg md:text-lg lg:text-xl  min-[1406px]:text-xl max-[1536px]:text-2xl min-[1536px]:text-2xl">
         <div className="container mx-auto flex justify-between items-center">
           <Link
             href="/"
-            className="hidden md:hidden lg:flex text-white lg:text-2xl font-bold"
+            className="hidden md:hidden lg:hidden xl:flex text-white  font-bold"
           >
             Community Garden Management
           </Link>
           <Link
             href="/"
             title="Community Garden Management"
-            className="lg:hidden text-white text-2xl font-bold"
+            className="xl:hidden text-white text-2xl font-bold"
           >
             CGM
           </Link>
