@@ -62,7 +62,7 @@ const NavBar = () => {
               </Link>
             </li>
             <li>
-              <Link href="/community-gardens" className="px-4">
+              <Link href="/gardens" className="px-4">
                 Gardens
               </Link>
             </li>

@@ -25,6 +25,9 @@ sudo /etc/init.d/postgresql stop
 sudo /etc/init.d/postgresql restart
 
 psql -U cgmadmin -d community_garden_management
+
+GRANT ALL PRIVILEGES ON DATABASE community_garden_management TO cgmadmin;
+
   
 To untrack a single file that has already been added/initialized to your repository, i.e., stop tracking the file but not delete it from your system use: git rm --cached filename
 
