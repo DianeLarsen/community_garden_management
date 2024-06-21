@@ -25,15 +25,22 @@ sudo /etc/init.d/postgresql stop
 sudo /etc/init.d/postgresql restart
 
 psql -U cgmadmin -d community_garden_management
-
-https://support.microsoft.com/en-us/account-billing/how-to-get-and-use-app-passwords-5896ed9b-4263-e681-128a-a6f2979a7944#:~:text=In%20the%20Outlook%20desktop%20app,Get%20a%20new%20app%20password.
-
-https://www.youtube.com/watch?v=D16DWU85Gvc
-
-Photo by <a href="https://unsplash.com/@sradams57?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Steve Adams</a> on <a href="https://unsplash.com/photos/yellow-flowers-on-the-garden-bY_q4VodUc0?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
   
+To untrack a single file that has already been added/initialized to your repository, i.e., stop tracking the file but not delete it from your system use: git rm --cached filename
 
-  Photo by <a href="https://unsplash.com/@timumphreys?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Tim Umphreys</a> on <a href="https://unsplash.com/photos/woman-in-pink-hoodie-sitting-on-brown-wooden-bench-during-daytime-f6Rg82iR0nA?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
-  
-  Photo by <a href="https://unsplash.com/@yngprmtv?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Filip Urban</a> on <a href="https://unsplash.com/photos/boy-in-black-and-white-long-sleeve-shirt-standing-beside-gray-metal-watering-can-during-daytime-ffJ8Qa0VQU0?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
-  
+To untrack every file that is now in your .gitignore:
+
+First commit any outstanding code changes, and then, run this command:
+
+git rm -r --cached .
+This removes any changed files from the index(staging area), then just run:
+
+git add .
+Commit it:
+
+git commit -m ".gitignore is now working"
+To undo git rm --cached filename, use git add filename.
+
+Make sure to commit all your important changes before running git add . Otherwise, you will lose any changes to other files.
+
+Please be careful, when you push this to a repository and pull from somewhere else into a state where those files are still tracked, the files will be DELETED
