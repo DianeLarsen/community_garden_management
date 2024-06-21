@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const AuthLinks = ({ showBanner }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,10 +18,10 @@ const AuthLinks = ({ showBanner }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/community-garden/login', {
-        method: 'POST',
+      const response = await fetch("/api/community-garden/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -28,37 +29,43 @@ const AuthLinks = ({ showBanner }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        throw new Error(data.error || "Something went wrong");
       }
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem("token", data.token);
       setIsAuthenticated(true);
-      showBanner('Login successful!', 'success');
+      showBanner("Login successful!", "success");
       setIsDropdownVisible(false);
     } catch (error) {
-      showBanner(error.message, 'error');
+      showBanner(error.message, "error");
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
-    showBanner('Logout successful!', 'success');
+    showBanner("Logout successful!", "success");
   };
 
   return (
     <div className="relative flex flex-nowrap items-center gap-6">
       {isAuthenticated ? (
         <div className="relative">
-          <img
+          <Image
             src="https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="
             alt="Profile"
-            className="w-10 h-10 rounded-full cursor-pointer"
+            className="cursor-pointer"
+            width={40}
+            height={40}
+            style={{ height: 'calc(100% - 0.5rem)', margin: '0.25rem 0' }}
             onClick={() => setIsDropdownVisible(!isDropdownVisible)}
           />
           {isDropdownVisible && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-              <Link href="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+              <Link
+                href="/profile"
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+              >
                 Profile
               </Link>
               <button
