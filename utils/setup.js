@@ -10,7 +10,7 @@ async function setupDatabase() {
     console.log('PostGIS extension created or already exists.');
 
     // Drop tables if they exist for fresh setup
-    await client.query('DROP TABLE IF EXISTS event_registrations, events, garden_plots, group_memberships, groups, users CASCADE');
+    await client.query('DROP TABLE IF EXISTS event_registrations, events, garden_plots, group_memberships, groups, users, gardens CASCADE');
 
     // Create users table
     await client.query(`
@@ -52,11 +52,11 @@ async function setupDatabase() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS garden_plots (
         id SERIAL PRIMARY KEY,
-        location GEOGRAPHY(POINT, 4326) NOT NULL,
+        location VARCHAR(255) NOT NULL,
         size VARCHAR(50),
         status VARCHAR(50) DEFAULT 'available',
         user_id INTEGER REFERENCES users(id),
-        group_id INTEGER REFERENCES groups(id), -- Added group_id column
+        group_id INTEGER REFERENCES groups(id),
         reserved_at TIMESTAMP,
         occupied_at TIMESTAMP
       )
@@ -86,6 +86,18 @@ async function setupDatabase() {
       )
     `);
     console.log('Event registrations table created.');
+
+    // Create gardens table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gardens (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        location GEOGRAPHY(POINT, 4326),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('Gardens table created.');
 
     // Insert sample data
     const hashedPassword1 = await bcrypt.hash('password1', 10);
@@ -132,11 +144,19 @@ async function setupDatabase() {
 
     await client.query(`
       INSERT INTO garden_plots (location, size, status, user_id, group_id) VALUES 
-      (ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326), '10x10', 'occupied', 1, 1),
-      (ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326), '20x20', 'available', NULL, NULL),
-      (ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326), '15x15', 'reserved', 2, 2)
+      ('Plot A', '10x10', 'occupied', 1, 1),
+      ('Plot B', '20x20', 'available', NULL, NULL),
+      ('Plot C', '15x15', 'reserved', 2, 2)
     `);
     console.log('Sample garden plots inserted.');
+
+    // Insert sample gardens
+    await client.query(`
+      INSERT INTO gardens (name, description, location) VALUES 
+      ('Community Garden A', 'A beautiful community garden', ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326)),
+      ('Community Garden B', 'Another wonderful community garden', ST_SetSRID(ST_MakePoint(-122.335, 47.610), 4326))
+    `);
+    console.log('Sample gardens inserted.');
   } catch (error) {
     console.error('Error setting up the database:', error);
     throw error;
