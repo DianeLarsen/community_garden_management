@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { jwtDecode } from "jwt-decode";
 
 const AuthLinks = ({ showBanner }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -11,7 +12,17 @@ const AuthLinks = ({ showBanner }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsAuthenticated(!!token);
+    if (token) {
+      const { exp } = jwtDecode(token);
+      if (exp * 1000 < Date.now()) {
+        // Token has expired
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        showBanner("Session expired. Please log in again.", "error");
+      } else {
+        setIsAuthenticated(true);
+      }
+    }
   }, []);
 
   const handleLogin = async (e) => {
