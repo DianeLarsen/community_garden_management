@@ -51,15 +51,16 @@ const AuthLinks = ({ showBanner }) => {
     <div className="relative flex flex-nowrap items-center gap-6">
       {isAuthenticated ? (
         <div className="relative">
+          <div className="flex items-center cursor-pointer">
           <Image
             src="https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="
             alt="Profile"
-            className="cursor-pointer"
-            width={40}
-            height={40}
-            style={{ height: 'calc(100% - 0.5rem)', margin: '0.25rem 0' }}
+            className="rounded-full cursor-pointer object-cover border-double border-4 border-blue-600"
+            width={120}
+            height={120}
             onClick={() => setIsDropdownVisible(!isDropdownVisible)}
           />
+          </div>
           {isDropdownVisible && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
               <Link
