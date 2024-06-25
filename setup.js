@@ -57,14 +57,12 @@ async function setupDatabase() {
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         location VARCHAR(255) NOT NULL,
+        geolocation GEOGRAPHY(Point, 4326),
         address VARCHAR(255),
         type VARCHAR(50),
         description TEXT,
         rentalBeds BOOLEAN DEFAULT FALSE,
-        availableOnSite BOOLEAN DEFAULT FALSE,
-        lat DOUBLE PRECISION,
-        lon DOUBLE PRECISION,
-        geom GEOGRAPHY(POINT, 4326)
+        availableOnSite BOOLEAN DEFAULT FALSE
       )
     `);
     console.log('Gardens table created.');
@@ -126,21 +124,22 @@ async function setupDatabase() {
     const gardensData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/snocomgar.json')));
 
     for (const garden of gardensData.communityGardens) {
-      const address = garden.address;
-      const { lat, lon } = await getLatLonFromAddress(address);
+      const location = garden.geolocation && Object.keys(garden.geolocation).length > 0 
+        ? `POINT(${garden.geolocation.lng} ${garden.geolocation.lat})`
+        : null;
 
       await client.query(`
-        INSERT INTO gardens (name, location, address, type, description, rentalBeds, availableOnSite, geom) VALUES 
-        ($1, $2, $3, $4, $5, $6, $7, ST_SetSRID(ST_MakePoint($8, $9), 4326)::geography)
+        INSERT INTO gardens (name, location, geolocation, address, type, description, rentalBeds, availableOnSite) VALUES 
+        ($1, $2, ST_GeomFromText($3, 4326), $4, $5, $6, $7, $8)
       `, [
-        garden.name, 
-        garden.location, 
-        garden.address, 
-        garden.type, 
-        garden.description, 
-        garden.rentalBeds ? true : false, 
-        true, // Assuming all gardens are available on the site for demonstration
-        lon, lat
+        garden.name ? garden.name : "unknown",
+        garden.location ? garden.location : "unknown",
+        garden.geolocation ? location : "unknown",
+        garden.address ? garden.address : "unknown",
+        garden.type ? garden.type : "unknown",
+        garden.description ? garden.description : "unknown",
+        garden.rentalBeds ? true : false,
+        true // Assuming all gardens are available on the site for demonstration
       ]);
     }
     console.log('Sample gardens inserted.');

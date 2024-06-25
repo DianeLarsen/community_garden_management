@@ -21,10 +21,10 @@ export async function GET(request) {
 
     const query = `
       SELECT gardens.name, garden_plots.size, garden_plots.status, 
-             ST_Distance(gardens.geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
+             ST_Distance(gardens.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
       FROM garden_plots
       JOIN gardens ON garden_plots.garden_id = gardens.id
-      WHERE ST_DWithin(gardens.geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3) -- Convert miles to meters
+      WHERE ST_DWithin(gardens.geolocation::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3) -- Convert miles to meters
       ORDER BY distance
       LIMIT $4
     `;
