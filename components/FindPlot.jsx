@@ -11,7 +11,7 @@ const FindPlot = () => {
 
   const fetchPlots = async () => {
     try {
-      const response = await fetch(`/api/plots?zipCode=${zipCode}&maxDistance=${maxDistance}&limit=${limit}`, {
+      const response = await fetch(`/api/gardens?zipCode=${zipCode}&maxDistance=${maxDistance}&limit=${limit}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -28,6 +28,7 @@ const FindPlot = () => {
         setPlots([]);
       } else {
         setMessage('');
+        console.log(data)
         setPlots(data);
       }
     } catch (error) {
@@ -91,20 +92,20 @@ const FindPlot = () => {
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr>
-            <th className="border px-4 py-2">Location</th>
+            <th className="border px-4 py-2">Name of Garden</th>
             <th className="border px-4 py-2">Size</th>
             <th className="border px-4 py-2">Status</th>
             <th className="border px-4 py-2">Distance (miles)</th>
           </tr>
         </thead>
         <tbody>
-          {plots.map((plot) => (
+          {plots.map((plot) => (plot.status == "available" && (
             <tr key={plot.id}>
-              <td className="border px-4 py-2">{plot.location}</td>
+              <td className="border px-4 py-2">{plot.name}</td>
               <td className="border px-4 py-2">{plot.size}</td>
               <td className="border px-4 py-2">{plot.status}</td>
               <td className="border px-4 py-2">{(plot.distance / 1609.34).toFixed(2)}</td> {/* Convert meters to miles */}
-            </tr>
+            </tr>)
           ))}
         </tbody>
       </table>

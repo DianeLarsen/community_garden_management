@@ -1,6 +1,6 @@
 // api/gardens/[id]/route.js
 import { NextResponse } from 'next/server';
-import pool from '@/utils/db';
+import pool from '@/db';
 
 export async function GET(request, { params }) {
   try {

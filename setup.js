@@ -1,7 +1,8 @@
 const fs = require('fs');
+const path = require('path');
 const pool = require('./db');
 const bcrypt = require('bcrypt');
-const path = require('path');
+const getLatLonFromZipCode = require('./utils/getLatLonFromZipCode');
 
 async function setupDatabase() {
   const client = await pool.connect();
@@ -55,12 +56,15 @@ async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS gardens (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        location GEOGRAPHY(Point, 4326), -- Use geography type for location
+        location VARCHAR(255) NOT NULL,
         address VARCHAR(255),
         type VARCHAR(50),
         description TEXT,
         rentalBeds BOOLEAN DEFAULT FALSE,
-        availableOnSite BOOLEAN DEFAULT FALSE
+        availableOnSite BOOLEAN DEFAULT FALSE,
+        lat DOUBLE PRECISION,
+        lon DOUBLE PRECISION,
+        geom GEOGRAPHY(POINT, 4326)
       )
     `);
     console.log('Gardens table created.');
@@ -122,21 +126,38 @@ async function setupDatabase() {
     const gardensData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/snocomgar.json')));
 
     for (const garden of gardensData.communityGardens) {
-      // Use dummy coordinates for the location, update this as needed
-      const dummyLat = 47.6062;
-      const dummyLon = -122.3321;
+      const address = garden.address;
+      const zipCodeMatch = address.match(/\b9\d{4}\b/);
+
+      
+      const zipCode = zipCodeMatch ? zipCodeMatch[0] : null;
+
+
+      let lat = null;
+      let lon = null;
+      if (zipCode) {
+        try {
+          const latLon = await getLatLonFromZipCode(zipCode);
+          lat = latLon.lat;
+          lon = latLon.lon;
+          console.log(lat, lon)
+        } catch (error) {
+          console.error(`Error fetching lat/lon for zip code ${zipCode}:`, error);
+        }
+      }
+
       await client.query(`
-        INSERT INTO gardens (name, location, address, type, description, rentalBeds, availableOnSite) VALUES 
-        ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4, $5, $6, $7, $8)
+        INSERT INTO gardens (name, location, address, type, description, rentalBeds, availableOnSite, geom) VALUES 
+        ($1, $2, $3, $4, $5, $6, $7, ST_SetSRID(ST_MakePoint($8, $9), 4326)::geography)
       `, [
-        garden.name ? garden.name : "unknown", 
-        dummyLon,
-        dummyLat,
-        garden.address ? garden.address : "unknown", 
-        garden.type ? garden.type : "unknown", 
-        garden.description ? garden.description : "unknown", 
-        garden.rentalBeds ? true : false, 
-        true // Assuming all gardens are available on the site for demonstration
+        garden.name ? garden.name : "unknown",
+        garden.location ? garden.location : "unknown",
+        garden.address ? garden.address : "unknown",
+        garden.type ? garden.type : "unknown",
+        garden.description ? garden.description : "unknown",
+        garden.rentalBeds ? true : false,
+        true, // Assuming all gardens are available on the site for demonstration
+        lon, lat
       ]);
     }
     console.log('Sample gardens inserted.');
@@ -170,12 +191,14 @@ async function setupDatabase() {
       (3, 1)
     `);
     console.log('Sample event registrations inserted.');
-    
-    // Insert sample garden plots
+
+    // Insert sample garden plots for gardens with rentalBeds as true
     const plotSizes = ['4x4', '4x6', '4x8', '4x10', '4x12'];
     const plotStatuses = ['available', 'reserved', 'occupied'];
 
-    for (let gardenId = 1; gardenId <= 5; gardenId++) {
+    const gardensWithRentalBeds = await client.query('SELECT id FROM gardens WHERE rentalBeds = true');
+    
+    for (const garden of gardensWithRentalBeds.rows) {
       for (let i = 1; i <= 20; i++) {
         const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
         const status = plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
@@ -183,7 +206,7 @@ async function setupDatabase() {
           INSERT INTO garden_plots (garden_id, location, size, status) VALUES 
           ($1, $2, $3, $4)
         `, [
-          gardenId,
+          garden.id,
           `Plot ${i}`,
           size,
           status
