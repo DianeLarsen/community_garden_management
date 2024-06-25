@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('./db');
 const bcrypt = require('bcrypt');
-const getLatLonFromZipCode = require('./utils/getLatLonFromZipCode');
+const getLatLonFromAddress  = require('./utils/getLatLonFromZipCode');
 
 async function setupDatabase() {
   const client = await pool.connect();
@@ -127,35 +127,18 @@ async function setupDatabase() {
 
     for (const garden of gardensData.communityGardens) {
       const address = garden.address;
-      const zipCodeMatch = address.match(/\b9\d{4}\b/);
-
-      
-      const zipCode = zipCodeMatch ? zipCodeMatch[0] : null;
-
-
-      let lat = null;
-      let lon = null;
-      if (zipCode) {
-        try {
-          const latLon = await getLatLonFromZipCode(zipCode);
-          lat = latLon.lat;
-          lon = latLon.lon;
-          console.log(lat, lon)
-        } catch (error) {
-          console.error(`Error fetching lat/lon for zip code ${zipCode}:`, error);
-        }
-      }
+      const { lat, lon } = await getLatLonFromAddress(address);
 
       await client.query(`
         INSERT INTO gardens (name, location, address, type, description, rentalBeds, availableOnSite, geom) VALUES 
         ($1, $2, $3, $4, $5, $6, $7, ST_SetSRID(ST_MakePoint($8, $9), 4326)::geography)
       `, [
-        garden.name ? garden.name : "unknown",
-        garden.location ? garden.location : "unknown",
-        garden.address ? garden.address : "unknown",
-        garden.type ? garden.type : "unknown",
-        garden.description ? garden.description : "unknown",
-        garden.rentalBeds ? true : false,
+        garden.name, 
+        garden.location, 
+        garden.address, 
+        garden.type, 
+        garden.description, 
+        garden.rentalBeds ? true : false, 
         true, // Assuming all gardens are available on the site for demonstration
         lon, lat
       ]);
