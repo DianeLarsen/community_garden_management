@@ -887,6 +887,81 @@
           "http://www.stanwood.wednet.edu/community-fliers/community-resources/5288-growing-forward-community-garden/file.html"
         ],
         "rentalBeds": false
+      },
+      {
+        "name": "Monroe Community Garden",
+        "location": "Monroe",
+        "address": "1001 Main Street, Monroe, WA 98272",
+        "type": "Community",
+        "description": "A vibrant community garden offering plots for local residents to grow their own vegetables and flowers.",
+        "contacts": [
+          {
+            "name": "Jane Doe",
+            "email": "jane.doe@monroegarden.org"
+          }
+        ],
+        "links": ["http://www.monroegarden.org"],
+        "rentalBeds": true
+      },
+      {
+        "name": "Evergreen Garden",
+        "location": "Monroe",
+        "address": "2020 Evergreen Avenue, Monroe, WA 98272",
+        "type": "Community",
+        "description": "This garden provides a serene environment for community members to cultivate organic produce and flowers.",
+        "contacts": [
+          {
+            "name": "John Smith",
+            "email": "john.smith@evergreengarden.org"
+          }
+        ],
+        "links": ["http://www.evergreengarden.org"],
+        "rentalBeds": true
+      },
+      {
+        "name": "Monroe Hillside Garden",
+        "location": "Monroe",
+        "address": "3030 Hillside Drive, Monroe, WA 98272",
+        "type": "Community",
+        "description": "A community garden located on a beautiful hillside, offering plots for local residents.",
+        "contacts": [
+          {
+            "name": "Alice Johnson",
+            "email": "alice.johnson@hillsidegarden.org"
+          }
+        ],
+        "links": ["http://www.hillsidegarden.org"],
+        "rentalBeds": true
+      },
+      {
+        "name": "Sunrise Garden",
+        "location": "Monroe",
+        "address": "4040 Sunrise Boulevard, Monroe, WA 98272",
+        "type": "Community",
+        "description": "A peaceful garden where community members can rent plots to grow their own food and flowers.",
+        "contacts": [
+          {
+            "name": "Bob Brown",
+            "email": "bob.brown@sunrisegarden.org"
+          }
+        ],
+        "links": ["http://www.sunrisegarden.org"],
+        "rentalBeds": true
+      },
+      {
+        "name": "Riverside Community Garden",
+        "location": "Monroe",
+        "address": "5050 Riverside Road, Monroe, WA 98272",
+        "type": "Community",
+        "description": "Located along the river, this garden offers plots for local residents to cultivate organic produce.",
+        "contacts": [
+          {
+            "name": "Sara White",
+            "email": "sara.white@riversidegarden.org"
+          }
+        ],
+        "links": ["http://www.riversidegarden.org"],
+        "rentalBeds": true
       }
   ]
 }

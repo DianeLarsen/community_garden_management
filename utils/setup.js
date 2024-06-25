@@ -1,5 +1,7 @@
+const fs = require('fs');
 const pool = require('./db');
 const bcrypt = require('bcrypt');
+const path = require('path');
 
 async function setupDatabase() {
   const client = await pool.connect();
@@ -10,7 +12,7 @@ async function setupDatabase() {
     console.log('PostGIS extension created or already exists.');
 
     // Drop tables if they exist for fresh setup
-    await client.query('DROP TABLE IF EXISTS event_registrations, events, garden_plots, group_memberships, groups, users CASCADE');
+    await client.query('DROP TABLE IF EXISTS event_registrations, events, garden_plots, group_memberships, groups, users, gardens CASCADE');
 
     // Create users table
     await client.query(`
@@ -48,15 +50,31 @@ async function setupDatabase() {
     `);
     console.log('Group memberships table created.');
 
+    // Create gardens table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gardens (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        location GEOGRAPHY(Point, 4326), -- Use geography type for location
+        address VARCHAR(255),
+        type VARCHAR(50),
+        description TEXT,
+        rentalBeds BOOLEAN DEFAULT FALSE,
+        availableOnSite BOOLEAN DEFAULT FALSE
+      )
+    `);
+    console.log('Gardens table created.');
+
     // Create garden plots table
     await client.query(`
       CREATE TABLE IF NOT EXISTS garden_plots (
         id SERIAL PRIMARY KEY,
-        location GEOGRAPHY(POINT, 4326) NOT NULL,
+        garden_id INTEGER REFERENCES gardens(id),
+        location VARCHAR(255) NOT NULL,
         size VARCHAR(50),
         status VARCHAR(50) DEFAULT 'available',
         user_id INTEGER REFERENCES users(id),
-        group_id INTEGER REFERENCES groups(id), -- Added group_id column
+        group_id INTEGER REFERENCES groups(id),
         reserved_at TIMESTAMP,
         occupied_at TIMESTAMP
       )
@@ -100,6 +118,29 @@ async function setupDatabase() {
     `);
     console.log('Sample users inserted.');
 
+    // Insert garden data from JSON file
+    const gardensData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/snocomgar.json')));
+
+    for (const garden of gardensData.communityGardens) {
+      // Use dummy coordinates for the location, update this as needed
+      const dummyLat = 47.6062;
+      const dummyLon = -122.3321;
+      await client.query(`
+        INSERT INTO gardens (name, location, address, type, description, rentalBeds, availableOnSite) VALUES 
+        ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4, $5, $6, $7, $8)
+      `, [
+        garden.name ? garden.name : "unknown", 
+        dummyLon,
+        dummyLat,
+        garden.address ? garden.address : "unknown", 
+        garden.type ? garden.type : "unknown", 
+        garden.description ? garden.description : "unknown", 
+        garden.rentalBeds ? true : false, 
+        true // Assuming all gardens are available on the site for demonstration
+      ]);
+    }
+    console.log('Sample gardens inserted.');
+
     await client.query(`
       INSERT INTO groups (name, description) VALUES 
       ('Garden Enthusiasts', 'A group for people who love gardening'),
@@ -129,13 +170,26 @@ async function setupDatabase() {
       (3, 1)
     `);
     console.log('Sample event registrations inserted.');
+    
+    // Insert sample garden plots
+    const plotSizes = ['4x4', '4x6', '4x8', '4x10', '4x12'];
+    const plotStatuses = ['available', 'reserved', 'occupied'];
 
-    await client.query(`
-      INSERT INTO garden_plots (location, size, status, user_id, group_id) VALUES 
-      (ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326), '10x10', 'occupied', 1, 1),
-      (ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326), '20x20', 'available', NULL, NULL),
-      (ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326), '15x15', 'reserved', 2, 2)
-    `);
+    for (let gardenId = 1; gardenId <= 5; gardenId++) {
+      for (let i = 1; i <= 20; i++) {
+        const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
+        const status = plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
+        await client.query(`
+          INSERT INTO garden_plots (garden_id, location, size, status) VALUES 
+          ($1, $2, $3, $4)
+        `, [
+          gardenId,
+          `Plot ${i}`,
+          size,
+          status
+        ]);
+      }
+    }
     console.log('Sample garden plots inserted.');
   } catch (error) {
     console.error('Error setting up the database:', error);
