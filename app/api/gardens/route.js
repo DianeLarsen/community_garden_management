@@ -3,28 +3,43 @@ import { NextResponse } from 'next/server';
 import pool from '@/db';
 import jwt from 'jsonwebtoken';
 import getLatLonFromZipCode from '@/utils/getLatLonFromZipCode';
+import getLatLonFromAddress from '@/utils/getLatLonFromAddress';
 
 export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const zipCode = searchParams.get('zipCode');
-  const maxDistance = searchParams.get('maxDistance') || 5; // Default to 5 miles
-  const limit = searchParams.get('limit') || 10; // Default to 10
-  const distanceInMeters = maxDistance * 1609.34;
-
-  if (!zipCode) {
-    return NextResponse.json({ error: 'Zip code is required' }, { status: 400 });
-  }
-
   try {
-    const { lat, lon } = await getLatLonFromZipCode(zipCode);
-    console.log(lat, lon)
+    console.error("made it here");
+    const { searchParams } = new URL(request.url);
+    const searchTerm = searchParams.get('searchTerm');
+    const maxDistance = searchParams.get('maxDistance') || 5; // Default to 5 miles
+    const limit = searchParams.get('limit') || 10; // Default to 10
+    const distanceInMeters = maxDistance * 1609.34;
+    console.error("Search Term:", searchTerm);
+
+    if (!searchTerm) {
+      return NextResponse.json({ error: 'Search term is required' }, { status: 400 });
+    }
+
+    let lat, lon;
+
+    // Check if the searchTerm is a zip code, address, or city
+    if (/\b9\d{4}\b/.test(searchTerm)) {
+      console.error("zipcode", searchTerm);
+      // It's a zip code
+      ({ lat, lon } = await getLatLonFromZipCode(searchTerm));
+    } else {
+      console.error("not zip code", searchTerm);
+      // Assume it's an address or city
+      ({ lat, lon } = await getLatLonFromAddress(searchTerm));
+    }
 
     const query = `
-      SELECT gardens.name, garden_plots.size, garden_plots.status, 
+      SELECT gardens.id, gardens.name, COUNT(garden_plots.id) AS available_plots,
              ST_Distance(gardens.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
-      FROM garden_plots
-      JOIN gardens ON garden_plots.garden_id = gardens.id
-      WHERE ST_DWithin(gardens.geolocation::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3) -- Convert miles to meters
+      FROM gardens
+      JOIN garden_plots ON garden_plots.garden_id = gardens.id
+      WHERE garden_plots.status = 'available'
+      AND ST_DWithin(gardens.geolocation::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3)
+      GROUP BY gardens.id
       ORDER BY distance
       LIMIT $4
     `;
@@ -35,12 +50,12 @@ export async function GET(request) {
     client.release();
 
     if (result.rows.length === 0) {
-      return NextResponse.json({ message: 'No plots found within the specified distance' });
+      return NextResponse.json({ message: 'No gardens found within the specified distance' });
     }
 
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error('Error searching plots:', error);
-    return NextResponse.json({ error: 'Error searching plots' }, { status: 500 });
+    console.error('Error searching gardens:', error);
+    return NextResponse.json({ error: 'Error searching gardens' }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const pool = require('./db');
 const bcrypt = require('bcrypt');
-const getLatLonFromAddress  = require('./utils/getLatLonFromZipCode');
+const getLatLonFromAddress  = require('./utils/getLatLonFromAddress');
 
 async function setupDatabase() {
   const client = await pool.connect();
