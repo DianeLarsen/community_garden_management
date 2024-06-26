@@ -42,10 +42,10 @@ console.log(garden)
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{garden.name}</h1>
-      <p>{garden.description}</p>
+      <h1 className="text-2xl font-bold mb-4">{garden[0].name}</h1>
+      <p>{garden[0].description}</p>
       <h2 className="text-xl font-bold mt-4 mb-2">Map and Directions</h2>
-      {garden.lat && garden.lon  ? <GardenMap lat={garden.lat} lon={garden.lon} /> : <NotFound />}
+     {garden && <GardenMap garden={garden} />}
     </div>
   );
 };
