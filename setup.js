@@ -20,6 +20,13 @@ async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
+        username VARCHAR(255) UNIQUE,
+        street_address VARCHAR(255),
+        city VARCHAR(255),
+        state VARCHAR(255),
+        zip VARCHAR(10) NOT NULL,
+        phone VARCHAR(15),
+        profile_photo VARCHAR(255),
         password VARCHAR(255) NOT NULL,
         verification_token VARCHAR(64),
         verified BOOLEAN DEFAULT FALSE,
@@ -113,11 +120,13 @@ async function setupDatabase() {
     const hashedPassword3 = await bcrypt.hash('password3', 10);
 
     await client.query(`
-      INSERT INTO users (email, password, verified, role) VALUES 
-      ('user1@example.com', '${hashedPassword1}', true, 'member'),
-      ('user2@example.com', '${hashedPassword2}', true, 'member'),
-      ('admin@example.com', '${hashedPassword3}', true, 'admin')
+      INSERT INTO users (email, username, street_address, city, state, zip, phone, password, verified, role) VALUES 
+      ('user1@example.com', 'user1', '123 Main St', 'Everett', 'WA', '98201', '555-1234', '${hashedPassword1}', true, 'member'),
+      ('user2@example.com', 'user2', '456 Oak St', 'Lynnwood', 'WA', '98036', '555-5678', '${hashedPassword2}', true, 'member'),
+      ('admin@example.com', 'admin', '789 Pine St', 'Snohomish', 'WA', '98290', '555-9012', '${hashedPassword3}', true, 'admin')
     `);
+    
+    
     console.log('Sample users inserted.');
 
     // Insert garden data from JSON file

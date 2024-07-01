@@ -6,7 +6,7 @@ const PlotsList = () => {
   const [plots, setPlots] = useState([]);
   const [error, setError] = useState('');
   const router = useRouter();
-
+console.log(plots)
   useEffect(() => {
     const fetchPlots = async () => {
       const token = localStorage.getItem('token');
@@ -47,7 +47,7 @@ const PlotsList = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Your Plots</h1>
-      {plots.length === 0 ? (
+      {plots.message == 'No plots found for the given criteria' ? (
         <div className="text-center text-gray-600">
           <p>You currently have no plots.</p>
           <p>Search for available plots below.</p>

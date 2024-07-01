@@ -36,7 +36,7 @@ const RegistrationForm = () => {
 
     const results = await response.json();
     if (response.ok) {
-      router.push('/profile_setup');
+      router.push('/profile');
     } else {
       setData(results);
     }
