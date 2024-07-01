@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/utils/db';
+import pool from '@/db';
 
 export async function GET(request) {
   const userId = request.headers.get('x-user-id'); // Assume user ID is sent in request headers

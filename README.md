@@ -47,3 +47,6 @@ To undo git rm --cached filename, use git add filename.
 Make sure to commit all your important changes before running git add . Otherwise, you will lose any changes to other files.
 
 Please be careful, when you push this to a repository and pull from somewhere else into a state where those files are still tracked, the files will be DELETED
+
+How to creat a jwt secret:
+openssl rand -base64 64

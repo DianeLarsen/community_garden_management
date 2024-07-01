@@ -1,5 +1,8 @@
+const fs = require('fs');
+const path = require('path');
 const pool = require('./db');
 const bcrypt = require('bcrypt');
+const getLatLonFromAddress  = require('./utils/getLatLonFromAddress');
 
 async function setupDatabase() {
   const client = await pool.connect();
@@ -48,10 +51,27 @@ async function setupDatabase() {
     `);
     console.log('Group memberships table created.');
 
+    // Create gardens table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS gardens (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        location VARCHAR(255) NOT NULL,
+        geolocation GEOGRAPHY(Point, 4326),
+        address VARCHAR(255),
+        type VARCHAR(50),
+        description TEXT,
+        rentalBeds BOOLEAN DEFAULT FALSE,
+        availableOnSite BOOLEAN DEFAULT FALSE
+      )
+    `);
+    console.log('Gardens table created.');
+
     // Create garden plots table
     await client.query(`
       CREATE TABLE IF NOT EXISTS garden_plots (
         id SERIAL PRIMARY KEY,
+        garden_id INTEGER REFERENCES gardens(id),
         location VARCHAR(255) NOT NULL,
         size VARCHAR(50),
         status VARCHAR(50) DEFAULT 'available',
@@ -87,18 +107,6 @@ async function setupDatabase() {
     `);
     console.log('Event registrations table created.');
 
-    // Create gardens table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS gardens (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        location GEOGRAPHY(POINT, 4326),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log('Gardens table created.');
-
     // Insert sample data
     const hashedPassword1 = await bcrypt.hash('password1', 10);
     const hashedPassword2 = await bcrypt.hash('password2', 10);
@@ -111,6 +119,30 @@ async function setupDatabase() {
       ('admin@example.com', '${hashedPassword3}', true, 'admin')
     `);
     console.log('Sample users inserted.');
+
+    // Insert garden data from JSON file
+    const gardensData = JSON.parse(fs.readFileSync(path.join(__dirname, 'data/snocomgar.json')));
+
+    for (const garden of gardensData.communityGardens) {
+      const location = garden.geolocation && Object.keys(garden.geolocation).length > 0 
+        ? `POINT(${garden.geolocation.lng} ${garden.geolocation.lat})`
+        : null;
+
+      await client.query(`
+        INSERT INTO gardens (name, location, geolocation, address, type, description, rentalBeds, availableOnSite) VALUES 
+        ($1, $2, ST_GeomFromText($3, 4326), $4, $5, $6, $7, $8)
+      `, [
+        garden.name ? garden.name : "unknown",
+        garden.location ? garden.location : "unknown",
+        garden.geolocation ? location : "unknown",
+        garden.address ? garden.address : "unknown",
+        garden.type ? garden.type : "unknown",
+        garden.description ? garden.description : "unknown",
+        garden.rentalBeds ? true : false,
+        true // Assuming all gardens are available on the site for demonstration
+      ]);
+    }
+    console.log('Sample gardens inserted.');
 
     await client.query(`
       INSERT INTO groups (name, description) VALUES 
@@ -142,21 +174,28 @@ async function setupDatabase() {
     `);
     console.log('Sample event registrations inserted.');
 
-    await client.query(`
-      INSERT INTO garden_plots (location, size, status, user_id, group_id) VALUES 
-      ('Plot A', '10x10', 'occupied', 1, 1),
-      ('Plot B', '20x20', 'available', NULL, NULL),
-      ('Plot C', '15x15', 'reserved', 2, 2)
-    `);
-    console.log('Sample garden plots inserted.');
+    // Insert sample garden plots for gardens with rentalBeds as true
+    const plotSizes = ['4x4', '4x6', '4x8', '4x10', '4x12'];
+    const plotStatuses = ['available', 'reserved', 'occupied'];
 
-    // Insert sample gardens
-    await client.query(`
-      INSERT INTO gardens (name, description, location) VALUES 
-      ('Community Garden A', 'A beautiful community garden', ST_SetSRID(ST_MakePoint(-122.3321, 47.6062), 4326)),
-      ('Community Garden B', 'Another wonderful community garden', ST_SetSRID(ST_MakePoint(-122.335, 47.610), 4326))
-    `);
-    console.log('Sample gardens inserted.');
+    const gardensWithRentalBeds = await client.query('SELECT id FROM gardens WHERE rentalBeds = true');
+    
+    for (const garden of gardensWithRentalBeds.rows) {
+      for (let i = 1; i <= 20; i++) {
+        const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
+        const status = plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
+        await client.query(`
+          INSERT INTO garden_plots (garden_id, location, size, status) VALUES 
+          ($1, $2, $3, $4)
+        `, [
+          garden.id,
+          `Plot ${i}`,
+          size,
+          status
+        ]);
+      }
+    }
+    console.log('Sample garden plots inserted.');
   } catch (error) {
     console.error('Error setting up the database:', error);
     throw error;

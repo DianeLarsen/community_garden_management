@@ -3,7 +3,7 @@
     {
       "name": "Arlington Community Garden",
       "location": "Arlington",
-      "address": "505 E. Third Street, Arlington, WA",
+      "address": "505 E. Third Street, Arlington, WA 98223",
       "type": "Community",
       "description": "This garden consists of 31 raised beds available to the public. Created in 2001 and moved to its current location in 2020. Sponsored by the City of Arlington, the Arlington Garden Club, and Waste Management NW. Currently all interested residents who reside in city limits will be put on a waitlist. Beds range from $10 for a 2x8, $12 for 4x4, $15 for 4x8, and $20 for a 4x20.",
       "contacts": [
@@ -12,8 +12,14 @@
           "email": "thirdstreetgardenarlington@gmail.com"
         }
       ],
-      "links": ["http://www.arlingtongardenclub.org"],
-      "rentalBeds": true
+      "links": [
+        "http://www.arlingtongardenclub.org"
+      ],
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 48.1954709,
+        "lng": -122.1202832
+      }
     },
     {
       "name": "The Stillaguamish Senior Center Apartments Community Garden",
@@ -31,7 +37,11 @@
         "http://snohomishcd.org/newsletters/Web%20Nexus_winter%202010.pdf",
         "http://stillycenter.com/housing.shtml"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.1629821,
+        "lng": -122.1836855
+      }
     },
     {
       "name": "Arlington Apple ECEAP Preschool (Eagle Creek Elementary site)",
@@ -41,7 +51,11 @@
       "description": "A cooperative learning family school garden project that was organized with Master Gardeners, Growing Groceries Mentors and community volunteers via a mentoring process to increase family's access to fresh, locally grown produce for home use. Monthly garden and nutrition sessions with cooking demonstration using produce grown on site. Families participate in a 9 month growing season, annually. Participants use gained knowledge to replicate gardening and nutrition practices in the home setting.",
       "contacts": [],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.197824,
+        "lng": -122.1134231
+      }
     },
     {
       "name": "Rooster's Rendezvous Community Garden",
@@ -57,7 +71,11 @@
       "links": [
         "http://www.countryvillagebothell.com/roosters-rendezvous-community-garden"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.780245,
+        "lng": -122.223309
+      }
     },
     {
       "name": "Songaia Co-housing Community Garden",
@@ -71,8 +89,14 @@
           "email": "patricia@songaia.com"
         }
       ],
-      "links": ["www.songaia.com"],
-      "rentalBeds": false
+      "links": [
+        "www.songaia.com"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.798473,
+        "lng": -122.1798906
+      }
     },
     {
       "name": "Edmonds Church of the Beloved - The Rosewood Community Garden",
@@ -90,7 +114,11 @@
       "links": [
         "https://belovedschurch.org/2010/02/23/the-rosewood-community-garden/"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.799245,
+        "lng": -122.3426628
+      }
     },
     {
       "name": "Edmonds College - Sustainable Urban Agriculture Education Garden",
@@ -108,7 +136,11 @@
         "http://farmerfrog.org/satellites/edcc/",
         "http://edcc.edu/campuscommunityfarm/"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8285472,
+        "lng": -122.3251049
+      }
     },
     {
       "name": "Edmonds Lutheran Church Pea Patch",
@@ -123,7 +155,11 @@
         }
       ],
       "links": [],
-      "rentalBeds": true
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.7854211,
+        "lng": -122.3446975
+      }
     },
     {
       "name": "Edmonds United Methodist Church",
@@ -138,8 +174,14 @@
           "email": "office@edmondsumc.org"
         }
       ],
-      "links": ["www.edmondsumc.org"],
-      "rentalBeds": false
+      "links": [
+        "www.edmondsumc.org"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8169778,
+        "lng": -122.3690064
+      }
     },
     {
       "name": "Bayside Park P-Patch",
@@ -156,7 +198,11 @@
       "links": [
         "https://www.facebook.com/pages/Bayside-Neighborhood-Association/260800510717147"
       ],
-      "rentalBeds": true
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.98726019999999,
+        "lng": -122.2127247
+      }
     },
     {
       "name": "Charles Street Community Garden",
@@ -176,7 +222,11 @@
       ],
       "email": "charlesp.patch@gmail.com",
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9682849,
+        "lng": -122.2174209
+      }
     },
     {
       "name": "Denney Youth Center",
@@ -189,8 +239,14 @@
           "phone": "(425) 388-7800"
         }
       ],
-      "links": ["https://www.facebook.com/gardenpathdyc"],
-      "rentalBeds": false
+      "links": [
+        "https://www.facebook.com/gardenpathdyc"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9789848,
+        "lng": -122.2020794
+      }
     },
     {
       "name": "Everett Community College ECEAP Preschool and Early Learning Center",
@@ -205,7 +261,11 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0070975,
+        "lng": -122.1997386
+      }
     },
     {
       "name": "Everett Housing Authority Delta Neighborhood Friendship Garden",
@@ -220,8 +280,14 @@
           "phone": "425-303-1185"
         }
       ],
-      "links": ["https://www.everettwa.gov/1378/Community-Garden"],
-      "rentalBeds": false
+      "links": [
+        "https://www.everettwa.gov/1378/Community-Garden"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.001518,
+        "lng": -122.1925285
+      }
     },
     {
       "name": "Everett Housing Authority Grandview Community Center Garden",
@@ -236,9 +302,15 @@
           "phone": "425-303-1185"
         }
       ],
-      "links": ["http://www.heraldnet.com/article/20101113/NEWS01/711139960"],
+      "links": [
+        "http://www.heraldnet.com/article/20101113/NEWS01/711139960"
+      ],
       "rentalBeds": false,
-      "restricted": "Residents only"
+      "restricted": "Residents only",
+      "geolocation": {
+        "lat": 47.9762907,
+        "lng": -122.2081466
+      }
     },
     {
       "name": "Everett VOA ECEAP Preschool (Faith Lutheran Church site)",
@@ -248,7 +320,11 @@
       "description": "A cooperative learning family school garden project that works with Master Gardeners, Growing Groceries Mentors and community volunteers via a mentoring process to increase family's access to fresh, locally grown produce for home use. Monthly garden and nutrition sessions with cooking demonstration using produce grown on site. Families participate in a 9 month growing season, annually. Participants use gained knowledge to replicate gardening and nutrition practices in the home setting.",
       "contacts": [],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.936755,
+        "lng": -122.2225815
+      }
     },
     {
       "name": "Interfaith Family Shelter Garden",
@@ -263,7 +339,11 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9789848,
+        "lng": -122.2020794
+      }
     },
     {
       "name": "Lowell Community Garden",
@@ -279,7 +359,11 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.920433,
+        "lng": -122.1798776
+      }
     },
     {
       "name": "The Red Barn Community Garden and Food Bank Farm",
@@ -293,12 +377,19 @@
           "phone": "425-259-3191"
         }
       ],
-      "links": ["https://www.voaww.org/locations"],
-      "rentalBeds": false
+      "links": [
+        "https://www.voaww.org/locations"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9196144,
+        "lng": -122.1806502
+      }
     },
     {
       "name": "Secret Garden",
       "location": "Riverside neighborhood, Everett",
+      "address": "",
       "type": "Private",
       "description": "Small private parcel, several small framed beds.",
       "contacts": [
@@ -308,7 +399,8 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": []
     },
     {
       "name": "Senator Henry M. Jackson Park Community Garden",
@@ -323,8 +415,14 @@
           "available": "M-F, 8am-1pm"
         }
       ],
-      "links": ["https://www.everettwa.gov/1378/Community-Garden"],
-      "rentalBeds": false
+      "links": [
+        "https://www.everettwa.gov/1378/Community-Garden"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9942387,
+        "lng": -122.1861407
+      }
     },
     {
       "name": "South Everett Neighborhood Center",
@@ -337,8 +435,14 @@
           "phone": "(425) 355-6005"
         }
       ],
-      "links": ["http://familysupport.lcsnw.org/senc/programs/"],
-      "rentalBeds": false
+      "links": [
+        "http://familysupport.lcsnw.org/senc/programs/"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9572444,
+        "lng": -122.2311502
+      }
     },
     {
       "name": "South Forest Park 'Growing Together' Community Garden",
@@ -356,8 +460,14 @@
           "phone": "425-422-6297"
         }
       ],
-      "links": ["http://myeverettgarden.com/about-the-garden/"],
-      "rentalBeds": "$30/YR"
+      "links": [
+        "http://myeverettgarden.com/about-the-garden/"
+      ],
+      "rentalBeds": "$30/YR",
+      "geolocation": {
+        "lat": 47.9556014,
+        "lng": -122.2172199
+      }
     },
     {
       "name": "St. Mary Magdelen Parish and School",
@@ -371,7 +481,11 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.920078,
+        "lng": -122.2218247
+      }
     },
     {
       "name": "Trinity Lutheran Church",
@@ -386,8 +500,14 @@
           "email": "office@TrinityLutheranEverett.com"
         }
       ],
-      "links": ["http://www.trinitylutheraneverett.com"],
-      "rentalBeds": false
+      "links": [
+        "http://www.trinitylutheraneverett.com"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9862416,
+        "lng": -122.2032026
+      }
     },
     {
       "name": "Trinity Lutheran College",
@@ -402,8 +522,14 @@
           "email": "david.ellingson@tlc.edu"
         }
       ],
-      "links": ["http://www.tlc.edu/rooftop/index.html"],
-      "rentalBeds": false
+      "links": [
+        "http://www.tlc.edu/rooftop/index.html"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.98031270000001,
+        "lng": -122.2075922
+      }
     },
     {
       "name": "Walter E Hall Community Garden",
@@ -417,8 +543,14 @@
           "email": "BLeonard@everettwa.gov"
         }
       ],
-      "links": ["http://www.heraldnet.com/article/20080818/NEWS01/867044568"],
-      "rentalBeds": false
+      "links": [
+        "http://www.heraldnet.com/article/20080818/NEWS01/867044568"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9205304,
+        "lng": -122.2515773
+      }
     },
     {
       "name": "YMCA",
@@ -433,113 +565,147 @@
           "phone": "425-357-3032"
         }
       ],
-      "links": ["https://ymca-snoco.org/our-locations/mill-creek-ymca/"],
-      "rentalBeds": false
+      "links": [
+        "https://ymca-snoco.org/our-locations/mill-creek-ymca/"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8724966,
+        "lng": -122.154303
+      }
     },
     {
-      "communityGardens": [
+      "name": "Granite Falls ECEAP Preschool (Monte Cristo Elementary site)",
+      "location": "Granite Falls",
+      "address": "1201 100th Street NE, Granite Falls, WA 98252",
+      "type": "School",
+      "description": "A cooperative learning family school garden project that works with Master Gardeners, Growing Groceries Mentors and community volunteers via a mentoring process to increase family's access to fresh, locally grown produce for home use. Monthly garden and nutrition sessions with cooking demonstration using produce grown on site. Families participate in a 9 month growing season, annually. Participants use gained knowledge to replicate gardening and nutrition practices in the home setting.",
+      "contacts": [],
+      "links": [],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0892604,
+        "lng": -121.9832649
+      }
+    },
+    {
+      "name": "Eagle Ridge Community Garden",
+      "location": "Lake Stevens",
+      "address": "Eagle Ridge Park, 2426 Soper Hill Rd., Lake Stevens, WA 98258",
+      "type": "Community",
+      "description": "Eagle Ridge Community Garden provides approximately 74 beds, including ADA-accessible beds, for the community to rent to grow food and flowers. Now you can reserve a plot online! The beds are organic and soil is provided. A dedicated group of volunteers grow and donate produce to the Lake Stevens Food Bank.",
+      "contacts": [
         {
-          "name": "Granite Falls ECEAP Preschool (Monte Cristo Elementary site)",
-          "location": "Granite Falls",
-          "address": "1201 100th Street NE, Granite Falls, WA 98252",
-          "type": "School",
-          "description": "A cooperative learning family school garden project that works with Master Gardeners, Growing Groceries Mentors and community volunteers via a mentoring process to increase family's access to fresh, locally grown produce for home use. Monthly garden and nutrition sessions with cooking demonstration using produce grown on site. Families participate in a 9 month growing season, annually. Participants use gained knowledge to replicate gardening and nutrition practices in the home setting.",
-          "contacts": [],
-          "links": [],
-          "rentalBeds": false
-        },
-        {
-          "name": "Eagle Ridge Community Garden",
-          "location": "Lake Stevens",
-          "address": "Eagle Ridge Park, 2426 Soper Hill Rd., Lake Stevens, WA 98258",
-          "type": "Community",
-          "description": "Eagle Ridge Community Garden provides approximately 74 beds, including ADA-accessible beds, for the community to rent to grow food and flowers. Now you can reserve a plot online! The beds are organic and soil is provided. A dedicated group of volunteers grow and donate produce to the Lake Stevens Food Bank.",
-          "contacts": [
-            {
-              "email": "parks@lakestevenswa.gov",
-              "phone": "425-622-9400",
-              "organization": "Lake Stevens Parks and Recreation",
-              "address": "City Hall, 1812 Main Street (physical), P.O. Box 257 (mailing), Lake Stevens, WA 98258"
-            }
-          ],
-          "links": [
-            "https://www.lakestevenswa.gov/411/Eagle-Ridge-Community-Garden"
-          ],
-          "rentalBeds": false
-        },
-        {
-          "name": "Holy Cross Parish Garden of Plenty",
-          "location": "Lake Stevens",
-          "address": "6915 SR 92, Lake Stevens, WA 98258",
-          "type": "Church",
-          "description": "The parish with the support of many volunteers, grows potatoes on the church property. In 2012 over 30,000 pounds of potatoes were harvested and shared with many the food banks in the area.",
-          "contacts": [
-            {
-              "phone": "(360) 691-2636"
-            }
-          ],
-          "links": ["http://www.holy-cross-parish.com/Garden.html"],
-          "rentalBeds": false
-        },
-        {
-          "name": "Lake Stevens ECEAP Preschool and Early Learning Center (Hillcrest Elementary site)",
-          "location": "Lake Stevens",
-          "address": "9317 4th Street SE, Lake Stevens, WA 98258",
-          "type": "School",
-          "description": "A cooperative learning family school garden project that works with Master Gardeners, Growing Groceries Mentors and community volunteers via a mentoring process to increase family's access to fresh, locally grown produce for home use. Monthly garden and nutrition sessions with cooking demonstrations using produce grown on site. Families participate in a 9 month growing season, annually. Participants use gained knowledge to replicate gardening and nutrition practices in the home setting.",
-          "contacts": [],
-          "links": [],
-          "rentalBeds": false
-        },
-        {
-          "name": "Mt. Pilchuck Elementary School Garden",
-          "location": "Lake Stevens",
-          "address": "12806 20th Street Northeast, Lake Stevens, WA 98258",
-          "type": "School",
-          "description": "All of the food that we harvest feeds children in the summer free lunch program in Lake Stevens and our local food banks. Built with a grant from the Snohomish County Master Gardeners.",
-          "contacts": [
-            {
-              "name": "Linda Mauer",
-              "email": "lmauer@lkstevens.wednet.edu",
-              "phone": "(425) 335-1525"
-            }
-          ],
-          "links": [
-            "http://www.lakestevensjournal.com/news/article.exm/2012-09-11_panther_giving_garden_provides_important_lesson_for_students_as_well_as_benefitting_the_community",
-            "http://www.lkstevens.wednet.edu/Page/2424"
-          ],
-          "rentalBeds": false
-        },
-        {
-          "name": "Good Shepherd Baptist Church Garden",
-          "location": "Lynnwood",
-          "address": "6915 196th Street S.W., Lynnwood, WA 98036 (on WA 524, 1/2 mile west of WA 99)",
-          "type": "Church",
-          "description": "Good Shepherd has hosted a community garden for over 20 years. Our Community Garden area has been expanded and its landscaping improved. The 30-plus community garden plots now have create walkways and sitting areas amidst the gardens for use by the gardeners and visitors. The gardens are currently located on the north side of our campus, near the extended parking area north of Shepherd’s Garden. We have 30 gardens this year, some of which are now raised gardens earmarked for Shepherd’s Garden residents, and as last year, includes a garden specifically tended to provide fresh produce to the Lynnwood Food Bank.",
-          "contacts": [
-            {
-              "address": "P.O. Box 1044, Lynnwood WA 98046",
-              "phone": "425-774-1010"
-            }
-          ],
-          "links": ["http://www.gsbchurch.com/"],
-          "rentalBeds": false
-        },
-        {
-          "name": "Larchway Community Garden at the Refuge Church",
-          "location": "Lynnwood",
-          "address": "2609 Larch Way, Lynnwood WA, 98036",
-          "type": "Church",
-          "description": "CGS sits on a large, open lot in the middle of a rapidly developing neighborhood. 'Air Condos' are filling the area with beautiful homes that have very small yards. To help people of our community have a chance to be a part of nature, we opened the Larchway Community Garden. Our garden offers rentable plots where people from our neighborhood grow their own organic produce. We also have a large plot that our volunteers maintain. The food grown in this garden is donated to the Lynnwood Food Bank.",
-          "contacts": [
-            {
-              "email": "larchwaycommunitygarden@gmail.com"
-            }
-          ],
-          "links": [],
-          "rentalBeds": false
+          "email": "parks@lakestevenswa.gov",
+          "phone": "425-622-9400",
+          "organization": "Lake Stevens Parks and Recreation",
+          "address": "City Hall, 1812 Main Street (physical), P.O. Box 257 (mailing), Lake Stevens, WA 98258"
         }
-      ]
+      ],
+      "links": [
+        "https://www.lakestevenswa.gov/411/Eagle-Ridge-Community-Garden"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0186647,
+        "lng": -122.1066946
+      }
+    },
+    {
+      "name": "Holy Cross Parish Garden of Plenty",
+      "location": "Lake Stevens",
+      "address": "6915 SR 92, Lake Stevens, WA 98258",
+      "type": "Church",
+      "description": "The parish with the support of many volunteers, grows potatoes on the church property. In 2012 over 30,000 pounds of potatoes were harvested and shared with many the food banks in the area.",
+      "contacts": [
+        {
+          "phone": "(360) 691-2636"
+        }
+      ],
+      "links": [
+        "http://www.holy-cross-parish.com/Garden.html"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.058131,
+        "lng": -122.021092
+      }
+    },
+    {
+      "name": "Lake Stevens ECEAP Preschool and Early Learning Center (Hillcrest Elementary site)",
+      "location": "Lake Stevens",
+      "address": "9317 4th Street SE, Lake Stevens, WA 98258",
+      "type": "School",
+      "description": "A cooperative learning family school garden project that works with Master Gardeners, Growing Groceries Mentors and community volunteers via a mentoring process to increase family's access to fresh, locally grown produce for home use. Monthly garden and nutrition sessions with cooking demonstrations using produce grown on site. Families participate in a 9 month growing season, annually. Participants use gained knowledge to replicate gardening and nutrition practices in the home setting.",
+      "contacts": [],
+      "links": [],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9925746,
+        "lng": -122.1057589
+      }
+    },
+    {
+      "name": "Mt. Pilchuck Elementary School Garden",
+      "location": "Lake Stevens",
+      "address": "12806 20th Street Northeast, Lake Stevens, WA 98258",
+      "type": "School",
+      "description": "All of the food that we harvest feeds children in the summer free lunch program in Lake Stevens and our local food banks. Built with a grant from the Snohomish County Master Gardeners.",
+      "contacts": [
+        {
+          "name": "Linda Mauer",
+          "email": "lmauer@lkstevens.wednet.edu",
+          "phone": "(425) 335-1525"
+        }
+      ],
+      "links": [
+        "http://www.lakestevensjournal.com/news/article.exm/2012-09-11_panther_giving_garden_provides_important_lesson_for_students_as_well_as_benefitting_the_community",
+        "http://www.lkstevens.wednet.edu/Page/2424"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0147921,
+        "lng": -122.05811
+      }
+    },
+    {
+      "name": "Good Shepherd Baptist Church Garden",
+      "location": "Lynnwood",
+      "address": "6915 196th Street S.W., Lynnwood, WA 98036 (on WA 524, 1/2 mile west of WA 99)",
+      "type": "Church",
+      "description": "Good Shepherd has hosted a community garden for over 20 years. Our Community Garden area has been expanded and its landscaping improved. The 30-plus community garden plots now have create walkways and sitting areas amidst the gardens for use by the gardeners and visitors. The gardens are currently located on the north side of our campus, near the extended parking area north of Shepherd’s Garden. We have 30 gardens this year, some of which are now raised gardens earmarked for Shepherd’s Garden residents, and as last year, includes a garden specifically tended to provide fresh produce to the Lynnwood Food Bank.",
+      "contacts": [
+        {
+          "address": "P.O. Box 1044, Lynnwood WA 98046",
+          "phone": "425-774-1010"
+        }
+      ],
+      "links": [
+        "http://www.gsbchurch.com/"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8220389,
+        "lng": -122.3269874
+      }
+    },
+    {
+      "name": "Larchway Community Garden at the Refuge Church",
+      "location": "Lynnwood",
+      "address": "2609 Larch Way, Lynnwood WA, 98036",
+      "type": "Church",
+      "description": "CGS sits on a large, open lot in the middle of a rapidly developing neighborhood. 'Air Condos' are filling the area with beautiful homes that have very small yards. To help people of our community have a chance to be a part of nature, we opened the Larchway Community Garden. Our garden offers rentable plots where people from our neighborhood grow their own organic produce. We also have a large plot that our volunteers maintain. The food grown in this garden is donated to the Lynnwood Food Bank.",
+      "contacts": [
+        {
+          "email": "larchwaycommunitygarden@gmail.com"
+        }
+      ],
+      "links": [],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8114241,
+        "lng": -122.2686774
+      }
     },
     {
       "name": "St Thomas More Catholic Parish Gardens",
@@ -551,7 +717,11 @@
       "links": [
         "http://www.heraldnet.com/article/20100629/NEWS01/706299937/0/LIVING"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.83964539999999,
+        "lng": -122.3205273
+      }
     },
     {
       "name": "Bethlehem Lutheran Church Community Garden",
@@ -568,7 +738,11 @@
         "http://www.heraldnet.com/article/20090610/NEWS01/706109844",
         "http://sites.google.com/site/wilcoxpeapatch/"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0770628,
+        "lng": -122.1437092
+      }
     },
     {
       "name": "Mountain View Presbyterian Church",
@@ -587,7 +761,11 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0864475,
+        "lng": -122.1611398
+      }
     },
     {
       "name": "Sunnyside Nursery Food Bank Garden",
@@ -602,8 +780,14 @@
           "phone": "(425) 334-2002"
         }
       ],
-      "links": ["http://www.sunnysidenursery.net/community.asp"],
-      "rentalBeds": "Only if all produce is donated"
+      "links": [
+        "http://www.sunnysidenursery.net/community.asp"
+      ],
+      "rentalBeds": "Only if all produce is donated",
+      "geolocation": {
+        "lat": 48.0318716,
+        "lng": -122.1459816
+      }
     },
     {
       "name": "Tulalip Community Garden",
@@ -619,7 +803,8 @@
       "links": [
         "http://www.tulaliptribes-nsn.gov/LinkClick.aspx?fileticket=WKkOKV5_3H0%3D&tabid=175"
       ],
-      "rentalBeds": "Tribal Members Only"
+      "rentalBeds": "Tribal Members Only",
+      "geolocation": []
     },
     {
       "name": "WSU Snohomish County Master Gardener Demonstration Gardens at Jennings Park",
@@ -635,7 +820,11 @@
       "links": [
         "http://www.heraldnet.com/article/20090813/LIVING03/708139984/1029/LIVING04"
       ],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.0579088,
+        "lng": -122.1603778
+      }
     },
     {
       "name": "Advent Lutheran Church - Garden of Giving",
@@ -651,242 +840,403 @@
         }
       ],
       "links": [],
-      "rentalBeds": false
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8771365,
+        "lng": -122.1739721
+      }
     },
     {
-        "name": "Lively Environmental Center Everett School District",
-        "location": "Mill Creek",
-        "address": "1918 Seattle Hill Rd Mill Creek, Washington 98012",
-        "type": "School",
-        "description": "Lively Environmental Center sits in South Snohomish County. The garden is in a magnificent natural setting. The 22 acre site was donated to the Everett School District several years ago. The vegetable garden was started, but left unattended for some time. Farmer Frog and the MG's assists in the renewal of the food growing program both vegetable gardening and forest foods. Our goal is to build at least one season extender to support year-round production.",
-        "contacts": [
-          {
-            "organization": "Everett School District",
-            "phone": "425-385-4000"
-          }
-        ],
-        "links": [],
-        "rentalBeds": false
-      },
-      {
-        "name": "Mill Creek YMCA Community Garden",
-        "location": "Mill Creek",
-        "address": "YMCA OF SNOHOMISH COUNTY, Mill Creek Family Branch, 13723 Puget Park Drive, Everett WA 98208",
-        "type": "Food Bank Garden",
-        "description": "The Mill Creek YMCA Community Garden is open to any volunteer who wants to help us grow food for the Mill Creek Community Food Bank, The Bread Booth and other local nonprofits who address food security needs in our community.",
-        "contacts": [
-          {
-            "name": "Sharon Crosby",
-            "title": "Executive Director",
-            "phone": "425-357-3031",
-            "organization": "YMCA OF SNOHOMISH COUNTY, Mill Creek Family Branch"
-          }
-        ],
-        "links": [
-          "https://ymca-snoco.org/our-locations/mill-creek-ymca/",
-          "https://www.hopecreekcf.org/mill-creek-community-food-bank/",
-          "https://www.coryparris.com/blog/2021/2/spotlight-series-the-bread-booth"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "The Julia V. Morris Memorial Garden",
-        "location": "Monroe",
-        "address": "On the corner of Village Way and Sky River Parkway in Monroe, WA",
-        "type": "Food Bank Garden",
-        "description": "Produce grown at the Julia Morris Garden is donated to the Sky Valley Food Bank next door.",
-        "contacts": [
-          {
-            "name": "Katie Darrow",
-            "phone": "360-863-4519"
-          }
-        ],
-        "links": [
-          "http://www.heraldnet.com/article/20080918/NEWS01/709189892",
-          "http://www.snoho.com/stories/June/063010_rezone.html",
-          "https://www.facebook.com/permalink.php?story_fbid=197407817010059&id=114965945186098",
-          "http://www.monroewa.gov/facilities/facility/details/Julia-V-Morris-Centennial-Garden-37"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "Mukilteo Community Garden",
-        "location": "Mukilteo",
-        "address": "44th Avenue West and 76th St. Mukilteo, WA",
-        "type": "Community",
-        "description": "Our mission is to provide fresh produce to area food banks and provide space and education for community members to successfully grow their own food. The recipients of food bank produce in 2014 were Lynnwood Food Bank, Mukilteo Food Bank, Mill Creek Food Bank, and Senior Services of Snohomish County.",
-        "contacts": [
-          {
-            "email": "mukilteop-patch@hotmail.com"
-          },
-          {
-            "email": "admin@mukilteogarden.org"
-          }
-        ],
-        "links": [
-          "http://www.mukilteogarden.org/contact-us"
-        ],
-        "rentalBeds": "$40-$60"
-      },
-      {
-        "name": "Olivia Park Elementary School, Mukilteo School District",
-        "location": "Mukilteo",
-        "address": "200 108th St Sw, Everett, WA 98204",
-        "type": "School",
-        "description": "School garden project which quickly became a school farm. Complete with berry patches, an orchard and over 34 vegetable beds the site fed hundreds of families over the past few years now. Farmer Frog garden. Students, staff and alumni are welcome to garden.",
-        "contacts": [
-          {
-            "phone": "425.356.1302"
-          }
-        ],
-        "links": [
-          "https://www.facebook.com/OliviaParkStudentGarden",
-          "http://www.heraldnet.com/article/20100427/NEWS01/704279923",
-          "http://farmerfrog.org/satellites/olivia-park-2/"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "Giving Garden at Christ the King Lutheran Church (ELCA)",
-        "location": "Snohomish",
-        "address": "1305 Pine Avenue, Snohomish, WA 98290",
-        "type": "Church",
-        "description": "Food Bank Garden - Part of SnoGroFood Committee network of community gardens",
-        "contacts": [
-          {
-            "name": "Diane M. Decker-Ihle",
-            "title": "Master Gardener",
-            "email": "deckerihle@comcast.net"
-          }
-        ],
-        "links": [
-          "http://www.ctksnohomish.org/content.cfm?id=148&ministry_id=7"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "God’s Garden Snohomish United Methodist Church",
-        "location": "Snohomish",
-        "address": "1400 Lake Avenue, Snohomish WA",
-        "type": "Church",
-        "description": "Food Bank Garden, Started as Summer Sunday School program in 2000. Garden is 50'x50', fenced with drip irrigation system. We provided over 600 lbs of produce to the Food Bank in 2012. Volunteers welcome!",
-        "contacts": [
-          {
-            "phone": "360-568-5755"
-          }
-        ],
-        "links": [
-          "http://www.snohomishumc.com"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "Martha Perry Memorial Community Veggie Garden",
-        "location": "Snohomish",
-        "address": "12711 Springhetti Road, Snohomish",
-        "type": "Community",
-        "description": "Food Bank Garden Sponsored by The Snohomish Garden Club and Bailey’s Compost and U-Pick Farm Established in 2009, this ½ acre vegetable garden produced over 8,000 pounds for the Maltby and Snohomish Food banks its first year. Run by members of the Snohomish Garden Club, community volunteers are always welcome.",
-        "contacts": [
-          {
-            "email": "info@snohomishgardenclub.com"
-          }
-        ],
-        "links": [
-          "http://www.snohomishgardenclub.com",
-          "http://www.baileycompost.com"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "Shepherd of the Hills LCMS Maltby Food Bank Garden",
-        "location": "Snohomish",
-        "address": "9225 212th St SE, Snohomish, WA 98296-7164",
-        "type": "Church",
-        "description": "Food Bank Garden",
-        "contacts": [
-          {
-            "name": "Michael Syvertsen",
-            "email": "m.syvertsen@comcast.net"
-          }
-        ],
-        "links": [],
-        "rentalBeds": false
-      },
-      {
-        "name": "Snohomish Central Christian Church, ‘Garden of Ebey’",
-        "location": "Snohomish",
-        "address": "126 Cedar Ave Snohomish, WA",
-        "type": "Church",
-        "description": "Food Bank Garden This 2/3 acre plot is located just south of the Snohomish Little League Fields on 115th Ave SE. Volunteers welcome",
-        "contacts": [
-          {
-            "name": "Gwen Thomas",
-            "email": "gwen.fcn@gmail.com"
-          },
-          {
-            "phone": "360-568-7271",
-            "email": "office@ctksnohomish.com"
-          }
-        ],
-        "links": [
-          "http://www.centralfaith.org/",
-          "http://www.heraldnet.com/article/20101227/NEWS01/712279953"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "St. John’s Episcopal Church Garden",
-        "location": "Snohomish",
-        "address": "Chinook Farms (Fritch Farm), 10601 Elliott Road, Snohomish, WA 98296",
-        "type": "Church",
-        "description": "Food Bank Garden sponsored by St.John's Episcopal Church, Snohomish.",
-        "contacts": [
-          {
-            "email": "office@stjohnsnohomish.org"
-          }
-        ],
-        "links": [
-          "http://heraldnet.com/article/20110219/NEWS01/702199963",
-          "http://www.chinookfarms.com/about.html"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "St. Michael’s Catholic Church, (Garden of Abundance)",
-        "location": "Snohomish",
-        "address": "1512 Pine Ave, Snohomish, WA",
-        "type": "Church",
-        "description": "The St. Michael Community Garden was started in 2009 as part of the SnoGrow program. SnoGrow is an initiative of churches of all denominations and garden Clubs in Snohomish who cooperate to grow produce for the food banks in the Community. The project at St. Michaels was funded by a grant from the Master Gardeners Association of Washington and the Archdiocese of Seattle with funds from the annual 'Rice Bowl' collection. The garden was also fortunate to have the fencing and arbor erected by Kevin Iverson as his Eagle Scout community project. We continue to receive modest grants from the Rice Bowl collection each year.",
-        "contacts": [
-          {
-            "email": "smpgardenangels@comcast.net"
-          },
-          {
-            "email": "administrator@stmichaelsnohomish.org"
-          }
-        ],
-        "links": [
-          "http://www.st-michaels-snohomish.com/garden.html"
-        ],
-        "rentalBeds": false
-      },
-      {
-        "name": "Growing Forward Gardens",
-        "location": "Stanwood",
-        "address": "Stanwood Camano Community Resource Center, 9612 271st Street NW, Stanwood, WA 98292",
-        "type": "Community",
-        "description": "Provides a site for community gardening and an opportunity to learn how to grow your own groceries. Growing & harvesting produce for the local Food Bank. Building Community. Demonstration site for edible landscaping.",
-        "contacts": [
-          {
-            "phone": "(360) 629-5257",
-            "email": "director@stanwoodcamanoresources.org"
-          }
-        ],
-        "links": [
-          "http://www.stanwoodcamanoresources.org/index.html",
-          "http://www.stanwood.wednet.edu/community-fliers/community-resources/5288-growing-forward-community-garden/file.html"
-        ],
-        "rentalBeds": false
+      "name": "Lively Environmental Center Everett School District",
+      "location": "Mill Creek",
+      "address": "1918 Seattle Hill Rd Mill Creek, Washington 98012",
+      "type": "School",
+      "description": "Lively Environmental Center sits in South Snohomish County. The garden is in a magnificent natural setting. The 22 acre site was donated to the Everett School District several years ago. The vegetable garden was started, but left unattended for some time. Farmer Frog and the MG's assists in the renewal of the food growing program both vegetable gardening and forest foods. Our goal is to build at least one season extender to support year-round production.",
+      "contacts": [
+        {
+          "organization": "Everett School District",
+          "phone": "425-385-4000"
+        }
+      ],
+      "links": [],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8475324,
+        "lng": -122.2060117
       }
+    },
+    {
+      "name": "Mill Creek YMCA Community Garden",
+      "location": "Mill Creek",
+      "address": "YMCA OF SNOHOMISH COUNTY, Mill Creek Family Branch, 13723 Puget Park Drive, Everett WA 98208",
+      "type": "Food Bank Garden",
+      "description": "The Mill Creek YMCA Community Garden is open to any volunteer who wants to help us grow food for the Mill Creek Community Food Bank, The Bread Booth and other local nonprofits who address food security needs in our community.",
+      "contacts": [
+        {
+          "name": "Sharon Crosby",
+          "title": "Executive Director",
+          "phone": "425-357-3031",
+          "organization": "YMCA OF SNOHOMISH COUNTY, Mill Creek Family Branch"
+        }
+      ],
+      "links": [
+        "https://ymca-snoco.org/our-locations/mill-creek-ymca/",
+        "https://www.hopecreekcf.org/mill-creek-community-food-bank/",
+        "https://www.coryparris.com/blog/2021/2/spotlight-series-the-bread-booth"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8724782,
+        "lng": -122.1541195
+      }
+    },
+    {
+      "name": "The Julia V. Morris Memorial Garden",
+      "location": "Monroe",
+      "address": "On the corner of Village Way and Sky River Parkway in Monroe, WA",
+      "type": "Food Bank Garden",
+      "description": "Produce grown at the Julia Morris Garden is donated to the Sky Valley Food Bank next door.",
+      "contacts": [
+        {
+          "name": "Katie Darrow",
+          "phone": "360-863-4519"
+        }
+      ],
+      "links": [
+        "http://www.heraldnet.com/article/20080918/NEWS01/709189892",
+        "http://www.snoho.com/stories/June/063010_rezone.html",
+        "https://www.facebook.com/permalink.php?story_fbid=197407817010059&id=114965945186098",
+        "http://www.monroewa.gov/facilities/facility/details/Julia-V-Morris-Centennial-Garden-37"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8499403,
+        "lng": -121.9806736
+      }
+    },
+    {
+      "name": "Mukilteo Community Garden",
+      "location": "Mukilteo",
+      "address": "44th Avenue West and 76th St. Mukilteo, WA",
+      "type": "Community",
+      "description": "Our mission is to provide fresh produce to area food banks and provide space and education for community members to successfully grow their own food. The recipients of food bank produce in 2014 were Lynnwood Food Bank, Mukilteo Food Bank, Mill Creek Food Bank, and Senior Services of Snohomish County.",
+      "contacts": [
+        {
+          "email": "mukilteop-patch@hotmail.com"
+        },
+        {
+          "email": "admin@mukilteogarden.org"
+        }
+      ],
+      "links": [
+        "http://www.mukilteogarden.org/contact-us"
+      ],
+      "rentalBeds": "$40-$60",
+      "geolocation": {
+        "lat": 47.9293323,
+        "lng": -122.2935797
+      }
+    },
+    {
+      "name": "Olivia Park Elementary School, Mukilteo School District",
+      "location": "Mukilteo",
+      "address": "200 108th St Sw, Everett, WA 98204",
+      "type": "School",
+      "description": "School garden project which quickly became a school farm. Complete with berry patches, an orchard and over 34 vegetable beds the site fed hundreds of families over the past few years now. Farmer Frog garden. Students, staff and alumni are welcome to garden.",
+      "contacts": [
+        {
+          "phone": "425.356.1302"
+        }
+      ],
+      "links": [
+        "https://www.facebook.com/OliviaParkStudentGarden",
+        "http://www.heraldnet.com/article/20100427/NEWS01/704279923",
+        "http://farmerfrog.org/satellites/olivia-park-2/"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.89949499999999,
+        "lng": -122.2361429
+      }
+    },
+    {
+      "name": "Giving Garden at Christ the King Lutheran Church (ELCA)",
+      "location": "Snohomish",
+      "address": "1305 Pine Avenue, Snohomish, WA 98290",
+      "type": "Church",
+      "description": "Food Bank Garden - Part of SnoGroFood Committee network of community gardens",
+      "contacts": [
+        {
+          "name": "Diane M. Decker-Ihle",
+          "title": "Master Gardener",
+          "email": "deckerihle@comcast.net"
+        }
+      ],
+      "links": [
+        "http://www.ctksnohomish.org/content.cfm?id=148&ministry_id=7"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9284392,
+        "lng": -122.0843998
+      }
+    },
+    {
+      "name": "God’s Garden Snohomish United Methodist Church",
+      "location": "Snohomish",
+      "address": "1400 Lake Avenue, Snohomish WA",
+      "type": "Church",
+      "description": "Food Bank Garden, Started as Summer Sunday School program in 2000. Garden is 50'x50', fenced with drip irrigation system. We provided over 600 lbs of produce to the Food Bank in 2012. Volunteers welcome!",
+      "contacts": [
+        {
+          "phone": "360-568-5755"
+        }
+      ],
+      "links": [
+        "http://www.snohomishumc.com"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9348733,
+        "lng": -122.0908249
+      }
+    },
+    {
+      "name": "Martha Perry Memorial Community Veggie Garden",
+      "location": "Snohomish",
+      "address": "12711 Springhetti Road, Snohomish",
+      "type": "Community",
+      "description": "Food Bank Garden Sponsored by The Snohomish Garden Club and Bailey’s Compost and U-Pick Farm Established in 2009, this ½ acre vegetable garden produced over 8,000 pounds for the Maltby and Snohomish Food banks its first year. Run by members of the Snohomish Garden Club, community volunteers are always welcome.",
+      "contacts": [
+        {
+          "email": "info@snohomishgardenclub.com"
+        }
+      ],
+      "links": [
+        "http://www.snohomishgardenclub.com",
+        "http://www.baileycompost.com"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8808656,
+        "lng": -122.0985809
+      }
+    },
+    {
+      "name": "Shepherd of the Hills LCMS Maltby Food Bank Garden",
+      "location": "Snohomish",
+      "address": "9225 212th St SE, Snohomish, WA 98296-7164",
+      "type": "Church",
+      "description": "Food Bank Garden",
+      "contacts": [
+        {
+          "name": "Michael Syvertsen",
+          "email": "m.syvertsen@comcast.net"
+        }
+      ],
+      "links": [],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.805774,
+        "lng": -122.1080096
+      }
+    },
+    {
+      "name": "Snohomish Central Christian Church, ‘Garden of Ebey’",
+      "location": "Snohomish",
+      "address": "126 Cedar Ave Snohomish, WA",
+      "type": "Church",
+      "description": "Food Bank Garden This 2/3 acre plot is located just south of the Snohomish Little League Fields on 115th Ave SE. Volunteers welcome",
+      "contacts": [
+        {
+          "name": "Gwen Thomas",
+          "email": "gwen.fcn@gmail.com"
+        },
+        {
+          "phone": "360-568-7271",
+          "email": "office@ctksnohomish.com"
+        }
+      ],
+      "links": [
+        "http://www.centralfaith.org/",
+        "http://www.heraldnet.com/article/20101227/NEWS01/712279953"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.9118479,
+        "lng": -122.0917542
+      }
+    },
+    {
+      "name": "St. John’s Episcopal Church Garden",
+      "location": "Snohomish",
+      "address": "Chinook Farms (Fritch Farm), 10601 Elliott Road, Snohomish, WA 98296",
+      "type": "Church",
+      "description": "Food Bank Garden sponsored by St.John's Episcopal Church, Snohomish.",
+      "contacts": [
+        {
+          "email": "office@stjohnsnohomish.org"
+        }
+      ],
+      "links": [
+        "http://heraldnet.com/article/20110219/NEWS01/702199963",
+        "http://www.chinookfarms.com/about.html"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.8464869,
+        "lng": -122.0842611
+      }
+    },
+    {
+      "name": "St. Michael’s Catholic Church, (Garden of Abundance)",
+      "location": "Snohomish",
+      "address": "1512 Pine Ave, Snohomish, WA",
+      "type": "Church",
+      "description": "The St. Michael Community Garden was started in 2009 as part of the SnoGrow program. SnoGrow is an initiative of churches of all denominations and garden Clubs in Snohomish who cooperate to grow produce for the food banks in the Community. The project at St. Michaels was funded by a grant from the Master Gardeners Association of Washington and the Archdiocese of Seattle with funds from the annual 'Rice Bowl' collection. The garden was also fortunate to have the fencing and arbor erected by Kevin Iverson as his Eagle Scout community project. We continue to receive modest grants from the Rice Bowl collection each year.",
+      "contacts": [
+        {
+          "email": "smpgardenangels@comcast.net"
+        },
+        {
+          "email": "administrator@stmichaelsnohomish.org"
+        }
+      ],
+      "links": [
+        "http://www.st-michaels-snohomish.com/garden.html"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 47.93089639999999,
+        "lng": -122.0859608
+      }
+    },
+    {
+      "name": "Growing Forward Gardens",
+      "location": "Stanwood",
+      "address": "Stanwood Camano Community Resource Center, 9612 271st Street NW, Stanwood, WA 98292",
+      "type": "Community",
+      "description": "Provides a site for community gardening and an opportunity to learn how to grow your own groceries. Growing & harvesting produce for the local Food Bank. Building Community. Demonstration site for edible landscaping.",
+      "contacts": [
+        {
+          "phone": "(360) 629-5257",
+          "email": "director@stanwoodcamanoresources.org"
+        }
+      ],
+      "links": [
+        "http://www.stanwoodcamanoresources.org/index.html",
+        "http://www.stanwood.wednet.edu/community-fliers/community-resources/5288-growing-forward-community-garden/file.html"
+      ],
+      "rentalBeds": false,
+      "geolocation": {
+        "lat": 48.241703,
+        "lng": -122.363301
+      }
+    },
+    {
+      "name": "Monroe Community Garden",
+      "location": "Monroe",
+      "address": "1001 Main Street, Monroe, WA 98272",
+      "type": "Community",
+      "description": "A vibrant community garden offering plots for local residents to grow their own vegetables and flowers.",
+      "contacts": [
+        {
+          "name": "Jane Doe",
+          "email": "jane.doe@monroegarden.org"
+        }
+      ],
+      "links": [
+        "http://www.monroegarden.org"
+      ],
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.858511,
+        "lng": -121.993643
+      }
+    },
+    {
+      "name": "Evergreen Garden",
+      "location": "Monroe",
+      "address": "2020 Evergreen Avenue, Monroe, WA 98272",
+      "type": "Community",
+      "description": "This garden provides a serene environment for community members to cultivate organic produce and flowers.",
+      "contacts": [
+        {
+          "name": "John Smith",
+          "email": "john.smith@evergreengarden.org"
+        }
+      ],
+      "links": [
+        "http://www.evergreengarden.org"
+      ],
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.864154581184295, 
+        "lng": -121.94094271495253
+      }
+    },
+    {
+      "name": "Monroe Hillside Garden",
+      "location": "Monroe",
+      "address": "3030 Hillside Drive, Monroe, WA 98272",
+      "type": "Community",
+      "description": "A community garden located on a beautiful hillside, offering plots for local residents.",
+      "contacts": [
+        {
+          "name": "Alice Johnson",
+          "email": "alice.johnson@hillsidegarden.org"
+        }
+      ],
+      "links": [
+        "http://www.hillsidegarden.org"
+      ],
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.87348218912535, 
+        "lng": -121.99098200632675
+      }
+    },
+    {
+      "name": "Sunrise Garden",
+      "location": "Monroe",
+      "address": "4040 Sunrise Boulevard, Monroe, WA 98272",
+      "type": "Community",
+      "description": "A peaceful garden where community members can rent plots to grow their own food and flowers.",
+      "contacts": [
+        {
+          "name": "Bob Brown",
+          "email": "bob.brown@sunrisegarden.org"
+        }
+      ],
+      "links": [
+        "http://www.sunrisegarden.org"
+      ],
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.8483168348932, 
+        "lng": -121.98154063034067
+      }
+    },
+    {
+      "name": "Riverside Community Garden",
+      "location": "Monroe",
+      "address": "5050 Riverside Road, Monroe, WA 98272",
+      "type": "Community",
+      "description": "Located along the river, this garden offers plots for local residents to cultivate organic produce.",
+      "contacts": [
+        {
+          "name": "Sara White",
+          "email": "sara.white@riversidegarden.org"
+        }
+      ],
+      "links": [
+        "http://www.riversidegarden.org"
+      ],
+      "rentalBeds": true,
+      "geolocation": {
+        "lat": 47.85165756207209, 
+        "lng": -121.99269861967775
+      }
+    }
   ]
 }

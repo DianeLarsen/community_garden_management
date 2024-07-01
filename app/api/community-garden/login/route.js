@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import pool from '../../../../utils/db';
+import pool from '../../../../db';
 
 export async function POST(request) {
   try {
