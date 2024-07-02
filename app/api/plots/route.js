@@ -8,6 +8,7 @@ export async function GET(request) {
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
 
+
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -57,6 +58,7 @@ export async function GET(request) {
     }
 
     if (gardenId) {
+      console.log(gardenId)
       plotQuery += values.length > 1 ? ' OR gp.garden_id = $4' : ' AND gp.garden_id = $2';
       values.push(gardenId);
     }

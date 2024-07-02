@@ -4,9 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
 
-const AuthLinks = ({ showBanner }) => {
+const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

@@ -2,16 +2,41 @@
 import Link from "next/link";
 import AuthLinks from "@/components/AuthLinks";
 import { IoMdMenu } from "react-icons/io";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NavBar = () => {
   const [menuToggle, setMenuToggle] = useState("menu");
   const [banner, setBanner] = useState({ message: "", type: "" });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if the user is authenticated by looking for a token in localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+   
+  }, []);
 
   const showBanner = (message, type) => {
     setBanner({ message, type });
     setTimeout(() => setBanner({ message: "", type: "" }), 30000); // Hide banner after 3 seconds
   };
+
+  const navLinks = isAuthenticated ? [
+    { href: "/", label: "Home" },
+    { href: "/plots", label: "Plots" },
+    { href: "/events", label: "Events" },
+    { href: "/weather", label: "Weather" },
+    { href: "/gardens", label: "Gardens" },
+    { href: "/groups", label: "Groups" },
+    { href: "/about", label: "About" },
+  ] : [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+  ];
 
   return (
     <>
@@ -41,36 +66,13 @@ const NavBar = () => {
           <ul
             className={`flex md:flex-row flex-col md:items-center text-white  font-bold md:gap=[4vw] gap-7`}
           >
-            <li>
-              <Link href="/" className="px-4">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/plots" className="px-4">
-                Plots
-              </Link>
-            </li>
-            <li>
-              <Link href="/events" className="px-4">
-                Events
-              </Link>
-            </li>
-            <li>
-              <Link href="/weather" className="px-4">
-                Weather
-              </Link>
-            </li>
-            <li>
-              <Link href="/gardens" className="px-4">
-                Gardens
-              </Link>
-            </li>
-            <li>
-              <Link href="/groups" className="px-4">
-                Groups
-              </Link>
-            </li>
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="px-4">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -82,7 +84,7 @@ const NavBar = () => {
               setMenuToggle(menuToggle == "menu" ? "close" : "menu")
             }
           />
-          <AuthLinks showBanner={showBanner} />
+          <AuthLinks setIsAuthenticated={setIsAuthenticated} isAuthenticated={isAuthenticated} showBanner={showBanner} />
         </div>
       </nav>
       {banner.message && (
