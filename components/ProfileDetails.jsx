@@ -6,7 +6,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
   const [localProfileData, setLocalProfileData] = useState(profileData);
   const [photo, setPhoto] = useState(localProfileData.profilePhoto);
   const [usernameAvailable, setUsernameAvailable] = useState(null);
-
+const [confirmationMessage, setConfirmationMessage] = useState("")
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLocalProfileData({
@@ -54,9 +54,9 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
     setMessage(data.message || data.error);
     if (data.message) {
       setProfileData(localProfileData);
+        setConfirmationMessage(data.message)
     }
   };
-
   return (
     <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-4 bg-white shadow-md rounded">
       <h2 className="text-2xl mb-4">Welcome to Your Profile, {profileData.email}</h2>
@@ -157,6 +157,9 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
       <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded">
         Save Profile
       </button>
+      {confirmationMessage && (
+        <div className="mt-4 text-green-600 whitespace-pre-wrap">{confirmationMessage}</div>
+      )}
     </form>
   );
 };

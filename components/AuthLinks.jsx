@@ -3,13 +3,14 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
+import { useRouter } from 'next/navigation';
 
 const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -56,6 +57,7 @@ const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
     showBanner("Logout successful!", "success");
+    router.push('/');
   };
 
   return (

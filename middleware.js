@@ -1,23 +1,31 @@
 // middleware.js
 import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
 export function middleware(request) {
-  const currentUser = request.cookies.get('token')?.value;
-
+  const token = request.cookies.get('token')?.value;
   const publicPaths = ['/', '/about'];
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
 
-  if (!currentUser && !isPublicPath) {
+if(token){
+    
+    // Token is valid, allow access
+    return NextResponse.next();
+  } else {
+    console.log("THere was an error", error)
+    // Invalid token, redirect to home
+    if (isPublicPath){
+      return NextResponse.next();
+    } else {
     return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
-  if (currentUser && isPublicPath) {
-    return NextResponse.redirect(new URL('/', request.url)); // Change this to your main authenticated page
-  }
 
-  return NextResponse.next();
+
+
 }
 
 export const config = {
-  matcher: ['/', '/about', '/((?!api|_next/static|_next/image|.*\\..*).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|.*\\..*).*)'],
 };

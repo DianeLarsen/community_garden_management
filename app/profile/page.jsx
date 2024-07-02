@@ -7,6 +7,7 @@ import GroupList from '@/components/GroupList';
 
 const Profile = () => {
   const [profileData, setProfileData] = useState({
+    email: '',
     address: '',
     phone: '',
     profilePhoto: null,

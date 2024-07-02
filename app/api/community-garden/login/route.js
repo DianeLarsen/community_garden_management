@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../../../../db';
+import { serialize } from 'cookie';
 
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
-    console.log("made it to sign in api")
+
     // Validate input
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
@@ -31,7 +32,18 @@ export async function POST(request) {
     // Create JWT token
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    return NextResponse.json({ token });
+    // Set the token in a cookie
+    const cookie = serialize('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== 'development',
+      maxAge: 60 * 60, // 1 hour
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    const response = NextResponse.json({ token });
+    response.headers.set('Set-Cookie', cookie);
+    return response;
   } catch (error) {
     console.error('Error logging in user:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
