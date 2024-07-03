@@ -1,43 +1,44 @@
 "use client";
 import { useState, useEffect } from "react";
 import { CldUploadWidget } from "next-cloudinary";
+import { useRouter } from 'next/navigation';
 
 const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
   const [localProfileData, setLocalProfileData] = useState({});
-  const [tempLocalProfileData, setTempLocalProfileData] = useState({});
   const [photo, setPhoto] = useState(profileData.profilePhoto);
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const fetchProfileData = async () => {
-      const response = await fetch("/api/profile", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      setLocalProfileData(data.profile);
-    };
+//   useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     const fetchProfileData = async () => {
+//       const response = await fetch("/api/profile", {
+//         method: "GET",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+//       const data = await response.json();
+//       setLocalProfileData(data.profile);
+//     };
 
-    fetchProfileData();
-  }, []);
+//     fetchProfileData();
+//   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTempLocalProfileData({
-      ...localProfileData,
+    setLocalProfileData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
   useEffect(() => {
     const checkUsernameAvailability = async () => {
-      if (tempLocalProfileData.username) {
+      if (localProfileData.username) {
         const response = await fetch(
-          `/api/check_username?username=${tempLocalProfileData.username}`
+          `/api/check_username?username=${localProfileData.username}`
         );
         const data = await response.json();
         setUsernameAvailable(data.available);
@@ -52,6 +53,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
+    console.log(localProfileData.username)
     formData.append("username", localProfileData.username);
     formData.append("street_address", localProfileData.street_address);
     formData.append("city", localProfileData.city);
@@ -73,12 +75,10 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
     const data = await response.json();
     setMessage(data.message || data.error);
     if (data.message) {
-      const oldProfileData = JSON.stringify(profileData, null, 2);
-      const newProfileData = JSON.stringify(localProfileData, null, 2);
-      setConfirmationMessage(
-        `Profile updated successfully.\n\nBefore:\n${oldProfileData}\n\nAfter:\n${newProfileData}`
-      );
+      setConfirmationMessage(`Profile updated successfully.`);
       setProfileData(localProfileData);
+      setLocalProfileData({}); // Clear the form
+      router.refresh();
     }
   };
 
@@ -106,7 +106,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
         <input
           type="text"
           name="username"
-          value={tempLocalProfileData.username}
+          value={localProfileData.username || ""}
           onChange={handleChange}
           className={`w-full px-3 py-2 border rounded ${
             usernameAvailable === false
@@ -131,7 +131,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
         <input
           type="text"
           name="street_address"
-          value={tempLocalProfileData.street_address}
+          value={localProfileData.street_address || ""}
           onChange={handleChange}
           className="w-full px-3 py-2 border rounded"
         />
@@ -143,7 +143,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
         <input
           type="text"
           name="city"
-          value={tempLocalProfileData.city}
+          value={localProfileData.city || ""}
           onChange={handleChange}
           className="w-full px-3 py-2 border rounded"
         />
@@ -156,7 +156,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
           <input
             type="text"
             name="state"
-            value={tempLocalProfileData.state}
+            value={localProfileData.state || ""}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded"
           />
@@ -168,7 +168,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
           <input
             type="text"
             name="zip"
-            value={tempLocalProfileData.zip}
+            value={localProfileData.zip || ""}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded"
             required={!profileData?.zip}
@@ -182,7 +182,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
         <input
           type="text"
           name="phone"
-          value={tempLocalProfileData.phone}
+          value={localProfileData.phone || ""}
           onChange={handleChange}
           className="w-full px-3 py-2 border rounded"
         />
