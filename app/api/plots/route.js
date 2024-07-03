@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+  const token = request.cookies.get('token')?.value;
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
 
@@ -23,12 +23,7 @@ export async function GET(request) {
 
     const client = await pool.connect();
 
-    // Find groups the user is part of
-    const groupQuery = 'SELECT group_id FROM group_memberships WHERE user_id = $1';
-    const groupResult = await client.query(groupQuery, [userId]);
-    const groupIds = groupResult.rows.map(row => row.group_id);
-
-    // Find garden plots associated with the user, their groups, or specific garden
+    // Build dynamic query
     let plotQuery = `
       SELECT 
         gp.id, gp.size, gp.status, gp.garden_id, gp.user_id, gp.group_id, 
@@ -42,30 +37,33 @@ export async function GET(request) {
       LEFT JOIN 
         groups gr ON gp.group_id = gr.id
       WHERE 
-        gp.user_id = $1
+        1=1
     `;
+    const values = [];
+    let index = 1;
 
-    const values = [userId];
-
-    if (groupIds.length > 0) {
-      plotQuery += ` OR gp.group_id = ANY($2::int[])`;
-      values.push(groupIds);
+    // Add conditions based on the presence of parameters
+    if (userId) {
+      plotQuery += ` AND gp.user_id = $${index}`;
+      values.push(userId);
+      index++;
     }
 
     if (groupId) {
-      plotQuery += values.length > 1 ? ' OR gp.group_id = $3' : ' AND gp.group_id = $2';
+      plotQuery += ` AND gp.group_id = $${index}`;
       values.push(groupId);
+      index++;
     }
 
     if (gardenId) {
-      console.log(gardenId)
-      plotQuery += values.length > 1 ? ' OR gp.garden_id = $4' : ' AND gp.garden_id = $2';
+      plotQuery += ` AND gp.garden_id = $${index}`;
       values.push(gardenId);
+      index++;
     }
 
     const plotResult = await client.query(plotQuery, values);
-
     client.release();
+
     if (plotResult.rows.length === 0) {
       return NextResponse.json({ message: 'No plots found for the given criteria' });
     }

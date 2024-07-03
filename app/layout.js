@@ -3,6 +3,7 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -16,15 +17,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-
       <body className={inter.className}>
-
         <link rel="icon" href="/public/favicon.ico" sizes="any" />
         <header className="bg-gray-800 text-white ">
           <NavBar />
         </header>
 
         <main className="p-4">{children}</main>
+
         <footer className="bg-blue-600 text-white p-4 text-center">
           <p>&copy; 2024 Community Garden</p>
           <p>123 Garden Lane, Monroe, WA 98272</p>
