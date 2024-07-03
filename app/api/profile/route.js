@@ -1,4 +1,3 @@
-// pages/api/profile.js
 import { NextResponse } from 'next/server';
 import pool from '@/db';
 import jwt from 'jsonwebtoken';
@@ -11,6 +10,37 @@ export const config = {
     bodyParser: false,
   },
 };
+
+export async function GET(request) {
+  const token = request.headers.get('authorization')?.split(' ')[1];
+
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const client = await pool.connect();
+    const userQuery = `
+      SELECT id, email, username, street_address, city, state, zip, phone, profile_photo
+      FROM users
+      WHERE id = $1
+    `;
+    const userResult = await client.query(userQuery, [userId]);
+    client.release();
+
+    if (userResult.rows.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ profile: userResult.rows[0] });
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });
+  }
+}
 
 export async function POST(request) {
   const token = request.headers.get('authorization')?.split(' ')[1];
@@ -37,26 +67,16 @@ export async function POST(request) {
     const userId = decoded.userId;
 
     const client = await pool.connect();
-    
-    if (username) {
-        const usernameCheckQuery = 'SELECT id FROM users WHERE username = $1 AND id != $2';
-        const usernameCheckValues = [username, userId];
-        const usernameCheckResult = await client.query(usernameCheckQuery, usernameCheckValues);
-  
-        if (usernameCheckResult.rows.length > 0) {
-          client.release();
-          return NextResponse.json({ error: 'Username is already taken' }, { status: 400 });
-        }
-      }
+
     let query = 'UPDATE users SET zip = $1';
     const values = [zip];
     let index = 2;  // Starting index for additional parameters
 
     if (username) {
-        query += `, username = $${index}`;
-        values.push(username);
-        index++;
-      }
+      query += `, username = $${index}`;
+      values.push(username);
+      index++;
+    }
     if (streetAddress) {
       query += `, street_address = $${index}`;
       values.push(streetAddress);

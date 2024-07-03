@@ -48,6 +48,7 @@ const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
       setIsAuthenticated(true);
       showBanner("Login successful!", "success");
       setIsDropdownVisible(false);
+      router.push('/profile');
     } catch (error) {
       showBanner(error.message, "error");
     }

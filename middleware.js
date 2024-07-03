@@ -12,7 +12,6 @@ if(token){
     // Token is valid, allow access
     return NextResponse.next();
   } else {
-    console.log("THere was an error", error)
     // Invalid token, redirect to home
     if (isPublicPath){
       return NextResponse.next();
