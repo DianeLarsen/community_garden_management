@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { CldUploadWidget } from "next-cloudinary";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
   const [localProfileData, setLocalProfileData] = useState({});
@@ -9,25 +9,14 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const router = useRouter();
-
+//   console.log(profileData);
 //   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     const fetchProfileData = async () => {
-//       const response = await fetch("/api/profile", {
-//         method: "GET",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       const data = await response.json();
-//       setLocalProfileData(data.profile);
-//     };
-
-//     fetchProfileData();
-//   }, []);
+//     router.refresh();
+//   }, [profileData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setLocalProfileData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -53,19 +42,25 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    console.log(localProfileData.username)
-    formData.append("username", localProfileData.username);
-    formData.append("street_address", localProfileData.street_address);
-    formData.append("city", localProfileData.city);
-    formData.append("state", localProfileData.state);
-    formData.append("zip", localProfileData.zip);
-    formData.append("phone", localProfileData.phone);
+
+    formData.append(
+      "username",
+      localProfileData.username || profileData.username
+    );
+    formData.append(
+      "street_address",
+      localProfileData.street_address || profileData.street_address
+    );
+    formData.append("city", localProfileData.city || profileData.city);
+    formData.append("state", localProfileData.state || profileData.state);
+    formData.append("zip", localProfileData.zip || profileData.zip);
+    formData.append("phone", localProfileData.phone || profileData.phone);
     if (photo) {
       formData.append("profilePhoto", photo);
     }
     const token = localStorage.getItem("token");
     const response = await fetch("/api/profile", {
-      method: "POST",
+      method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -76,7 +71,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
     setMessage(data.message || data.error);
     if (data.message) {
       setConfirmationMessage(`Profile updated successfully.`);
-      setProfileData(localProfileData);
+      setProfileData((prev) => ({...prev, ...localProfileData}));
       setLocalProfileData({}); // Clear the form
       router.refresh();
     }

@@ -115,3 +115,36 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
   }
 }
+export async function PATCH(request) {
+    const token = request.headers.get('Authorization')?.split(' ')[1];
+  
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+  
+    const formData = await request.formData();
+    const updates = {};
+  
+    formData.forEach((value, key) => {
+      updates[key] = value;
+    });
+  
+    const updateFields = Object.keys(updates).map((key, index) => `${key} = $${index + 1}`).join(', ');
+    const values = Object.values(updates);
+  
+    if (updateFields.length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+    }
+  
+    try {
+      const query = `UPDATE users SET ${updateFields} WHERE id = ${userId}`;
+      await pool.query(query, values);
+  
+      return NextResponse.json({ message: 'Profile updated successfully' });
+    } catch (error) {
+      return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
+    }
+  }
