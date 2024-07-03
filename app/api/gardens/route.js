@@ -6,29 +6,43 @@ import getLatLonFromAddress from '@/utils/getLatLonFromAddress';
 
 export async function GET(request) {
   try {
-    console.error("made it here");
     const { searchParams } = new URL(request.url);
     const searchTerm = searchParams.get('searchTerm');
     const maxDistance = searchParams.get('maxDistance') || 5; // Default to 5 miles
     const limit = searchParams.get('limit') || 10; // Default to 10
     const distanceInMeters = maxDistance * 1609.34;
-    console.error("Search Term:", searchTerm);
 
-    if (!searchTerm) {
-      return NextResponse.json({ error: 'Search term is required' }, { status: 400 });
+    const token = request.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     let lat, lon;
 
-    // Check if the searchTerm is a zip code, address, or city
-    if (/\b9\d{4}\b/.test(searchTerm)) {
-      console.error("zipcode", searchTerm);
-      // It's a zip code
-      ({ lat, lon } = await getLatLonFromZipCode(searchTerm));
+    if (searchTerm) {
+      // Check if the searchTerm is a zip code, address, or city
+      if (/\b9\d{4}\b/.test(searchTerm)) {
+        // It's a zip code
+        ({ lat, lon } = await getLatLonFromZipCode(searchTerm));
+      } else {
+        // Assume it's an address or city
+        ({ lat, lon } = await getLatLonFromAddress(searchTerm));
+      }
     } else {
-      console.error("not zip code", searchTerm);
-      // Assume it's an address or city
-      ({ lat, lon } = await getLatLonFromAddress(searchTerm));
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.userId;
+
+      const client = await pool.connect();
+      const userQuery = 'SELECT zip FROM users WHERE id = $1';
+      const userResult = await client.query(userQuery, [userId]);
+      client.release();
+
+      if (userResult.rowCount === 0) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      const userZip = userResult.rows[0].zip;
+      ({ lat, lon } = await getLatLonFromZipCode(userZip));
     }
 
     const query = `
