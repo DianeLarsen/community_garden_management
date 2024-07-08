@@ -1,7 +1,6 @@
 "use client";
 import { useState } from 'react';
-import Link from 'next/link'; // Import Link from next/link
-import GardenPlots from './GardenPlots';
+import Link from 'next/link';
 import GardenMap from './GardenMap';
 
 const FindPlot = () => {
@@ -54,11 +53,12 @@ const FindPlot = () => {
       }
 
       const data = await response.json();
-
-      // Filter the plots to only include those with status 'available'
-      const availablePlots = data.filter(plot => plot.status === 'available');
-
-      setPlots(availablePlots);
+      if (Array.isArray(data) && data.length > 0) {
+        const availablePlots = data.filter(plot => plot.status === 'available');
+        setPlots(availablePlots);
+      } else {
+        setPlots([]); // Set an empty array if no plots are found
+      }
     } catch (error) {
       setError(error.message);
     }
@@ -156,7 +156,7 @@ const FindPlot = () => {
               </tr>
             </thead>
             <tbody>
-              {plots.map((plot) => (
+              {plots.length > 0 ? plots.map((plot) => (
                 <tr key={plot.id}>
                   <td className="border px-4 py-2">{plot.size}</td>
                   <td className="border px-4 py-2">{plot.status}</td>
@@ -166,10 +166,11 @@ const FindPlot = () => {
                     </Link>
                   </td>
                 </tr>
-              ))}
+              )) : <p>No Plots available at this garden</p>}
             </tbody>
           </table>
-          <h2 className="text-xl font-bold mt-4 mb-2">Map and Directions to {selectedGarden.name}</h2>
+          <h2 className="text-xl font-bold mt-4 mb-2 text-blue-600"><Link href={`/gardens/${selectedGarden.id}`}>Map and Directions to {selectedGarden.name}
+          </Link></h2>
         
         </div>
       )}

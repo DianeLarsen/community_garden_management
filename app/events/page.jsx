@@ -1,4 +1,6 @@
+
 const EventCalendar = () => {
+
   return (
     <div>
       <h2 className="text-xl font-bold">Event Calendar</h2>

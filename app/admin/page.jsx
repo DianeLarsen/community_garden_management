@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 const AdminPage = () => {
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const response = await fetch('/api/community-garden/users');
+        const response = await fetch("/api/community-garden/users");
         if (!response.ok) {
           const text = await response.text();
           throw new Error(`Network response was not ok: ${text}`);
@@ -17,7 +17,7 @@ const AdminPage = () => {
         const data = await response.json();
         setUsers(data.users);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error("Error fetching users:", error);
         setError(error.message);
       }
     }
@@ -27,10 +27,10 @@ const AdminPage = () => {
 
   const handleRoleChange = async (id, newRole) => {
     try {
-      const response = await fetch('/api/community-garden/users', {
-        method: 'PATCH',
+      const response = await fetch("/api/community-garden/users", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ id, role: newRole }),
       });
@@ -41,9 +41,9 @@ const AdminPage = () => {
       }
 
       const data = await response.json();
-      setUsers(users.map(user => (user.id === id ? data.user : user)));
+      setUsers(users.map((user) => (user.id === id ? data.user : user)));
     } catch (error) {
-      console.error('Error updating user role:', error);
+      console.error("Error updating user role:", error);
       setError(error.message);
     }
   };
@@ -63,16 +63,16 @@ const AdminPage = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map(user => (
+          {users.map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
-              <td>{user.verified ? 'Yes' : 'No'}</td>
+              <td>{user.verified ? "Yes" : "No"}</td>
               <td>
                 <select
                   value={user.role}
-                  onChange={e => handleRoleChange(user.id, e.target.value)}
+                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
                 >
                   <option value="member">Member</option>
                   <option value="admin">Admin</option>

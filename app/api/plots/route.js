@@ -7,9 +7,9 @@ export async function GET(request) {
   const token = request.cookies.get('token')?.value;
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
+  const userInfo = searchParams.get('userInfo');
 
-
-  if (!token) {
+  if (!token && userInfo) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -43,7 +43,7 @@ export async function GET(request) {
     let index = 1;
 
     // Add conditions based on the presence of parameters
-    if (userId) {
+    if (userId && userInfo) {
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(userId);
       index++;
@@ -57,11 +57,14 @@ export async function GET(request) {
 
     if (gardenId) {
       plotQuery += ` AND gp.garden_id = $${index}`;
+      
       values.push(gardenId);
       index++;
     }
-
+    console.log(plotQuery)
+    console.log(values)
     const plotResult = await client.query(plotQuery, values);
+    // console.log(plotResult)
     client.release();
 
     if (plotResult.rows.length === 0) {

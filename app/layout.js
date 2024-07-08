@@ -2,7 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
-
+import TokenRefresher from "@/components/TokenRefresher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
         <header className="bg-gray-800 text-white ">
           <NavBar />
         </header>
-
+        <TokenRefresher />
         <main className="p-4">{children}</main>
 
         <footer className="bg-blue-600 text-white p-4 text-center">

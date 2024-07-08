@@ -16,7 +16,7 @@ console.log(plots)
       }
 
       try {
-        const response = await fetch(`/api/plots?token=${token}`, {
+        const response = await fetch(`/api/plots?token=${token}&userInfo=true`, {
           method: 'GET',
         });
 
