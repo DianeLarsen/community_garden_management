@@ -11,13 +11,12 @@ const NavBar = () => {
 
   useEffect(() => {
     // Check if the user is authenticated by looking for a token in localStorage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
     }
-   
   }, []);
 
   const showBanner = (message, type) => {
@@ -25,18 +24,20 @@ const NavBar = () => {
     setTimeout(() => setBanner({ message: "", type: "" }), 30000); // Hide banner after 3 seconds
   };
 
-  const navLinks = isAuthenticated ? [
-    { href: "/", label: "Home" },
-    { href: "/plots", label: "Plots" },
-    { href: "/events", label: "Events" },
-    { href: "/weather", label: "Weather" },
-    { href: "/gardens", label: "Gardens" },
-    { href: "/groups", label: "Groups" },
-    { href: "/about", label: "About" },
-  ] : [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-  ];
+  const navLinks = isAuthenticated
+    ? [
+        { href: "/", label: "Home" },
+
+        { href: "/events", label: "Events" },
+        { href: "/weather", label: "Weather" },
+        { href: "/gardens", label: "Gardens" },
+        { href: "/groups", label: "Groups" },
+        { href: "/about", label: "About" },
+      ]
+    : [
+        { href: "/", label: "Home" },
+        { href: "/about", label: "About" },
+      ];
 
   return (
     <>
@@ -84,7 +85,11 @@ const NavBar = () => {
               setMenuToggle(menuToggle == "menu" ? "close" : "menu")
             }
           />
-          <AuthLinks setIsAuthenticated={setIsAuthenticated} isAuthenticated={isAuthenticated} showBanner={showBanner} />
+          <AuthLinks
+            setIsAuthenticated={setIsAuthenticated}
+            isAuthenticated={isAuthenticated}
+            showBanner={showBanner}
+          />
         </div>
       </nav>
       {banner.message && (

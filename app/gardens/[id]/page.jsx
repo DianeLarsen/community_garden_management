@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import GardenMap from "@/components/GardenMap";
 import PlotCreate from "@/components/PlotCreate";
 
+import PlotsList from "@/components/PlotsList";
+
+
 const GardenDetails = () => {
   const { id } = useParams();
   const [garden, setGarden] = useState(null);
@@ -11,6 +14,7 @@ const GardenDetails = () => {
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState("");
   const [newPlot, setNewPlot] = useState({ location: "", size: "", user_id: "" });
+
 
   useEffect(() => {
     const fetchGarden = async () => {
@@ -21,7 +25,7 @@ const GardenDetails = () => {
         }
         const data = await response.json();
         setGarden(data);
-        fetchPlots(id);
+
         fetchGroups(id);
       } catch (error) {
         setError(error.message);
@@ -33,18 +37,6 @@ const GardenDetails = () => {
     }
   }, [id]);
 
-  const fetchPlots = async (gardenId) => {
-    try {
-      const response = await fetch(`/api/plots?gardenId=${gardenId}`);
-      if (!response.ok) {
-        throw new Error("Error fetching plots");
-      }
-      const data = await response.json();
-      setPlots(data.length > 0 ? [...data] : [data]);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
 
   const fetchGroups = async (gardenId) => {
     try {
@@ -59,21 +51,7 @@ const GardenDetails = () => {
     }
   };
 
-  const handleDeletePlot = async (plotId) => {
-    try {
-      const response = await fetch(`/api/gardens/${id}/plots/${plotId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error deleting plot");
-      }
-
-      fetchPlots(id);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+ 
 
   if (error) {
     return <p className="text-red-500">{error}</p>;
@@ -138,37 +116,17 @@ const GardenDetails = () => {
         <PlotCreate
           newPlot={newPlot}
           setNewPlot={setNewPlot}
-          fetchPlots={fetchPlots}
+
           gardenId={id}
         />
       </div>
 
       <div className="mb-6 p-4 bg-white shadow-md rounded">
         <h3 className="text-lg font-bold mb-4">Existing Plots</h3>
-        {plots[0]?.message ? (
-          <p>No plots available.</p>
-        ) : (
-          <ul>
-            {plots.map((plot) => (
-              <li
-                key={plot.id}
-                className="mb-2 flex justify-between items-center"
-              >
-                <div>
-                  <p>Size: {plot.size}</p>
-                  <p>Status: {plot.status}</p>
-                  <p>User ID: {plot.user_id}</p>
-                </div>
-                <button
-                  onClick={() => handleDeletePlot(plot.id)}
-                  className="text-red-600"
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+
+
+          <PlotsList setError={setError} gardenId={id} message={"No Plots associated with this garden."}/>
+   
       </div>
     </div>
   );

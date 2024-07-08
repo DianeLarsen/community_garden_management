@@ -1,68 +1,88 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-const PlotsList = () => {
+import Link from "next/link";
+const PlotsList = ({ user = "", setError = [], message = "", gardenId = "", groupId = ""}) => {
   const [plots, setPlots] = useState([]);
-  const [error, setError] = useState('');
-  const router = useRouter();
-console.log(plots)
+  const [userInfo, setUserInfo] = useState(false);
+
   useEffect(() => {
-    const fetchPlots = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setError('You must be logged in to view plots.');
-        return;
+    if (user) {
+      setUserInfo(true);
+    } else {
+      setUserInfo(false);
+    }
+  }, [user]);
+
+
+  useEffect(() => {
+  const fetchPlots = async () => {
+    try {
+      const response = await fetch(
+        `/api/plots?gardenId=${gardenId}&groupId=${groupId}&userInfo=${userInfo}`
+      );
+      if (!response.ok) {
+        throw new Error("Error fetching plots");
       }
+      const data = await response.json();
+      setPlots(data.length > 0 ? [...data] : [data]);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+  fetchPlots()
+}, [gardenId, groupId, userInfo]);
+const handleDeletePlot = async (plotId) => {
+  try {
+    const response = await fetch(`/api/gardens/${id}/plots/${plotId}`, {
+      method: "DELETE",
+    });
 
-      try {
-        const response = await fetch(`/api/plots?token=${token}&userInfo=true`, {
-          method: 'GET',
-        });
+    if (!response.ok) {
+      throw new Error("Error deleting plot");
+    }
 
-        const data = await response.json();
-        if (response.ok) {
-          setPlots(data);
-        } else {
-          if (data.error === 'Unauthorized') {
-            setError('Session expired. Please log in again.');
-            localStorage.removeItem('token');
-            router.push('/login'); // Redirect to login page
-          } else {
-            setError(data.error);
-          }
-        }
-      } catch (err) {
-        setError('Failed to fetch plots.');
-      }
-    };
 
-    fetchPlots();
-  }, [router]);
-
-  if (error) {
-    return <div className="text-red-500 font-bold mt-4">{error}</div>;
+  } catch (error) {
+    setError(error.message);
   }
+};
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Plots</h1>
-      {plots.message == 'No plots found for the given criteria' ? (
-        <div className="text-center text-gray-600">
-          <p>You currently have no plots.</p>
-          <p>Search for available plots below.</p>
-        </div>
-      ) : (
-        <ul className="list-none p-0">
-          {plots.map(plot => (
-            <li key={plot.id} className="bg-gray-100 mb-4 p-4 rounded shadow-md">
-              <div className="font-semibold">Location: {plot.location}</div>
-              <div>Size: {plot.size}</div>
-              <div>Status: {plot.status}</div>
+      <ul className="list-none p-0">
+        {plots[0]?.message || plots.length === 0 ? (
+          <p>{message}</p>
+        ) : (
+          plots.map((plot) => (
+            <li
+              key={plot.id}
+              className="mb-2 flex justify-between items-center"
+            >
+              <div>
+                <p>Size: {plot.size}</p>
+                <p>Status: {plot.status}</p>
+                <p>User ID: {plot.user_id}</p>
+              </div>
+              {user?.isAdmin && (
+                <button
+                  onClick={() => handleDeletePlot(plot.id)}
+                  className="text-red-600"
+                >
+                  Delete
+                </button>
+              )}
+              {plot.status === "available" && (
+                <Link
+                  href={`/plots/reserve/${plot.id}`}
+                  className="text-blue-600 ml-4"
+                >
+                  Reserve
+                </Link>
+              )}
             </li>
-          ))}
-        </ul>
-      )}
+          ))
+        )}
+      </ul>
     </div>
   );
 };

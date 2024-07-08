@@ -35,7 +35,7 @@ const GardenList = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Community Gardens</h1>
+      <h1 className="text-2xl font-bold mb-4">Community Gardens Near You</h1>
       <ul className="list-none p-0">
         {gardens.map(garden => (
           <li 

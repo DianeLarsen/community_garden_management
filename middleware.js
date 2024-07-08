@@ -13,6 +13,7 @@ if(token){
     return NextResponse.next();
   } else {
     // Invalid token, redirect to home
+    console.log("Invalid token")
     if (isPublicPath){
       return NextResponse.next();
     } else {

@@ -9,7 +9,7 @@ export async function GET(request) {
   const gardenId = searchParams.get('gardenId');
   const userInfo = searchParams.get('userInfo');
 
-  if (!token && userInfo) {
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -43,26 +43,29 @@ export async function GET(request) {
     let index = 1;
 
     // Add conditions based on the presence of parameters
-    if (userId && userInfo) {
+    if (userInfo == "true" && userId) {
+
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(userId);
       index++;
     }
 
     if (groupId) {
+
       plotQuery += ` AND gp.group_id = $${index}`;
       values.push(groupId);
       index++;
     }
 
     if (gardenId) {
+
       plotQuery += ` AND gp.garden_id = $${index}`;
       
       values.push(gardenId);
       index++;
     }
-    console.log(plotQuery)
-    console.log(values)
+    // console.log(plotQuery)
+    // console.log(values)
     const plotResult = await client.query(plotQuery, values);
     // console.log(plotResult)
     client.release();
