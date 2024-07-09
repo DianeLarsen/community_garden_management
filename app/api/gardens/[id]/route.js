@@ -2,8 +2,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/db";
 import jwt from "jsonwebtoken";
-import getLatLonFromZipCode from "@/utils/getLatLonFromZipCode";
-import getLatLonFromAddress from "@/utils/getLatLonFromAddress";
 
 export async function GET(request, { params }) {
   const { id } = params;

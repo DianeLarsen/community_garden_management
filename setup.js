@@ -94,7 +94,8 @@ async function setupDatabase() {
         id SERIAL PRIMARY KEY,
         garden_id INTEGER REFERENCES gardens(id),
         location VARCHAR(255) NOT NULL,
-        size VARCHAR(50),
+        length VARCHAR(50),
+        width  VARCHAR(50),
         status VARCHAR(50) DEFAULT 'available',
         user_id INTEGER REFERENCES users(id),
         group_id INTEGER REFERENCES groups(id),
@@ -219,14 +220,16 @@ async function setupDatabase() {
     for (const garden of gardensWithRentalBeds.rows) {
       for (let i = 1; i <= 20; i++) {
         const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
+        const length = size.split("x")[0]
+        const width = size.split("x")[1]
         const status =
           plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
         await client.query(
           `
-          INSERT INTO garden_plots (garden_id, location, size, status) VALUES 
-          ($1, $2, $3, $4)
+          INSERT INTO garden_plots (garden_id, location, length, width, status) VALUES 
+          ($1, $2, $3, $4, $5)
         `,
-          [garden.id, `Plot ${i}`, size, status]
+          [garden.id, `Plot ${i}`, length, width, status]
         );
       }
     }

@@ -1,7 +1,8 @@
 "use client";
-import { useState } from 'react';
-import Link from 'next/link';
-import GardenMap from './GardenMap';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import GardenMap from "./GardenMap";
+import PlotsList from "./PlotsList";
 
 const FindPlot = () => {
   const [gardens, setGardens] = useState([]);
@@ -13,14 +14,27 @@ const FindPlot = () => {
   const [selectedGarden, setSelectedGarden] = useState(null);
   const [plots, setPlots] = useState([]); // State for storing plots
 
+  const [user, setUser] = useState({
+    email: "",
+    username: "",
+    street_address: "",
+    city: "",
+    state: "",
+    zip: "",
+    phone: "",
+    profilePhoto: null,
+  });
   const fetchGardens = async () => {
     try {
-      const response = await fetch(`/api/gardens?searchTerm=${searchTerm}&maxDistance=${maxDistance}&limit=${limit}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `/api/gardens?searchTerm=${searchTerm}&maxDistance=${maxDistance}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Error fetching gardens");
@@ -31,7 +45,7 @@ const FindPlot = () => {
         setMessage(data.message);
         setGardens([]);
       } else {
-        setMessage('');
+        setMessage("");
         setGardens(data);
       }
     } catch (error) {
@@ -42,10 +56,10 @@ const FindPlot = () => {
   const fetchPlots = async (gardenId) => {
     try {
       const response = await fetch(`/api/plots?gardenId=${gardenId}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       if (!response.ok) {
@@ -54,7 +68,9 @@ const FindPlot = () => {
 
       const data = await response.json();
       if (Array.isArray(data) && data.length > 0) {
-        const availablePlots = data.filter(plot => plot.status === 'available');
+        const availablePlots = data.filter(
+          (plot) => plot.status === "available"
+        );
         setPlots(availablePlots);
       } else {
         setPlots([]); // Set an empty array if no plots are found
@@ -63,11 +79,31 @@ const FindPlot = () => {
       setError(error.message);
     }
   };
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("/api/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setUser(data.profile);
 
+        setGroups(data.groups);
+      } catch (error) {
+        setMessage("Error fetching profile data");
+      }
+    };
+
+    fetchProfileData();
+  }, []);
   const handleSearch = (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
+    setError("");
+    setMessage("");
     fetchGardens();
   };
 
@@ -134,44 +170,28 @@ const FindPlot = () => {
           {gardens.map((garden) => (
             <tr key={garden.id} onClick={() => handleRowClick(garden)}>
               <td className="border px-4 py-2">
-                <Link href={`/gardens/${garden.id}`}>
-                 {garden.name}
-                </Link>
+                <Link href={`/gardens/${garden.id}`}>{garden.name}</Link>
               </td>
               <td className="border px-4 py-2">{garden.available_plots}</td>
-              <td className="border px-4 py-2">{(garden.distance / 1609.34).toFixed(2)}</td>
+              <td className="border px-4 py-2">
+                {(garden.distance / 1609.34).toFixed(2)}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
       {selectedGarden && (
         <div>
-          <h2 className="text-xl font-bold mt-4 mb-2">Available Plots at {selectedGarden.name}</h2>
-          <table className="w-full table-auto border-collapse">
-            <thead>
-              <tr>
-                <th className="border px-4 py-2">Plot Size</th>
-                <th className="border px-4 py-2">Status</th>
-                <th className="border px-4 py-2">Link to Garden</th>
-              </tr>
-            </thead>
-            <tbody>
-              {plots.length > 0 ? plots.map((plot) => (
-                <tr key={plot.id}>
-                  <td className="border px-4 py-2">{plot.size}</td>
-                  <td className="border px-4 py-2">{plot.status}</td>
-                  <td className="border px-4 py-2">
-                    <Link href={`/gardens/${selectedGarden.id}`}>
-                      View Garden
-                    </Link>
-                  </td>
-                </tr>
-              )) : <p>No Plots available at this garden</p>}
-            </tbody>
-          </table>
-          <h2 className="text-xl font-bold mt-4 mb-2 text-blue-600"><Link href={`/gardens/${selectedGarden.id}`}>Map and Directions to {selectedGarden.name}
-          </Link></h2>
-        
+          <h2 className="text-xl font-bold mt-4 mb-2">
+            Available Plots at {selectedGarden.name}
+          </h2>
+          <PlotsList gardenId={selectedGarden.id} user={user}/>
+
+          <h2 className="text-xl font-bold mt-4 mb-2 text-blue-600">
+            <Link href={`/gardens/${selectedGarden.id}`}>
+              Map and Directions to {selectedGarden.name}
+            </Link>
+          </h2>
         </div>
       )}
     </div>

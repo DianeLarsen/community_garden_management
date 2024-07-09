@@ -39,12 +39,13 @@ const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
       });
 
       const data = await response.json();
-
+console.log(data)
       if (!response.ok) {
         throw new Error(data.error || "Something went wrong");
       }
 
       localStorage.setItem("token", data.token);
+      setEmail(data.email)
       setIsAuthenticated(true);
       showBanner("Login successful!", "success");
       setIsDropdownVisible(false);
@@ -71,6 +72,7 @@ const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
             alt="Profile"
             className="rounded-full cursor-pointer object-cover border-double border-4 border-blue-600"
             fill={true}
+            title={email}
             // width={120}
             // height={120}
             onClick={() => setIsDropdownVisible(!isDropdownVisible)}

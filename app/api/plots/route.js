@@ -8,7 +8,7 @@ export async function GET(request) {
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
   const userInfo = searchParams.get('userInfo');
-
+console.log(groupId, gardenId, userInfo)
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -26,7 +26,7 @@ export async function GET(request) {
     // Build dynamic query
     let plotQuery = `
       SELECT 
-        gp.id, gp.size, gp.status, gp.garden_id, gp.user_id, gp.group_id, 
+        gp.id, gp.length,gp.width,  gp.status, gp.garden_id, gp.user_id, gp.group_id, 
         g.name AS garden_name, u.email AS user_email, gr.name AS group_name
       FROM 
         garden_plots gp
@@ -44,7 +44,7 @@ export async function GET(request) {
 
     // Add conditions based on the presence of parameters
     if (userInfo == "true" && userId) {
-
+      console.log(userId)
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(userId);
       index++;

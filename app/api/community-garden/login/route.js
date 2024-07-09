@@ -41,7 +41,7 @@ export async function POST(request) {
       path: '/',
     });
 
-    const response = NextResponse.json({ token });
+    const response = NextResponse.json({ token, email });
     response.headers.set('Set-Cookie', cookie);
     return response;
   } catch (error) {
