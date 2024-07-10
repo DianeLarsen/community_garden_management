@@ -3,6 +3,7 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
 import TokenRefresher from "@/components/TokenRefresher";
+import { BasicProvider } from "@/context/BasicContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
+      <BasicProvider>
         <link rel="icon" href="/public/favicon.ico" sizes="any" />
         <header className="bg-gray-800 text-white ">
           <NavBar />
@@ -53,6 +55,7 @@ export default function RootLayout({ children }) {
             </Link>
           </div>
         </footer>
+        </BasicProvider>
       </body>
     </html>
   );

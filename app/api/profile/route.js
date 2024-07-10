@@ -24,7 +24,7 @@ export async function GET(request) {
 
     const client = await pool.connect();
     const userQuery = `
-      SELECT id, email, username, street_address, city, state, zip, phone, profile_photo
+      SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
       FROM users
       WHERE id = $1
     `;

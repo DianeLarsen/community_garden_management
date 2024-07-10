@@ -13,17 +13,11 @@ const FindPlot = () => {
   const [message, setMessage] = useState("");
   const [selectedGarden, setSelectedGarden] = useState(null);
   const [plots, setPlots] = useState([]); // State for storing plots
-
-  const [user, setUser] = useState({
-    email: "",
-    username: "",
-    street_address: "",
-    city: "",
-    state: "",
-    zip: "",
-    phone: "",
-    profilePhoto: null,
-  });
+  const [loading, setLoading] = useState(true); // State for loading
+  const [groups, setGroups] = useState([]);
+  const [user, setUser] = useState({});
+  const [userInfo, setUserInfo] = useState(false)
+console.log(user)
   const fetchGardens = async () => {
     try {
       const response = await fetch(
@@ -79,6 +73,7 @@ const FindPlot = () => {
       setError(error.message);
     }
   };
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -93,13 +88,15 @@ const FindPlot = () => {
         setUser(data.profile);
 
         setGroups(data.groups);
+        setLoading(false);
       } catch (error) {
         setMessage("Error fetching profile data");
-      }
+      } 
     };
 
     fetchProfileData();
   }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     setError("");
@@ -111,6 +108,10 @@ const FindPlot = () => {
     setSelectedGarden(garden);
     fetchPlots(garden.id);
   };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -185,7 +186,7 @@ const FindPlot = () => {
           <h2 className="text-xl font-bold mt-4 mb-2">
             Available Plots at {selectedGarden.name}
           </h2>
-          <PlotsList gardenId={selectedGarden.id} user={user}/>
+          <PlotsList gardenId={selectedGarden.id} user={user} userInfo={false} status="available"/>
 
           <h2 className="text-xl font-bold mt-4 mb-2 text-blue-600">
             <Link href={`/gardens/${selectedGarden.id}`}>

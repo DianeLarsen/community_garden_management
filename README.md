@@ -50,3 +50,8 @@ Please be careful, when you push this to a repository and pull from somewhere el
 
 How to creat a jwt secret:
 openssl rand -base64 64
+
+turning off password on sudo
+sudo visudo
+ add this to end:
+your-username ALL=(ALL) NOPASSWD: /etc/init.d/postgresql

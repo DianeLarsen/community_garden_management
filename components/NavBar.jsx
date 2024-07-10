@@ -2,27 +2,23 @@
 import Link from "next/link";
 import AuthLinks from "@/components/AuthLinks";
 import { IoMdMenu } from "react-icons/io";
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
+import { BasicContext } from "@/context/BasicContext";
 
 const NavBar = () => {
   const [menuToggle, setMenuToggle] = useState("menu");
-  const [banner, setBanner] = useState({ message: "", type: "" });
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    // Check if the user is authenticated by looking for a token in localStorage
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, []);
 
-  const showBanner = (message, type) => {
-    setBanner({ message, type });
-    setTimeout(() => setBanner({ message: "", type: "" }), 30000); // Hide banner after 3 seconds
-  };
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    banner,
+    setBanner,
+    setUser, 
+    showBanner
+  } = useContext(BasicContext);
+
+
 
   const navLinks = isAuthenticated
     ? [

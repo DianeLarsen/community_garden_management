@@ -1,13 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from 'next/navigation';
+import { useRouter  } from 'next/navigation';
+import { BasicContext } from "@/context/BasicContext";
 
-const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
+const AuthLinks = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    showBanner
+  } = useContext(BasicContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
@@ -39,7 +44,7 @@ const AuthLinks = ({ showBanner, isAuthenticated, setIsAuthenticated }) => {
       });
 
       const data = await response.json();
-console.log(data)
+
       if (!response.ok) {
         throw new Error(data.error || "Something went wrong");
       }

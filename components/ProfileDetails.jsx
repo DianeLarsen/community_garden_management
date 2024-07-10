@@ -1,18 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { CldUploadWidget } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 
-const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
+const ProfileDetails = ({ user, setUser, setMessage }) => {
   const [localProfileData, setLocalProfileData] = useState({});
-  const [photo, setPhoto] = useState(profileData.profilePhoto);
+  const [photo, setPhoto] = useState(
+    user?.profilePhoto ||
+      "https://res.cloudinary.com/dqjh46sk5/image/upload/v1677786781/zpoquv2r7p88ahgupk0d.jpg"
+  );
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const router = useRouter();
-//   console.log(profileData);
-//   useEffect(() => {
-//     router.refresh();
-//   }, [profileData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,18 +43,15 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
     e.preventDefault();
     const formData = new FormData();
 
-    formData.append(
-      "username",
-      localProfileData.username || profileData.username
-    );
+    formData.append("username", localProfileData.username || user.username);
     formData.append(
       "street_address",
-      localProfileData.street_address || profileData.street_address
+      localProfileData.street_address || user.street_address
     );
-    formData.append("city", localProfileData.city || profileData.city);
-    formData.append("state", localProfileData.state || profileData.state);
-    formData.append("zip", localProfileData.zip || profileData.zip);
-    formData.append("phone", localProfileData.phone || profileData.phone);
+    formData.append("city", localProfileData.city || user.city);
+    formData.append("state", localProfileData.state || user.state);
+    formData.append("zip", localProfileData.zip || user.zip);
+    formData.append("phone", localProfileData.phone || user.phone);
     if (photo) {
       formData.append("profilePhoto", photo);
     }
@@ -71,7 +68,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
     setMessage(data.message || data.error);
     if (data.message) {
       setConfirmationMessage(`Profile updated successfully.`);
-      setProfileData((prev) => ({...prev, ...localProfileData}));
+      setUser((prev) => ({ ...prev, ...localProfileData }));
       setLocalProfileData({}); // Clear the form
       router.refresh();
     }
@@ -84,17 +81,16 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
     >
       <h2 className="text-2xl mb-4">
         Welcome to Your Profile,{" "}
-        {profileData.username.charAt(0).toUpperCase() +
-          profileData.username.slice(1) || "N/A"}
+        {user.username.charAt(0).toUpperCase() + user.username.slice(1) ||
+          "N/A"}
       </h2>
 
       <h3 className="text-xl mb-2">Update Profile</h3>
       <div className="mb-4">
         <label className="block mb-2 text-sm font-medium text-gray-700">
           Username:{" "}
-          {profileData?.username
-            ? profileData.username.charAt(0).toUpperCase() +
-              profileData.username.slice(1)
+          {user?.username
+            ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
             : "N/A"}{" "}
           <span className="text-red-500">*</span>
         </label>
@@ -110,7 +106,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
               ? "border-green-500"
               : ""
           }`}
-          required={!profileData?.username}
+          required={!user?.username}
         />
         {usernameAvailable === false && (
           <p className="text-red-500">Username is taken</p>
@@ -121,7 +117,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
       </div>
       <div className="mb-4">
         <label className="block mb-2 text-sm font-medium text-gray-700">
-          Street Address: {profileData?.street_address}
+          Street Address: {user?.street_address}
         </label>
         <input
           type="text"
@@ -133,7 +129,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
       </div>
       <div className="mb-4">
         <label className="block mb-2 text-sm font-medium text-gray-700">
-          City: {profileData?.city}
+          City: {user?.city}
         </label>
         <input
           type="text"
@@ -146,7 +142,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
       <div className="mb-4 flex">
         <div className="w-1/2 pr-2">
           <label className="block mb-2 text-sm font-medium text-gray-700">
-            State: {profileData?.state}
+            State: {user?.state}
           </label>
           <input
             type="text"
@@ -158,7 +154,7 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
         </div>
         <div className="w-1/2 pl-2">
           <label className="block mb-2 text-sm font-medium text-gray-700">
-            Zip Code: {profileData?.zip} <span className="text-red-500">*</span>
+            Zip Code: {user?.zip} <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -166,13 +162,13 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
             value={localProfileData.zip || ""}
             onChange={handleChange}
             className="w-full px-3 py-2 border rounded"
-            required={!profileData?.zip}
+            required={!user?.zip}
           />
         </div>
       </div>
       <div className="mb-4">
         <label className="block mb-2 text-sm font-medium text-gray-700">
-          Phone: {profileData?.phone}
+          Phone: {user?.phone}
         </label>
         <input
           type="text"
@@ -193,29 +189,16 @@ const ProfileDetails = ({ profileData, setProfileData, setMessage }) => {
             widget.close();
           }}
         >
-          {({ open }) =>
-            photo ? (
-              <div className="relative group cursor-pointer" onClick={open}>
-                <img
-                  src={photo}
-                  alt="Profile"
-                  className="w-32 h-32 object-cover rounded-full"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-medium">
-                  Click to update profile picture
-                </div>
+          {({ open }) => (
+            <div className="relative group cursor-pointer" onClick={open}>
+              <div className="relative w-32 h-32 rounded-full items-center">
+                <Image src={photo} alt="Profile" fill={true} />
               </div>
-            ) : (
-              <div className="relative group cursor-pointer" onClick={open}>
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
-                  No Photo
-                </div>
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-medium">
-                  Click to add profile picture
-                </div>
+              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-medium">
+                Click to update profile picture
               </div>
-            )
-          }
+            </div>
+          )}
         </CldUploadWidget>
       </div>
       <button
