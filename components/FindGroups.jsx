@@ -38,7 +38,7 @@ const fetchGroups = async (e) => {
 
   return (
     <div className="container mx-auto p-4">
-    <h1 className="text-2xl font-bold mb-4">Find a Community Garden</h1>
+    <h1 className="text-2xl font-bold mb-4">Find a Community Garden Group</h1>
     {error && <p className="text-red-500">{error}</p>}
     {message && <p className="text-yellow-500">{message}</p>}
     <form onSubmit={fetchGroups} className="mb-4">

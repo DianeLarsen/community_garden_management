@@ -6,6 +6,7 @@ import PlotCreate from "@/components/PlotCreate";
 import PlotsList from "@/components/PlotsList";
 import { BasicContext } from "@/context/BasicContext";
 import GroupList from "@/components/GroupList";
+import CreateEvent from "@/components/CreateEvent";
 
 const GardenDetails = () => {
   const { id } = useParams();
@@ -23,7 +24,7 @@ const GardenDetails = () => {
     user_id: "",
     group_id: "",
   });
-  console.log(user);
+  // console.log(user);
 
   useEffect(() => {
     const fetchGarden = async () => {
@@ -156,6 +157,7 @@ const GardenDetails = () => {
           message={"No Plots associated with this garden."}
         />
       </div>
+      <CreateEvent gardenId={id}/>
     </div>
   );
 };

@@ -1,6 +1,4 @@
-import React from "react";
 
-import GroupList from "@/components/GroupList";
 import FindGroups from "@/components/FindGroups";
 
 const GroupsPage = () => {

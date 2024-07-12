@@ -128,7 +128,10 @@ async function setupDatabase() {
         name VARCHAR(255) NOT NULL,
         description TEXT,
         date TIMESTAMP NOT NULL,
-        location VARCHAR(255),
+        plot_id INTEGER REFERENCES garden_plots(id),
+        group_id INTEGER REFERENCES groups(id),
+        user_id INTEGER REFERENCES users(id),
+        garden_id INTEGER REFERENCES gardens(id),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -253,7 +256,7 @@ async function setupDatabase() {
 
     // Insert sample plot history
     await client.query(`
-     INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose) VALUES 
+     INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose ) VALUES 
           (1, 1, null, '2024-01-01', 12, 'Personal gardening'),
      (2, 2, null, '2024-02-01', 6, 'Community event'),
      (3, 3, 1, '2024-03-01', 8, 'Group gardening project'),
@@ -264,6 +267,36 @@ async function setupDatabase() {
   (8, 5, 3, '2024-05-01', 10, 'Herb growing workshop')
    `);
     console.log("Sample plot history inserted.");
+
+    await client.query(`
+      INSERT INTO events (name, description, date, group_id, user_id, garden_id, plot_id) VALUES
+    ('Community Gardening Day', 'Join us for a community gardening day!', '2024-07-20 09:00:00',  1, 1, 1, 1),
+    ('Organic Farming Workshop', 'Learn about organic farming techniques.', '2024-07-22 14:00:00',  2, 2, 2, 21),
+    ('Urban Farming Meetup', 'Meet other urban farmers and share tips.', '2024-07-25 18:00:00',  3, 3, 3, 41),
+    ('Herb Gardening Class', 'Discover the secrets of herb gardening.', '2024-07-28 10:00:00',  4, 4, 4, 61),
+    ('Vegetable Planting Session', 'Hands-on vegetable planting session.', '2024-07-30 15:00:00',  5, 5, 5, 81);
+    `);
+    console.log("Sample events inserted.");
+    
+
+     await client.query(`
+     INSERT INTO event_registrations (user_id, event_id, group_id) VALUES
+(1, 1, 1),
+(2, 2, 2),
+(3, 3, 3),
+(4, 4, 4),
+(5, 5, 5),
+(1, 2, 1),
+(2, 3, 2),
+(3, 4, 3),
+(4, 5, 4),
+(5, 1, 5);
+
+    `);
+     console.log("Sample event registration inserted.");
+
+
+
   } catch (error) {
     console.error("Error setting up the database:", error);
     throw error;

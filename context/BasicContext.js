@@ -1,5 +1,18 @@
 "use client";
 import { createContext, useState, useEffect } from "react";
+import {
+  addMonths,
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  getDay,
+  isSameDay,
+  isSameMonth,
+  isBefore,
+  isToday,
+  loading,
+} from "date-fns";
 
 export const BasicContext = createContext();
 
@@ -7,14 +20,23 @@ export const BasicProvider = ({ children }) => {
   const [plot, setPlot] = useState(null);
   const [garden, setGarden] = useState(null);
   const [history, setHistory] = useState([]);
+  const [allGroups, setAllGroups] = useState([])
   const [groups, setGroups] = useState([]);
   const [banner, setBanner] = useState({ message: "", type: "" });
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [message, setMessage] = useState("");
-  const [group, setGroup] = useState('');
-  const [location, setLocation] = useState('');
+  const [group, setGroup] = useState("");
+//   const [location, setLocation] = useState("");
   const [events, setEvents] = useState([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [loading, setLoading] = useState(true);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedGarden, setSelectedGarden] = useState("");
+  const [availablePlots, setAvailablePlots] = useState("all");
+  const [distance, setDistance] = useState(5);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+
   const [user, setUser] = useState({
     email: "",
     username: "",
@@ -26,7 +48,27 @@ export const BasicProvider = ({ children }) => {
     phone: "",
     profilePhoto: null,
   });
+  useEffect(() => {
+  const fetchAllGroups = async () => {
 
+    try {
+    
+      let url = `/api/groups`;
+
+
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setAllGroups(data);
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError('Failed to fetch groups.');
+    }
+  };
+  fetchAllGroups()
+}, []);
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -38,7 +80,7 @@ export const BasicProvider = ({ children }) => {
           },
         });
         const data = await response.json();
-        // console.log(data);
+
         setUser(data.profile);
         if (data.profile.role === "admin") {
           setIsAdmin(true);
@@ -66,12 +108,10 @@ export const BasicProvider = ({ children }) => {
       setIsAuthenticated(false);
     }
   }, []);
-  const handleEventSearch = async() => {
-    e.preventDefault()
+  const handleEventSearch = async () => {
+    e.preventDefault();
     try {
-    
       let url = `/api/events?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
-
 
       const response = await fetch(url);
       const data = await response.json();
@@ -81,25 +121,63 @@ export const BasicProvider = ({ children }) => {
         setError(data.error);
       }
     } catch (err) {
-      setError('Failed to fetch groups.');
+      setError("Failed to fetch groups.");
     }
   };
 
   useEffect(() => {
     const fetchEvents = async () => {
-
       try {
-        const response = await fetch(`/api/events?location=${location}&garden=${garden}&group=${group}`);
+        const response = await fetch(`/api/events`);
         const data = await response.json();
-        setEvents(data);
+        // Initial filtering logic
+        const filtered = data.filter((event) => {
+          const eventDate = new Date(event.date);
+          const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
+          const isPastEvent =
+            isBefore(eventDate, new Date()) && !isToday(eventDate);
+        //   console.log("distance", distance * 1609.34 >= event.distance);
+          const isWithinDistance = event.distance <= distance * 1609.34; // Convert miles to meters
 
-      } catch (error) {
-        console.error('Error fetching events:', error);
+          if (user.role === "admin") return isEventInCurrentMonth;
+          if (isPastEvent || !isWithinDistance) return false;
+        //   console.log("selectedGroup", selectedGroup);
+          const isEventRelevant =
+            ((selectedGroup === "" ||
+              event.group_id === parseInt(selectedGroup)) &&
+              (selectedGarden === "" ||
+                event.garden_id === parseInt(selectedGarden)) &&
+              (availablePlots === "all" ||
+                (availablePlots === "yes" && event.available_plots > 0) ||
+                (availablePlots === "no" && event.available_plots === 0))) ||
+            event.user_id === user.id;
 
+          return isEventInCurrentMonth && isEventRelevant;
+        });
+  
+        setFilteredEvents(filtered);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching events:", err);
       }
     };
     fetchEvents();
-  }, [location, garden, group]);
+  }, [
+    currentDate,
+    selectedGroup,
+    selectedGarden,
+    availablePlots,
+    distance,
+    user,
+  ]);
+
+  const handlePrevMonth = () => {
+    setCurrentDate(addMonths(currentDate, -1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(addMonths(currentDate, 1));
+  };
 
   const value = {
     plot,
@@ -119,8 +197,24 @@ export const BasicProvider = ({ children }) => {
     setMessage,
     handleEventSearch,
     group,
-    location,
-    events
+    setGroup,
+    // location,
+    // setLocation,
+    events,
+    handlePrevMonth,
+    handleNextMonth,
+    currentDate,
+    loading,
+    availablePlots,
+    setAvailablePlots,
+    selectedGarden,
+    setSelectedGarden,
+    selectedGroup,
+    setSelectedGroup,
+    distance,
+    setDistance,
+    filteredEvents,
+    setFilteredEvents,
   };
 
   return (
