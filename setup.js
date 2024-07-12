@@ -42,10 +42,13 @@ async function setupDatabase() {
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
+        location VARCHAR(10),
+        accepting_members BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log("Groups table created.");
+    
 
     // Create group memberships table
     await client.query(`
@@ -53,7 +56,7 @@ async function setupDatabase() {
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         group_id INTEGER REFERENCES groups(id),
-        role VARCHAR(50) DEFAULT 'member',
+        role VARCHAR(50) DEFAULT 'new',
         joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -137,6 +140,7 @@ async function setupDatabase() {
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         event_id INTEGER REFERENCES events(id),
+        group_id INTEGER REFERENCES groups(id),
         registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -161,11 +165,16 @@ async function setupDatabase() {
 
     // Insert sample groups
     await client.query(`
-     INSERT INTO groups (name, description) VALUES 
-     ('Garden Enthusiasts', 'A group for people who love gardening'),
-     ('Organic Growers', 'A group focused on organic gardening practices')
-   `);
+      INSERT INTO groups (name, description, location, accepting_members) VALUES 
+      ('Garden Enthusiasts', 'A group for people who love gardening', '98001', true),
+      ('Organic Growers', 'A group focused on organic gardening practices', '98002', true),
+      ('Urban Farmers', 'A group for city dwellers interested in farming', '98003', true),
+      ('Herb Growers', 'A group dedicated to growing herbs', '98004', true),
+      ('Vegetable Planters', 'A group focused on planting vegetables', '98005', true)
+    `);
     console.log("Sample groups inserted.");
+    
+    
 
     // Insert sample group memberships
     await client.query(`
@@ -177,6 +186,8 @@ async function setupDatabase() {
      (4, 2, 'member')
    `);
     console.log("Sample group memberships inserted.");
+
+
 
     // Insert garden data from JSON file
     const gardensData = JSON.parse(
@@ -243,9 +254,14 @@ async function setupDatabase() {
     // Insert sample plot history
     await client.query(`
      INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose) VALUES 
-     (1, 1, null, '2024-01-01', 12, 'Personal gardening'),
+          (1, 1, null, '2024-01-01', 12, 'Personal gardening'),
      (2, 2, null, '2024-02-01', 6, 'Community event'),
-     (3, null, 1, '2024-03-01', 8, 'Group gardening project')
+     (3, 3, 1, '2024-03-01', 8, 'Group gardening project'),
+       (4, 1, null, '2024-01-01', 12, 'Personal gardening'),
+  (5, 2, null, '2024-02-01', 6, 'Community event'),
+  (6, 3, 1, '2024-03-01', 8, 'Group gardening project'),
+  (7, 4, 2, '2024-04-01', 4, 'Vegetable planting session'),
+  (8, 5, 3, '2024-05-01', 10, 'Herb growing workshop')
    `);
     console.log("Sample plot history inserted.");
   } catch (error) {

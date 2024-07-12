@@ -12,7 +12,7 @@ export async function GET(request) {
 
     let query = `
       SELECT 
-        groups.id, groups.name, groups.description, 
+        groups.id, groups.name, groups.description, groups.location, groups.accepting_members,
         COALESCE(json_agg(garden_groups.garden_id) FILTER (WHERE garden_groups.garden_id IS NOT NULL), '[]') AS gardens
       FROM 
         groups
@@ -53,14 +53,14 @@ export async function GET(request) {
 
 // POST Method
 export async function POST(request) {
-  const { name, description, userId } = await request.json();
+  const { name, description, location, accepting_members, userId } = await request.json();
 
   try {
     const client = await pool.connect();
 
     // Insert new group into the database
-    const createGroupQuery = 'INSERT INTO groups (name, description) VALUES ($1, $2) RETURNING *';
-    const result = await client.query(createGroupQuery, [name, description]);
+    const createGroupQuery = 'INSERT INTO groups (name, description, location, accepting_members) VALUES ($1, $2, $3, $4) RETURNING *';
+    const result = await client.query(createGroupQuery, [name, description, location, accepting_members]);
     const group = result.rows[0];
 
     // Add the creator as an admin member
@@ -73,5 +73,49 @@ export async function POST(request) {
   } catch (error) {
     console.error('Error creating group:', error);
     return NextResponse.json({ error: 'Error creating group' }, { status: 500 });
+  }
+}
+
+// PATCH Method
+export async function PATCH(request) {
+  const { id, name, description, location, accepting_members } = await request.json();
+
+  try {
+    const client = await pool.connect();
+
+    const updateGroupQuery = `
+      UPDATE groups
+      SET name = $1, description = $2, location = $3, accepting_members = $4
+      WHERE id = $5
+      RETURNING *
+    `;
+    const result = await client.query(updateGroupQuery, [name, description, location, accepting_members, id]);
+    const group = result.rows[0];
+
+    client.release();
+
+    return NextResponse.json({ message: 'Group updated successfully', group });
+  } catch (error) {
+    console.error('Error updating group:', error);
+    return NextResponse.json({ error: 'Error updating group' }, { status: 500 });
+  }
+}
+
+// DELETE Method
+export async function DELETE(request) {
+  const { id } = await request.json();
+
+  try {
+    const client = await pool.connect();
+
+    const deleteGroupQuery = 'DELETE FROM groups WHERE id = $1';
+    await client.query(deleteGroupQuery, [id]);
+
+    client.release();
+
+    return NextResponse.json({ message: 'Group deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting group:', error);
+    return NextResponse.json({ error: 'Error deleting group' }, { status: 500 });
   }
 }

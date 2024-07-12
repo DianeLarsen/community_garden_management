@@ -20,22 +20,32 @@ export async function GET(request) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
+    const userId = parseInt(decoded.userId, 10);
 
     const client = await pool.connect();
+    
     const userQuery = `
       SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
       FROM users
       WHERE id = $1
     `;
     const userResult = await client.query(userQuery, [userId]);
+
+    const groupsQuery = `
+      SELECT g.id, g.name, g.description, g.location, gm.role
+      FROM groups g
+      JOIN group_memberships gm ON g.id = gm.group_id
+      WHERE gm.user_id = $1
+    `;
+    const groupsResult = await client.query(groupsQuery, [userId]);
+
     client.release();
 
     if (userResult.rows.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ profile: userResult.rows[0] });
+    return NextResponse.json({ profile: userResult.rows[0], groups: groupsResult.rows });
   } catch (error) {
     console.error('Error fetching profile:', error);
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });

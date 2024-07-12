@@ -1,51 +1,40 @@
 "use client";
-import { useState, useEffect } from 'react';
 
-const GroupList = ({ gardenId, userId }) => {
-  const [groups, setGroups] = useState([]);
-  const [error, setError] = useState('');
+import { useRouter } from "next/navigation";
 
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        let url = '/api/groups';
-        if (gardenId) {
-          url += `?gardenId=${gardenId}`;
-        } else if (userId) {
-          url += `?userId=${userId}`;
-        }
-
-        const response = await fetch(url);
-        const data = await response.json();
-        if (response.ok) {
-          setGroups(data);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError('Failed to fetch groups.');
-      }
-    };
-
-    fetchGroups();
-  }, [gardenId, userId]);
-
+const GroupList = ({ groups, error }) => {
+  const router = useRouter();
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
   }
-
+  console.log(groups);
+  const handleRowClick = (id) => {
+    router.push(`/groups/${id}`);
+  };
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Groups</h1>
-      <ul className="list-none p-0">
-        {groups.map(group => (
-          <li key={group.id} className="bg-gray-100 mb-4 p-4 rounded shadow-md">
-            <div className="font-semibold">Name: {group.name}</div>
-            <div>Description: {group.description}</div>
-            <div>Gardens: {group.gardens.join(', ')}</div>
-          </li>
-        ))}
-      </ul>
+      <table className="w-full table-auto border-collapse">
+        <thead>
+          <tr>
+            <th className="border px-4 py-2">Name of Group</th>
+            <th className="border px-4 py-2">Accepting Members</th>
+            <th className="border px-4 py-2">Location</th>
+          </tr>
+        </thead>
+        <tbody>
+          {groups?.map((group) => (
+            <tr
+              key={group.id}
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => handleRowClick(group.id)}
+            >
+              <td className="border px-4 py-2 text-center">{group.name}</td>
+              <td className="border px-4 py-2 text-center">{group.accepting_members ? "Yes" : "No"}</td>
+              <td className="border px-4 py-2 text-center">{group.location}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

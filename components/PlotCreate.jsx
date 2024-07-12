@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PlotCreate = ({ newPlot, setNewPlot, fetchPlots, gardenId, groups, isAdmin }) => {
+const PlotCreate = ({ newPlot, setNewPlot, fetchPlots, gardenId, groups, role }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewPlot((prev) => ({
@@ -31,7 +31,7 @@ const PlotCreate = ({ newPlot, setNewPlot, fetchPlots, gardenId, groups, isAdmin
     }
   };
 
-  if (!isAdmin) {
+  if (!role == 'admin') {
     return <p>You do not have permission to create plots.</p>;
   }
 

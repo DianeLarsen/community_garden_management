@@ -43,15 +43,15 @@ const ProfileDetails = ({ user, setUser, setMessage }) => {
     e.preventDefault();
     const formData = new FormData();
 
-    formData.append("username", localProfileData.username || user.username);
+    formData.append("username", localProfileData.username || user?.username);
     formData.append(
       "street_address",
-      localProfileData.street_address || user.street_address
+      localProfileData.street_address || user?.street_address
     );
-    formData.append("city", localProfileData.city || user.city);
-    formData.append("state", localProfileData.state || user.state);
-    formData.append("zip", localProfileData.zip || user.zip);
-    formData.append("phone", localProfileData.phone || user.phone);
+    formData.append("city", localProfileData.city || user?.city);
+    formData.append("state", localProfileData.state || user?.state);
+    formData.append("zip", localProfileData.zip || user?.zip);
+    formData.append("phone", localProfileData.phone || user?.phone);
     if (photo) {
       formData.append("profilePhoto", photo);
     }
@@ -81,7 +81,7 @@ const ProfileDetails = ({ user, setUser, setMessage }) => {
     >
       <h2 className="text-2xl mb-4">
         Welcome to Your Profile,{" "}
-        {user.username.charAt(0).toUpperCase() + user.username.slice(1) ||
+        {user?.username.charAt(0).toUpperCase() + user?.username.slice(1) ||
           "N/A"}
       </h2>
 
@@ -90,7 +90,7 @@ const ProfileDetails = ({ user, setUser, setMessage }) => {
         <label className="block mb-2 text-sm font-medium text-gray-700">
           Username:{" "}
           {user?.username
-            ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
+            ? user?.username.charAt(0).toUpperCase() + user?.username.slice(1)
             : "N/A"}{" "}
           <span className="text-red-500">*</span>
         </label>

@@ -9,6 +9,7 @@ import { BasicContext } from "@/context/BasicContext";
 const AuthLinks = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const {
+    user,
     isAuthenticated,
     setIsAuthenticated,
     showBanner
@@ -71,13 +72,13 @@ const AuthLinks = () => {
     <div className="relative flex flex-nowrap items-center gap-6">
       {isAuthenticated ? (
         <div className="relative">
-          <div className="flex items-center w-12 h-12 cursor-pointer">
+          <div className="flex items-center w-12 h-12 cursor-pointer" title={user?.email}>
           <Image
             src="https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="
-            alt="Profile"
+            alt={`Profile for ${user.email}`}
             className="rounded-full cursor-pointer object-cover border-double border-4 border-blue-600"
             fill={true}
-            title={email}
+            title={user.email}
             // width={120}
             // height={120}
             onClick={() => setIsDropdownVisible(!isDropdownVisible)}
@@ -89,7 +90,7 @@ const AuthLinks = () => {
                 href="/profile"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
               >
-                Profile
+                {`Profile for ${email}`}
               </Link>
               <button
                 onClick={handleLogout}

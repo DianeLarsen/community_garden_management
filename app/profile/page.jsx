@@ -10,10 +10,10 @@ const Profile = () => {
 
   const {
     user,
-
+    groups, message, setMessage
   } = useContext(BasicContext);
-  const [groups, setGroups] = useState([]);
-  const [message, setMessage] = useState("");
+
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
