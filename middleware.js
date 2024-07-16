@@ -1,29 +1,29 @@
-// middleware.js
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 
-export function middleware(request) {
+export async function middleware(request) {
   const token = request.cookies.get('token')?.value;
   const publicPaths = ['/', '/about'];
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
 
-if(token){
-    
-    // Token is valid, allow access
-    return NextResponse.next();
-  } else {
-    // Invalid token, redirect to home
-    console.log("Invalid token")
-    if (isPublicPath){
+  if (!token) {
+    if (isPublicPath) {
       return NextResponse.next();
     } else {
-    return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 
-
-
-
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    await jwtVerify(token, secret);
+    return NextResponse.next();
+  } catch (err) {
+    console.log(err);
+    const response = NextResponse.redirect(new URL('/', request.url));
+    response.cookies.delete('token');
+    return response;
+  }
 }
 
 export const config = {

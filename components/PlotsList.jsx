@@ -29,7 +29,7 @@ const PlotsList = ({
         const data = await response.json();
         if (userInfo) {
           const userPlots = data.filter((plot) => plot.user_id === user.id);
-          console.log(userPlots)
+
           setPlots(userPlots);
           
         } else {

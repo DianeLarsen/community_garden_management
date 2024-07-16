@@ -29,7 +29,10 @@ export async function GET(request) {
         ({ lat, lon } = await getLatLonFromAddress(searchTerm));
       }
     } else {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
       const userId = decoded.userId;
 
       const client = await pool.connect();

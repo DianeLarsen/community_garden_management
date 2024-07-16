@@ -13,7 +13,7 @@ async function setupDatabase() {
 
     // Drop tables if they exist for fresh setup
     await client.query(
-      "DROP TABLE IF EXISTS plot_history, event_registrations, events, garden_plots, group_memberships, groups, users, gardens CASCADE"
+      "DROP TABLE IF EXISTS plot_history, event_registrations, events, event_invitations, garden_plots, group_memberships, groups, users, gardens CASCADE"
     );
 
     // Create users table
@@ -48,7 +48,6 @@ async function setupDatabase() {
       )
     `);
     console.log("Groups table created.");
-    
 
     // Create group memberships table
     await client.query(`
@@ -95,6 +94,7 @@ async function setupDatabase() {
       CREATE TABLE IF NOT EXISTS garden_plots (
         id SERIAL PRIMARY KEY,
         garden_id INTEGER REFERENCES gardens(id),
+        name VARCHAR(255) NOT NULL,
         location VARCHAR(255) NOT NULL,
         length VARCHAR(50),
         width  VARCHAR(50),
@@ -139,6 +139,18 @@ async function setupDatabase() {
 
     // Create event registrations table
     await client.query(`
+ CREATE TABLE IF NOT EXISTS event_invitations (
+  id SERIAL PRIMARY KEY,
+  event_id INTEGER REFERENCES events(id),
+  user_id INTEGER REFERENCES users(id),
+  status VARCHAR(50) NOT NULL
+);
+
+        `);
+    console.log("Event invitations table created.");
+
+    // Create event registrations table
+    await client.query(`
       CREATE TABLE IF NOT EXISTS event_registrations (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
@@ -176,8 +188,6 @@ async function setupDatabase() {
       ('Vegetable Planters', 'A group focused on planting vegetables', '98005', true)
     `);
     console.log("Sample groups inserted.");
-    
-    
 
     // Insert sample group memberships
     await client.query(`
@@ -189,8 +199,6 @@ async function setupDatabase() {
      (4, 2, 'member')
    `);
     console.log("Sample group memberships inserted.");
-
-
 
     // Insert garden data from JSON file
     const gardensData = JSON.parse(
@@ -233,7 +241,7 @@ async function setupDatabase() {
     const plotStatuses = ["available", "reserved", "occupied"];
 
     const gardensWithRentalBeds = await client.query(
-      "SELECT id FROM gardens WHERE rentalBeds = true"
+      "SELECT id, name FROM gardens WHERE rentalBeds = true"
     );
 
     for (const garden of gardensWithRentalBeds.rows) {
@@ -243,12 +251,13 @@ async function setupDatabase() {
         const width = size.split("x")[1];
         const status =
           plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
+        const plotName = `${garden.name} Plot ${i}`;
         await client.query(
           `
-         INSERT INTO garden_plots (garden_id, location, length, width, status) VALUES 
-         ($1, $2, $3, $4, $5)
-       `,
-          [garden.id, `Plot ${i}`, length, width, status]
+       INSERT INTO garden_plots (garden_id, name, location, length, width, status) VALUES 
+       ($1, $2, $3, $4, $5, $6)
+     `,
+          [garden.id, plotName, `Plot ${i}`, length, width, status]
         );
       }
     }
@@ -277,9 +286,8 @@ async function setupDatabase() {
     ('Vegetable Planting Session', 'Hands-on vegetable planting session.', '2024-07-30 15:00:00',  5, 5, 5, 81);
     `);
     console.log("Sample events inserted.");
-    
 
-     await client.query(`
+    await client.query(`
      INSERT INTO event_registrations (user_id, event_id, group_id) VALUES
 (1, 1, 1),
 (2, 2, 2),
@@ -293,10 +301,7 @@ async function setupDatabase() {
 (5, 1, 5);
 
     `);
-     console.log("Sample event registration inserted.");
-
-
-
+    console.log("Sample event registration inserted.");
   } catch (error) {
     console.error("Error setting up the database:", error);
     throw error;

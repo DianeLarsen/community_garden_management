@@ -13,6 +13,7 @@ import {
   isToday,
   loading,
 } from "date-fns";
+import { parseCookies } from "nookies";
 
 export const BasicContext = createContext();
 
@@ -20,14 +21,15 @@ export const BasicProvider = ({ children }) => {
   const [plot, setPlot] = useState(null);
   const [garden, setGarden] = useState(null);
   const [history, setHistory] = useState([]);
-  const [allGroups, setAllGroups] = useState([])
+  const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
   const [banner, setBanner] = useState({ message: "", type: "" });
   const [isAdmin, setIsAdmin] = useState(false);
+  const [token, setToken] = useState("")
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [message, setMessage] = useState("");
   const [group, setGroup] = useState("");
-//   const [location, setLocation] = useState("");
+  //   const [location, setLocation] = useState("");
   const [events, setEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ export const BasicProvider = ({ children }) => {
   const [availablePlots, setAvailablePlots] = useState("all");
   const [distance, setDistance] = useState(5);
   const [filteredEvents, setFilteredEvents] = useState([]);
-
+  // console.log(isAuthenticated)
   const [user, setUser] = useState({
     email: "",
     username: "",
@@ -48,31 +50,36 @@ export const BasicProvider = ({ children }) => {
     phone: "",
     profilePhoto: null,
   });
+  // console.log(user)
+useEffect(() => {
+  const tokenCookie = parseCookies().token;
+  const localToken = localStorage.getItem("token");
+  setToken(localToken || tokenCookie)
+}, [])
+
+
   useEffect(() => {
-  const fetchAllGroups = async () => {
+    const fetchAllGroups = async () => {
+      try {
+        let url = `/api/groups`;
 
-    try {
-    
-      let url = `/api/groups`;
-
-
-      const response = await fetch(url);
-      const data = await response.json();
-      if (response.ok) {
-        setAllGroups(data);
-      } else {
-        setError(data.error);
+        const response = await fetch(url);
+        const data = await response.json();
+        if (response.ok) {
+          setAllGroups(data);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch groups.");
       }
-    } catch (err) {
-      setError('Failed to fetch groups.');
-    }
-  };
-  fetchAllGroups()
-}, []);
+    };
+    fetchAllGroups();
+  }, []);
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // const token = localStorage.getItem("token");
         const response = await fetch("/api/profile", {
           method: "GET",
           headers: {
@@ -80,8 +87,9 @@ export const BasicProvider = ({ children }) => {
           },
         });
         const data = await response.json();
-
+       
         setUser(data.profile);
+
         if (data.profile.role === "admin") {
           setIsAdmin(true);
         } else {
@@ -92,22 +100,25 @@ export const BasicProvider = ({ children }) => {
         setMessage("Error fetching profile data");
       }
     };
-
-    fetchProfileData();
-  }, []);
+    if (isAuthenticated) {
+      fetchProfileData();
+    }
+  }, [isAuthenticated, token]);
   const showBanner = (message, type) => {
     setBanner({ message, type });
     setTimeout(() => setBanner({ message: "", type: "" }), 30000); // Hide banner after 3 seconds
   };
+  // const token = parseCookies().token;
+  // const localToken = localStorage.getItem("token");
   useEffect(() => {
     // Check if the user is authenticated by looking for a token in localStorage
-    const token = localStorage.getItem("token");
+
     if (token) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [token]);
   const handleEventSearch = async () => {
     e.preventDefault();
     try {
@@ -136,12 +147,12 @@ export const BasicProvider = ({ children }) => {
           const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
           const isPastEvent =
             isBefore(eventDate, new Date()) && !isToday(eventDate);
-        //   console.log("distance", distance * 1609.34 >= event.distance);
+          //   console.log("distance", distance * 1609.34 >= event.distance);
           const isWithinDistance = event.distance <= distance * 1609.34; // Convert miles to meters
 
           if (user.role === "admin") return isEventInCurrentMonth;
           if (isPastEvent || !isWithinDistance) return false;
-        //   console.log("selectedGroup", selectedGroup);
+          //   console.log("selectedGroup", selectedGroup);
           const isEventRelevant =
             ((selectedGroup === "" ||
               event.group_id === parseInt(selectedGroup)) &&
@@ -154,14 +165,16 @@ export const BasicProvider = ({ children }) => {
 
           return isEventInCurrentMonth && isEventRelevant;
         });
-  
+
         setFilteredEvents(filtered);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching events:", err);
       }
     };
-    fetchEvents();
+    if (isAuthenticated) {
+      fetchEvents();
+    }
   }, [
     currentDate,
     selectedGroup,
@@ -169,6 +182,7 @@ export const BasicProvider = ({ children }) => {
     availablePlots,
     distance,
     user,
+    isAuthenticated
   ]);
 
   const handlePrevMonth = () => {
@@ -182,6 +196,7 @@ export const BasicProvider = ({ children }) => {
   const value = {
     plot,
     garden,
+    token,
     history,
     groups,
     user,

@@ -4,8 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export async function GET(request, { params }) {
   const { id } = params;
-  const token = request.headers.get('authorization')?.split(' ')[1];
-
+  const token = request.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -16,9 +15,12 @@ export async function GET(request, { params }) {
 
     const client = await pool.connect();
     const eventQuery = `
-      SELECT e.*, u.username AS organizer
+      SELECT e.*, u.username AS organizer, g.name AS garden_name, gp.name AS plot_name, gm.user_id AS group_admin_id
       FROM events e
-      LEFT JOIN users u ON e.organizer_id = u.id
+      LEFT JOIN users u ON e.user_id = u.id
+      LEFT JOIN gardens g ON e.garden_id = g.id
+      LEFT JOIN garden_plots gp ON e.plot_id = gp.id
+      LEFT JOIN group_memberships gm ON e.group_id = gm.group_id AND gm.role = 'admin'
       WHERE e.id = $1
     `;
     const eventResult = await client.query(eventQuery, [id]);
@@ -28,6 +30,7 @@ export async function GET(request, { params }) {
     }
 
     const event = eventResult.rows[0];
+    const groupAdmins = eventResult.rows.map(row => row.group_admin_id);
 
     const attendeesQuery = `
       SELECT er.user_id, u.username, u.email
@@ -38,9 +41,19 @@ export async function GET(request, { params }) {
     const attendeesResult = await client.query(attendeesQuery, [id]);
     const attendees = attendeesResult.rows;
 
+    const invitationsQuery = `
+    SELECT ei.user_id, u.username, u.email, ei.status
+    FROM event_invitations ei
+    LEFT JOIN users u ON ei.user_id = u.id
+    WHERE ei.event_id = $1
+  `;
+  const invitationsResult = await client.query(invitationsQuery, [id]);
+  const invitations = invitationsResult.rows;
+  
+
     client.release();
 
-    return NextResponse.json({ event, attendees });
+    return NextResponse.json({ event: {...event, group_admins: groupAdmins}, attendees, invitations });
   } catch (error) {
     console.error('Error fetching event details:', error);
     return NextResponse.json({ error: 'Error fetching event details' }, { status: 500 });

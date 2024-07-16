@@ -7,7 +7,7 @@ const GroupList = ({ groups, error }) => {
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
   }
-  console.log(groups);
+
   const handleRowClick = (id) => {
     router.push(`/groups/${id}`);
   };

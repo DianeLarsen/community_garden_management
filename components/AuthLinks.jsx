@@ -61,12 +61,14 @@ const AuthLinks = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
+    await fetch('/api/logout', { method: 'POST' });
     showBanner("Logout successful!", "success");
     router.push('/');
   };
+  
 
   return (
     <div className="relative flex flex-nowrap items-center gap-6">

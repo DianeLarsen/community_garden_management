@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 const ProfileDetails = ({ user, setUser, setMessage }) => {
   const [localProfileData, setLocalProfileData] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(
     user?.profilePhoto ||
       "https://res.cloudinary.com/dqjh46sk5/image/upload/v1677786781/zpoquv2r7p88ahgupk0d.jpg"
@@ -14,7 +14,7 @@ const ProfileDetails = ({ user, setUser, setMessage }) => {
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const router = useRouter();
-
+  console.log(user)
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -23,9 +23,22 @@ const ProfileDetails = ({ user, setUser, setMessage }) => {
       [name]: value,
     }));
   };
-  if (loading) {
+
+  if (loading || !user.id) {
     return <div>Loading...</div>;
   }
+useEffect(() => {
+  if (!user.id){
+    setLoading(true)
+  }
+}, [user.id])
+
+if (loading) {
+  return <div>Loading...</div>;
+}
+
+
+
   useEffect(() => {
     const checkUsernameAvailability = async () => {
       if (localProfileData.username) {

@@ -12,8 +12,7 @@ export const config = {
 };
 
 export async function GET(request) {
-  const token = request.headers.get('authorization')?.split(' ')[1];
-
+  const token = request.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
