@@ -143,6 +143,7 @@ async function setupDatabase() {
   id SERIAL PRIMARY KEY,
   event_id INTEGER REFERENCES events(id),
   user_id INTEGER REFERENCES users(id),
+  requester_id INTEGER REFERENCES users(id),
   status VARCHAR(50) NOT NULL
 );
 

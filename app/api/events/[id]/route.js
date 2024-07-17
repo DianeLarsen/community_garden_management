@@ -42,7 +42,7 @@ export async function GET(request, { params }) {
     const attendees = attendeesResult.rows;
 
     const invitationsQuery = `
-    SELECT ei.user_id, u.username, u.email, ei.status
+    SELECT ei.id, ei.user_id, u.username, u.email, ei.status
     FROM event_invitations ei
     LEFT JOIN users u ON ei.user_id = u.id
     WHERE ei.event_id = $1

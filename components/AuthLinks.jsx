@@ -66,6 +66,7 @@ const AuthLinks = () => {
     setIsAuthenticated(false);
     await fetch('/api/logout', { method: 'POST' });
     showBanner("Logout successful!", "success");
+    setIsDropdownVisible(!isDropdownVisible)
     router.push('/');
   };
   

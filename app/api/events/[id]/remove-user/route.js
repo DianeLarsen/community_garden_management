@@ -3,7 +3,7 @@ import pool from '@/db';
 import jwt from 'jsonwebtoken';
 
 export async function POST(request, { params }) {
-    const { id } = params;
+    const { id } = params; // event id
     const { userId } = await request.json();
     console.log(userId)
     const token = request.cookies.get('token')?.value;

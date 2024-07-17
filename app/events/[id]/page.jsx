@@ -11,7 +11,7 @@ const EventDetails = () => {
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
+console.log(invitations)
   useEffect(() => {
     const fetchEventDetails = async () => {
       setLoading(true);
@@ -96,6 +96,7 @@ const EventDetails = () => {
     inviteUserId,
     inviteUsername
   ) => {
+    console.log(inviteId)
     try {
       const response = await fetch(`/api/events/${id}/approve-invite`, {
         method: "POST",
@@ -103,7 +104,7 @@ const EventDetails = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ inviteId }),
+        body: JSON.stringify({ inviteId, inviteUserId }),
       });
       if (response.ok) {
         alert("Invite approved!");
@@ -145,7 +146,7 @@ const EventDetails = () => {
 
   const handleLeaveEvent = async () => {
     try {
-      const response = await fetch(`/api/events/${id}/leave`, {
+      const response = await fetch(`/api/events/${id}/remove-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -310,7 +311,7 @@ const EventDetails = () => {
                 {invitations.length > 0 ? (
                   invitations.map((invite) => (
                     <li
-                      key={invite.user_id}
+                      key={invite.id}
                       className="text-gray-700 flex items-center"
                     >
                       {invite.username} - {invite.status}

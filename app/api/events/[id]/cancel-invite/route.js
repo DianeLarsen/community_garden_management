@@ -3,10 +3,10 @@ import pool from '@/db';
 import jwt from 'jsonwebtoken';
 
 export async function POST(request, { params }) {
-  const { id } = params;
-  const { inviteId, inviteUserId } = await request.json();
+  const { id } = params; // event
+
   const token = request.cookies.get('token')?.value;
-console.log(inviteId, inviteUserId)
+
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -37,34 +37,40 @@ console.log(inviteId, inviteUserId)
     const groupAdminResult = await client.query(groupAdminQuery, [event.group_id]);
     const isGroupAdmin = groupAdminResult.rows.some(row => row.user_id === userId);
 
-    if (!isAdmin && !isOrganizer && !isGroupAdmin) {
+    const inviteQuery = `
+      SELECT id FROM event_invitations WHERE user_id = $1 AND event_id = $2
+    `;
+    console.log(inviteQuery)
+    const inviteResult = await client.query(inviteQuery, [userId, id]);
+    
+    const invite = inviteResult.rows[0];
+
+    if (!invite) {
+      client.release();
+      return NextResponse.json({ error: 'Invitation not found' }, { status: 404 });
+    }
+
+    const isRequester = invite.user_id === invite.requester_id;
+
+    if (!isAdmin && !isOrganizer && !isGroupAdmin && !isRequester) {
+      client.release();
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    await client.query('BEGIN');
-
-
-    // Remove from event_invitations
     const deleteInviteQuery = `
       DELETE FROM event_invitations WHERE id = $1
+      RETURNING *
     `;
-    await client.query(deleteInviteQuery, [inviteId]);
-    console.log("made it here1")
-    // Add to event_registrations
-    const insertRegistrationQuery = `
-      INSERT INTO event_registrations (event_id, user_id)
-      VALUES ($1, $2)
-    `;
-    await client.query(insertRegistrationQuery, [id, inviteUserId]);
-    console.log("made it here2")
-    await client.query('COMMIT');
+    const result = await client.query(deleteInviteQuery, [invite.id]);
     client.release();
 
-    return NextResponse.json({ message: 'Invite approved and user added to attendees' });
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'Invitation not found or already cancelled' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Invitation cancelled successfully' });
   } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('Error approving invite:', error);
-    client.release();
-    return NextResponse.json({ error: 'Error approving invite' }, { status: 500 });
+    console.error('Error cancelling invite:', error);
+    return NextResponse.json({ error: 'Error cancelling invite' }, { status: 500 });
   }
 }

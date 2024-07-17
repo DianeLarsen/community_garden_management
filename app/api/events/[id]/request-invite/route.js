@@ -16,8 +16,8 @@ export async function POST(request, { params }) {
 
     const client = await pool.connect();
     const insertQuery = `
-      INSERT INTO event_invitations (event_id, user_id, status)
-      VALUES ($1, $2, 'pending')
+      INSERT INTO event_invitations (event_id, user_id, requester_id, status)
+      VALUES ($1, $2, $2, 'pending')
       RETURNING *
     `;
     const result = await client.query(insertQuery, [id, userId]);
