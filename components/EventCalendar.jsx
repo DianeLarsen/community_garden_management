@@ -2,6 +2,7 @@
 import { useState, useEffect, useContext } from "react";
 import { BasicContext } from "@/context/BasicContext";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   addMonths,
   format,
@@ -15,8 +16,6 @@ import {
   isToday,
   loading,
 } from "date-fns";
-
-import { useRouter } from "next/navigation";
 
 const EventCalendar = () => {
   const {
@@ -38,6 +37,7 @@ const EventCalendar = () => {
     filteredEvents,
     setFilteredEvents,
     loading,
+    showBanner
   } = useContext(BasicContext);
   const router = useRouter();
   const [groups, setGroups] = useState([]);
@@ -57,7 +57,6 @@ const EventCalendar = () => {
 
     fetchGroups();
   }, []);
-
 
   useEffect(() => {
     // Fetch gardens based on distance
@@ -96,6 +95,12 @@ const EventCalendar = () => {
     end: endOfMonth(currentDate),
   });
   const startDay = getDay(startOfMonth(currentDate));
+
+  if (!user.zip) {
+    showBanner("Please update profile page with required information", "error")
+    router.push("/profile");
+  }
+
   if (loading) {
     return <div>Loading...</div>;
   }

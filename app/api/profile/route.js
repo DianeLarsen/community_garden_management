@@ -20,6 +20,7 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
+    
 
     const client = await pool.connect();
     
@@ -125,35 +126,75 @@ export async function POST(request) {
   }
 }
 export async function PATCH(request) {
-    const token = request.headers.get('Authorization')?.split(' ')[1];
-  
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-  
+  const token = request.headers.get('authorization')?.split(' ')[1];
+
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const formData = await request.formData();
+  const username = formData.get('username');
+  const streetAddress = formData.get('street_address');
+  const city = formData.get('city');
+  const state = formData.get('state');
+  const zip = formData.get('zip');
+  const phone = formData.get('phone');
+  const profilePhoto = formData.get('profilePhoto');
+
+  if (!zip) {
+    return NextResponse.json({ error: 'Zip code is required' }, { status: 400 });
+  }
+
+  try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
-  
-    const formData = await request.formData();
-    const updates = {};
-  
-    formData.forEach((value, key) => {
-      updates[key] = value;
-    });
-  
-    const updateFields = Object.keys(updates).map((key, index) => `${key} = $${index + 1}`).join(', ');
-    const values = Object.values(updates);
-  
-    if (updateFields.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+
+    const client = await pool.connect();
+
+    let query = 'UPDATE users SET zip = $1';
+    const values = [zip];
+    let index = 2;  // Starting index for additional parameters
+
+    if (username) {
+      query += `, username = $${index}`;
+      values.push(username);
+      index++;
     }
-  
-    try {
-      const query = `UPDATE users SET ${updateFields} WHERE id = ${userId}`;
-      await pool.query(query, values);
-  
-      return NextResponse.json({ message: 'Profile updated successfully' });
-    } catch (error) {
-      return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
+    if (streetAddress) {
+      query += `, street_address = $${index}`;
+      values.push(streetAddress);
+      index++;
     }
+    if (city) {
+      query += `, city = $${index}`;
+      values.push(city);
+      index++;
+    }
+    if (state) {
+      query += `, state = $${index}`;
+      values.push(state);
+      index++;
+    }
+    if (phone) {
+      query += `, phone = $${index}`;
+      values.push(phone);
+      index++;
+    }
+    if (profilePhoto) {
+      query += `, profile_photo = $${index}`;
+      values.push(profilePhoto);
+      index++;
+    }
+
+    query += ` WHERE id = $${index}`;
+    values.push(userId);
+
+    await client.query(query, values);
+    client.release();
+
+    return NextResponse.json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
+  }
   }

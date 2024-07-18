@@ -1,10 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { CldUploadWidget } from "next-cloudinary";
 import { useRouter } from "next/navigation";
+import { BasicContext } from "@/context/BasicContext";
 
-const ProfileDetails = ({ user, setUser, setMessage }) => {
+const ProfileDetails = () => {
+  const {
+    user,setUser,
+    groups, message, setMessage 
+  } = useContext(BasicContext);
   const [localProfileData, setLocalProfileData] = useState({});
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(
@@ -14,31 +19,15 @@ const ProfileDetails = ({ user, setUser, setMessage }) => {
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const router = useRouter();
-  console.log(user)
-  const handleChange = (e) => {
-    const { name, value } = e.target;
 
-    setLocalProfileData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  if (loading || !user.id) {
-    return <div>Loading...</div>;
-  }
-useEffect(() => {
-  if (!user.id){
-    setLoading(true)
-  }
-}, [user.id])
-
-if (loading) {
-  return <div>Loading...</div>;
-}
-
-
-
+console.log(user)
+  useEffect(() => {
+    if (!user?.id){
+      setLoading(true)
+    } else {
+      setLoading(false)
+    }
+  }, [user?.id])
   useEffect(() => {
     const checkUsernameAvailability = async () => {
       if (localProfileData.username) {
@@ -54,6 +43,20 @@ if (loading) {
 
     checkUsernameAvailability();
   }, [localProfileData.username]);
+  
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setLocalProfileData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  if (loading || !user.id) {
+    return <div>Loading...</div>;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,7 +92,7 @@ if (loading) {
       setLocalProfileData({}); // Clear the form
       router.refresh();
     }
-    setLoading(true)
+    setLoading(false)
   };
 
   return (
@@ -99,7 +102,7 @@ if (loading) {
     >
       <h2 className="text-2xl mb-4">
         Welcome to Your Profile,{" "}
-        {user?.username.charAt(0).toUpperCase() + user?.username.slice(1) ||
+        {user?.username?.charAt(0).toUpperCase() + user?.username?.slice(1) ||
           "N/A"}
       </h2>
 

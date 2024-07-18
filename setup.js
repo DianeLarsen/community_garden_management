@@ -25,7 +25,7 @@ async function setupDatabase() {
         street_address VARCHAR(255),
         city VARCHAR(255),
         state VARCHAR(255),
-        zip VARCHAR(10) NOT NULL,
+        zip VARCHAR(10),
         phone VARCHAR(15),
         profile_photo VARCHAR(255),
         password VARCHAR(255) NOT NULL,

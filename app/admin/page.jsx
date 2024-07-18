@@ -1,29 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { BasicContext } from "@/context/BasicContext";
 
 const AdminPage = () => {
-  const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function fetchUsers() {
-      try {
-        const response = await fetch("/api/community-garden/users");
-        if (!response.ok) {
-          const text = await response.text();
-          throw new Error(`Network response was not ok: ${text}`);
-        }
-        const data = await response.json();
-        setUsers(data.users);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        setError(error.message);
-      }
-    }
-
-    fetchUsers();
-  }, []);
+  const {
+    users,
+    events,
+    gardens,
+    allGroups
+  } = useContext(BasicContext);
 
   const handleRoleChange = async (id, newRole) => {
     try {
@@ -48,41 +35,83 @@ const AdminPage = () => {
     }
   };
 
+  if (!users && !groups && !gardens && !events) {
+    return <p>Loading...</p>
+  }
+
   return (
-    <div>
-      <h1>Admin Page</h1>
-      {error && <p>Error: {error}</p>}
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Verified</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>{user.verified ? "Yes" : "No"}</td>
-              <td>
-                <select
-                  value={user.role}
-                  onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                >
-                  <option value="member">Member</option>
-                  <option value="admin">Admin</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </td>
+    <div className="max-w-7xl mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-8">Admin Page</h1>
+      {error && <p className="text-red-500 mb-4">Error: {error}</p>}
+      
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Users</h2>
+        <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="py-2 px-4">ID</th>
+              <th className="py-2 px-4">Email</th>
+              <th className="py-2 px-4">Role</th>
+              <th className="py-2 px-4">Verified</th>
+              <th className="py-2 px-4">Action</th>
             </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="border-t">
+                <td className="py-2 px-4">{user.id}</td>
+                <td className="py-2 px-4">{user.email}</td>
+                <td className="py-2 px-4">{user.role}</td>
+                <td className="py-2 px-4">{user.verified ? "Yes" : "No"}</td>
+                <td className="py-2 px-4">
+                  <select
+                    value={user.role}
+                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                    className="p-2 border rounded-md"
+                  >
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Events</h2>
+        <ul className="list-disc pl-5">
+          {events.map(event => (
+            <li key={event.id} className="text-gray-700 mb-2">
+              {event.name}
+            </li>
           ))}
-        </tbody>
-      </table>
+        </ul>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Groups</h2>
+        <ul className="list-disc pl-5">
+          {allGroups.map(group => (
+            <li key={group.id} className="text-gray-700 mb-2">
+              {group.name}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Gardens</h2>
+        <ul className="list-disc pl-5">
+          {gardens.map(garden => (
+            <li key={garden.id} className="text-gray-700 mb-2">
+              {garden.name}
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 };

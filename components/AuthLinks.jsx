@@ -3,19 +3,20 @@ import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import { useRouter  } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
+import Login from "./Login";
 
 const AuthLinks = () => {
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const {
     user,
     isAuthenticated,
     setIsAuthenticated,
-    showBanner
+    showBanner,
+    isDropdownVisible,
+    setIsDropdownVisible,
   } = useContext(BasicContext);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,69 +33,46 @@ const AuthLinks = () => {
     }
   }, []);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch("/api/community-garden/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      localStorage.setItem("token", data.token);
-      setEmail(data.email)
-      setIsAuthenticated(true);
-      showBanner("Login successful!", "success");
-      setIsDropdownVisible(false);
-      router.push('/profile');
-    } catch (error) {
-      showBanner(error.message, "error");
-    }
-  };
-
   const handleLogout = async () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
-    await fetch('/api/logout', { method: 'POST' });
+    await fetch("/api/logout", { method: "POST" });
     showBanner("Logout successful!", "success");
-    setIsDropdownVisible(!isDropdownVisible)
-    router.push('/');
+    setIsDropdownVisible(!isDropdownVisible);
+    router.push("/");
   };
-  
-
+if (!user){
+  return <p>Loading...</p>
+}
   return (
     <div className="relative flex flex-nowrap items-center gap-6">
       {isAuthenticated ? (
         <div className="relative">
-          <div className="flex items-center w-12 h-12 cursor-pointer" title={user?.email}>
-          <Image
-            src="https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="
-            alt={`Profile for ${user.email}`}
-            className="rounded-full cursor-pointer object-cover border-double border-4 border-blue-600"
-            fill={true}
-            title={user.email}
-            // width={120}
-            // height={120}
-            onClick={() => setIsDropdownVisible(!isDropdownVisible)}
-          />
+          <div
+            className="flex items-center w-12 h-12 cursor-pointer"
+            title={user?.email}
+          >
+            <Image
+              src="https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="
+              alt={`Profile for ${user?.email}`}
+              className="rounded-full cursor-pointer object-cover border-double border-4 border-blue-600"
+              fill={true}
+              title={user?.email}
+              // width={120}
+              // height={120}
+              onClick={() => setIsDropdownVisible(!isDropdownVisible)}
+            />
           </div>
           {isDropdownVisible && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+            <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10">
               <Link
                 href="/profile"
                 className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
               >
-                {`Profile for ${email}`}
+                {`Profile for ${user?.username || user?.email}`}
               </Link>
+              {user?.role == 'admin' && <Link href="/admin"
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Admin page</Link>}
               <button
                 onClick={handleLogout}
                 className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200"
@@ -115,40 +93,7 @@ const AuthLinks = () => {
           </button>
           {isDropdownVisible && (
             <div className="absolute right-0 top-12 mt-2 w-64 bg-white border rounded-md shadow-lg">
-              <form className="p-4" onSubmit={handleLogin}>
-                <div>
-                  <label className="text-blue-500">Email:</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full text-blue-500 border p-2 rounded"
-                    required
-                  />
-                </div>
-                <div className="mt-2">
-                  <label className="text-blue-500">Password:</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full text-blue-500 border p-2 rounded"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full mt-4 bg-blue-500 text-white p-2 rounded"
-                >
-                  Sign In
-                </button>
-              </form>
-              <Link
-                className="block p-2 text-center text-blue-500"
-                href="/register"
-              >
-                Not yet a member? Register here
-              </Link>
+              <Login />
             </div>
           )}
         </div>

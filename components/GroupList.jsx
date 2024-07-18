@@ -12,7 +12,7 @@ const GroupList = ({ groups, error }) => {
     router.push(`/groups/${id}`);
   };
   return (
-    <div className="p-6">
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md mt-10">
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr>

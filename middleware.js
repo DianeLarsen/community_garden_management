@@ -1,9 +1,10 @@
+
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 export async function middleware(request) {
   const token = request.cookies.get('token')?.value;
-  const publicPaths = ['/', '/about'];
+  const publicPaths = ['/', '/about', '/register', '/verify'];
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
 
   if (!token) {

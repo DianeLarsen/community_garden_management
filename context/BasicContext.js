@@ -19,7 +19,9 @@ export const BasicContext = createContext();
 
 export const BasicProvider = ({ children }) => {
   const [plot, setPlot] = useState(null);
+  const [error, setError] = useState("")
   const [garden, setGarden] = useState(null);
+  const [gardens, setGardens] = useState([]);
   const [history, setHistory] = useState([]);
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -38,6 +40,8 @@ export const BasicProvider = ({ children }) => {
   const [availablePlots, setAvailablePlots] = useState("all");
   const [distance, setDistance] = useState(5);
   const [filteredEvents, setFilteredEvents] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   // console.log(isAuthenticated)
   const [user, setUser] = useState({
     email: "",
@@ -57,7 +61,27 @@ useEffect(() => {
   setToken(localToken || tokenCookie)
 }, [])
 
+// Fetch all users
+useEffect(() => {
+  const fetchAllUsers = async () => {
+    try {
+      let url = `/api/users`;
 
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setUsers(data.users);
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError("Failed to fetch groups.");
+    }
+  };
+  fetchAllUsers();
+}, []);
+
+// Fetch all groups
   useEffect(() => {
     const fetchAllGroups = async () => {
       try {
@@ -76,6 +100,50 @@ useEffect(() => {
     };
     fetchAllGroups();
   }, []);
+
+// Fetch all events
+  useEffect(() => {
+    const handleEventSearch = async () => {
+   
+      try {
+        let url = `/api/events`;
+  
+        const response = await fetch(url);
+        const data = await response.json();
+        if (response.ok) {
+          setEvents(data);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch groups.");
+      }
+    };
+    handleEventSearch()
+  }, []);
+// Fetch all gardens
+useEffect(() => {
+  const maxDistance = 1000
+  const limit = 1000
+  const fetchAllGardens = async () => {
+    try {
+      let url = `/api/gardens?maxDistance=${maxDistance}&limit=${limit}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+      if (response.ok) {
+        setGardens(data);
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError("Failed to fetch groups.");
+    }
+  };
+  fetchAllGardens();
+}, []);
+
+  // fetch one user info
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -104,21 +172,21 @@ useEffect(() => {
       fetchProfileData();
     }
   }, [isAuthenticated, token]);
+
   const showBanner = (message, type) => {
     setBanner({ message, type });
     setTimeout(() => setBanner({ message: "", type: "" }), 30000); // Hide banner after 3 seconds
   };
-  // const token = parseCookies().token;
-  // const localToken = localStorage.getItem("token");
+// Check if the user is authenticated by looking for a token in localStorage
   useEffect(() => {
-    // Check if the user is authenticated by looking for a token in localStorage
-
+    
     if (token) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
     }
   }, [token]);
+
   const handleEventSearch = async () => {
     e.preventDefault();
     try {
@@ -136,6 +204,7 @@ useEffect(() => {
     }
   };
 
+  // fetch all events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -182,7 +251,8 @@ useEffect(() => {
     availablePlots,
     distance,
     user,
-    isAuthenticated
+    isAuthenticated,
+    
   ]);
 
   const handlePrevMonth = () => {
@@ -213,8 +283,6 @@ useEffect(() => {
     handleEventSearch,
     group,
     setGroup,
-    // location,
-    // setLocation,
     events,
     handlePrevMonth,
     handleNextMonth,
@@ -230,6 +298,11 @@ useEffect(() => {
     setDistance,
     filteredEvents,
     setFilteredEvents,
+    isDropdownVisible, setIsDropdownVisible,
+    groups,
+    users,
+    gardens,
+    allGroups
   };
 
   return (

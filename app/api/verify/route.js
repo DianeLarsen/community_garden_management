@@ -4,7 +4,7 @@ import pool from '@/db';
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
-
+console.log(token)
   try {
     const client = await pool.connect();
 
@@ -13,13 +13,13 @@ export async function GET(request) {
       [true, null, token]
     );
 
-    await client.release();
+    client.release();
 
     if (result.rowCount === 0) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
     }
 
-    return NextResponse.json({ message: 'Email verified successfully.' });
+    return NextResponse.redirect(new URL(`/verify?status=success&email=${result.rows[0].email}`, request.url));
   } catch (error) {
     console.error('Error verifying email:', error);
     return NextResponse.json({ error: 'Error verifying email' }, { status: 500 });

@@ -1,8 +1,11 @@
 "use client";
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { BasicContext } from "@/context/BasicContext";
 import { useRouter } from 'next/navigation';
 
 const RegistrationForm = () => {
+  const { showBanner } =
+  useContext(BasicContext);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,6 +39,7 @@ const RegistrationForm = () => {
 
     const results = await response.json();
     if (response.ok) {
+      showBanner("Registration successful!  Check Email!", "success");
       router.push('/profile');
     } else {
       setData(results);

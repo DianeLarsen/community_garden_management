@@ -10,8 +10,22 @@ const EventDetails = () => {
   const [attendees, setAttendees] = useState([]);
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [allUsers, setAllUsers] = useState([]);
   const router = useRouter();
-console.log(invitations)
+  const isInvited = invitations.some(
+    (invite) => invite.user_id === user.id && invite.status === "invited"
+  );
+  const isPending = invitations.some(
+    (invite) => invite.user_id === user.id && invite.status === "pending"
+  );
+  const isAttending = attendees.some(
+    (attendee) => attendee.user_id === user.id
+  );
+  const isAdmin = user.role === "admin";
+  const isGroupAdmin = event?.group_admins?.includes(user.id);
+  const isOrganizer = event?.user_id === user.id;
   useEffect(() => {
     const fetchEventDetails = async () => {
       setLoading(true);
@@ -29,19 +43,26 @@ console.log(invitations)
     };
     fetchEventDetails();
   }, [id]);
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const response = await fetch('/api/users', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setAllUsers(data.users || []);
+      } catch (error) {
+        console.error("Error fetching all users:", error);
+      }
+    };
+  
+    if (isAdmin || isGroupAdmin || isOrganizer) {
+      fetchAllUsers();
+    }
+  }, [isAdmin, isGroupAdmin, isOrganizer, token]);
 
-  const isInvited = invitations.some(
-    (invite) => invite.user_id === user.id && invite.status === "invited"
-  );
-  const isPending = invitations.some(
-    (invite) => invite.user_id === user.id && invite.status === "pending"
-  );
-  const isAttending = attendees.some(
-    (attendee) => attendee.user_id === user.id
-  );
-  const isAdmin = user.role === "admin";
-  const isGroupAdmin = event?.group_admins?.includes(user.id);
-  const isOrganizer = event?.user_id === user.id;
 
   const handleAcceptInvite = async () => {
     try {
@@ -215,11 +236,33 @@ console.log(invitations)
     }
   };
 
+  const handleInviteUser = async () => {
+    try {
+      const response = await fetch(`/api/events/${id}/invite-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: inviteEmail }),
+      });
+      if (response.ok) {
+        alert("User invited!");
+        setShowInviteModal(false);
+        setInviteEmail("");
+      } else {
+        alert("Failed to invite user.");
+      }
+    } catch (error) {
+      console.error("Error inviting user:", error);
+    }
+  };
+
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
 
-  return (
+    return (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-md shadow-md mt-10">
       {event && (
         <>
@@ -275,6 +318,14 @@ console.log(invitations)
                 className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
               >
                 Delete Event
+              </button>
+            )}
+            {(isAdmin || isGroupAdmin || isOrganizer) && (
+              <button
+                onClick={() => setShowInviteModal(true)}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              >
+                Invite User
               </button>
             )}
           </div>
@@ -339,7 +390,56 @@ console.log(invitations)
           )}
         </>
       )}
+      {showInviteModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-md shadow-md">
+              <h2 className="text-xl font-bold mb-4">Invite User</h2>
+              <input
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="Enter email"
+                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+              />
+              <div className="flex space-x-4">
+                <button
+                  onClick={handleInviteUser}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                >
+                  Send Invite
+                </button>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+              </div>
+              <h3 className="text-lg font-bold mt-4">Invite Existing User</h3>
+              <select
+                onChange={(e) => setInviteEmail(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+              >
+                <option value="">Select User</option>
+                {allUsers.map((user) => (
+                  <option key={user.id} value={user.email}>
+                    {user.username} ({user.email})
+                  </option>
+                ))}
+              </select>
+              <div className="flex space-x-4">
+                <button
+                  onClick={handleInviteUser}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                >
+                  Invite Selected User
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
+
 export default EventDetails;
