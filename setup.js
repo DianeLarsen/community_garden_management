@@ -13,7 +13,7 @@ async function setupDatabase() {
 
     // Drop tables if they exist for fresh setup
     await client.query(
-      "DROP TABLE IF EXISTS plot_history, event_registrations, events, event_invitations, garden_plots, group_memberships, groups, users, gardens CASCADE"
+      "DROP TABLE IF EXISTS plot_history, event_registrations, events, event_invitations, garden_plots, group_memberships, groups, group_invitations, users, gardens CASCADE"
     );
 
     // Create users table
@@ -38,28 +38,39 @@ async function setupDatabase() {
 
     // Create groups table
     await client.query(`
-      CREATE TABLE IF NOT EXISTS groups (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        location VARCHAR(10),
-        accepting_members BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log("Groups table created.");
+    CREATE TABLE IF NOT EXISTS groups (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      location VARCHAR(10),
+      accepting_members BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+      console.log("Groups table created.");
 
-    // Create group memberships table
-    await client.query(`
+      // Create group memberships table
+      await client.query(`
       CREATE TABLE IF NOT EXISTS group_memberships (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         group_id INTEGER REFERENCES groups(id),
-        role VARCHAR(50) DEFAULT 'new',
+        role VARCHAR(50) DEFAULT 'member',
         joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log("Group memberships table created.");
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS group_invitations (
+        id SERIAL PRIMARY KEY,
+        group_id INTEGER REFERENCES groups(id),
+        user_id INTEGER REFERENCES users(id),
+        requester_id INTEGER REFERENCES users(id),
+        status VARCHAR(50) NOT NULL
+      );
+    `);
+    console.log("Group invitations table created.");
 
     // Create gardens table
     await client.query(`
@@ -179,26 +190,31 @@ async function setupDatabase() {
    `);
     console.log("Sample users inserted.");
 
-    // Insert sample groups
     await client.query(`
       INSERT INTO groups (name, description, location, accepting_members) VALUES 
-      ('Garden Enthusiasts', 'A group for people who love gardening', '98001', true),
-      ('Organic Growers', 'A group focused on organic gardening practices', '98002', true),
-      ('Urban Farmers', 'A group for city dwellers interested in farming', '98003', true),
-      ('Herb Growers', 'A group dedicated to growing herbs', '98004', true),
-      ('Vegetable Planters', 'A group focused on planting vegetables', '98005', true)
+      ('Garden Enthusiasts', 'A group for people who love gardening', '98272', true),
+      ('Organic Growers', 'A group focused on organic gardening practices', '98223 ', true),
+      ('Urban Farmers', 'A group for city dwellers interested in farming', '98207', true),
+      ('Herb Growers', 'A group dedicated to growing herbs', '98208', true),
+      ('Vegetable Planters', 'A group focused on planting vegetables', '98050', true)
     `);
     console.log("Sample groups inserted.");
 
     // Insert sample group memberships
     await client.query(`
      INSERT INTO group_memberships (user_id, group_id, role) VALUES 
-     (1, 1, 'member'),
+     (1, 2, 'member'),
      (2, 2, 'member'),
-     (3, 1, 'admin'),
-     (3, 2, 'admin'),
-     (4, 2, 'member')
-   `);
+     (1, 1, 'admin'),
+     (2, 2, 'admin'),
+     (4, 2, 'member'),
+     (3, 3, 'admin'),
+     (4, 4, 'admin'),
+     (5, 5, 'admin'),
+     (4, 1, 'member'),
+     (4, 3, 'member'),
+     (4, 5, 'member')
+    `);
     console.log("Sample group memberships inserted.");
 
     // Insert garden data from JSON file

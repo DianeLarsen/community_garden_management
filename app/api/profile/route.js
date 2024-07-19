@@ -31,6 +31,9 @@ export async function GET(request) {
     `;
     const userResult = await client.query(userQuery, [userId]);
 
+    if (userResult.rows.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     const groupsQuery = `
       SELECT g.id, g.name, g.description, g.location, gm.role
       FROM groups g
@@ -39,13 +42,19 @@ export async function GET(request) {
     `;
     const groupsResult = await client.query(groupsQuery, [userId]);
 
+    
+    const invitesQuery = `
+      SELECT g.id, g.name, g.description, g.location, gi.status
+      FROM groups g
+      JOIN group_invitations gi ON g.id = gi.group_id
+      WHERE gi.user_id = $1
+    `;
+    const invitesResult = await client.query(invitesQuery, [userId]);
+
     client.release();
 
-    if (userResult.rows.length === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
 
-    return NextResponse.json({ profile: userResult.rows[0], groups: groupsResult.rows });
+    return NextResponse.json({ profile: userResult.rows[0], groups: groupsResult.rows, invites: invitesResult.rows });
   } catch (error) {
     console.error('Error fetching profile:', error);
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });

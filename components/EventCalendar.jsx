@@ -14,7 +14,6 @@ import {
   isSameMonth,
   isBefore,
   isToday,
-  loading,
 } from "date-fns";
 
 const EventCalendar = () => {
@@ -42,9 +41,9 @@ const EventCalendar = () => {
   const router = useRouter();
   const [groups, setGroups] = useState([]);
   const [gardens, setGardens] = useState([]);
+  const [view, setView] = useState("calendar");
 
   useEffect(() => {
-    // Fetch all groups the user is in
     const fetchGroups = async () => {
       try {
         const response = await fetch(`/api/groups`);
@@ -59,7 +58,6 @@ const EventCalendar = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch gardens based on distance
     const fetchGardens = async () => {
       try {
         const response = await fetch(`/api/gardens?distance=${distance}`);
@@ -72,6 +70,20 @@ const EventCalendar = () => {
 
     fetchGardens();
   }, [distance]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 900) {
+        setView("list");
+      } else {
+        setView("calendar");
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleDistanceChange = (e) => {
     setDistance(e.target.value);
@@ -176,6 +188,13 @@ const EventCalendar = () => {
             <option value="no">No</option>
           </select>
         </label>
+
+        <button
+          onClick={() => setView(view === "calendar" ? "list" : "calendar")}
+          className="ml-auto p-2 bg-gray-200 rounded"
+        >
+          Toggle View
+        </button>
       </div>
 
       <div className="calendar-nav flex justify-between items-center mb-4">
@@ -190,41 +209,56 @@ const EventCalendar = () => {
         </button>
       </div>
 
-      <div className="calendar-grid grid grid-cols-7 gap-2">
-        {Array.from({ length: startDay }).map((_, index) => (
-          <div key={index} className="calendar-day empty"></div>
-        ))}
-        {daysInMonth.map((day) => (
-          <div
-            key={day}
-            className={`calendar-day p-2 border rounded bg-white ${
-              isBefore(day, new Date()) && !isToday(day) ? "bg-gray-200" : ""
-            }`}
-          >
-            <div className="date font-bold mb-2">{format(day, "d")}</div>
-            <div className="events">
-              {filteredEvents
-                .filter((event) => isSameDay(new Date(event.date), day))
-                .map((event) => (
-                  <Link
-                    href={`/events/${event.id}`}
-                    key={event.id}
-                    className={`event block mb-2 p-1 rounded ${
-                      isBefore(new Date(event.date), new Date())
-                        ? "text-gray-500 line-through"
-                        : ""
-                    }`}
-                  >
-                    <h3 className="font-semibold">{event.name}</h3>
-                    <p className="text-sm">
-                      {new Date(event.date).toLocaleDateString()}
-                    </p>
-                  </Link>
-                ))}
+      {view === "calendar" ? (
+        <div className="calendar-grid grid grid-cols-7 gap-2">
+          {Array.from({ length: startDay }).map((_, index) => (
+            <div key={index} className="calendar-day empty"></div>
+          ))}
+          {daysInMonth.map((day) => (
+            <div
+              key={day}
+              className={`calendar-day p-2 border rounded bg-white ${
+                isBefore(day, new Date()) && !isToday(day) ? "bg-gray-200" : ""
+              }`}
+            >
+              <div className="date font-bold mb-2">{format(day, "d")}</div>
+              <div className="events">
+                {filteredEvents
+                  .filter((event) => isSameDay(new Date(event.date), day))
+                  .map((event) => (
+                    <Link
+                      href={`/events/${event.id}`}
+                      key={event.id}
+                      className={`event block mb-2 p-1 rounded ${
+                        isBefore(new Date(event.date), new Date())
+                          ? "text-gray-500 line-through"
+                          : ""
+                      }`}
+                    >
+                      <h3 className="font-semibold">{event.name}</h3>
+                      <p className="text-sm">
+                        {new Date(event.date).toLocaleDateString()}
+                      </p>
+                    </Link>
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <ul className="list-disc pl-5">
+          {filteredEvents.map((event) => (
+            <li key={event.id} className="mb-2">
+              <Link
+                href={`/events/${event.id}`}
+                className="text-blue-500 hover:underline"
+              >
+                {event.name} - {new Date(event.date).toLocaleDateString()}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

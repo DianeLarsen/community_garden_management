@@ -29,7 +29,8 @@ export async function GET(request) {
         e.*, 
         g.available_plots, 
         gd.name AS garden_name,
-        ST_Distance(gd.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
+        ST_Distance(gd.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance,
+        COUNT(inv.id) AS pending_invitations
       FROM 
         events e
       LEFT JOIN (
@@ -45,7 +46,12 @@ export async function GET(request) {
       ) g ON e.garden_id = g.garden_id
       JOIN 
         gardens gd ON e.garden_id = gd.id
+      LEFT JOIN 
+        event_invitations inv ON e.id = inv.event_id AND inv.status = 'pending'
+      GROUP BY 
+        e.id, g.available_plots, gd.name, gd.geolocation
     `, [lon, lat]);
+    
     client.release();
 
     if (result.rows.length === 0) {

@@ -41,6 +41,7 @@ export const BasicProvider = ({ children }) => {
   const [distance, setDistance] = useState(5);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [users, setUsers] = useState([]);
+  const [invites, setInvites] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   // console.log(isAuthenticated)
   const [user, setUser] = useState({
@@ -91,6 +92,7 @@ useEffect(() => {
         const data = await response.json();
         if (response.ok) {
           setAllGroups(data);
+       
         } else {
           setError(data.error);
         }
@@ -121,6 +123,7 @@ useEffect(() => {
     };
     handleEventSearch()
   }, []);
+
 // Fetch all gardens
 useEffect(() => {
   const maxDistance = 1000
@@ -164,6 +167,7 @@ useEffect(() => {
           setIsAdmin(false);
         }
         setGroups(data.groups);
+        setInvites(data.invites)
       } catch (error) {
         setMessage("Error fetching profile data");
       }
@@ -302,7 +306,8 @@ useEffect(() => {
     groups,
     users,
     gardens,
-    allGroups
+    allGroups,
+    invites
   };
 
   return (

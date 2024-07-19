@@ -17,27 +17,27 @@ export async function POST(request, { params }) {
     const role = decoded.role;
 
     const client = await pool.connect();
-    const eventQuery = `
-      SELECT user_id, group_id FROM events WHERE id = $1
+    const groupQuery = `
+      SELECT * FROM groups WHERE id = $1
     `;
-    const eventResult = await client.query(eventQuery, [id]);
-    const event = eventResult.rows[0];
+    const groupResult = await client.query(groupQuery, [id]);
+    const group = groupResult.rows[0];
 
-    if (!event) {
+    if (!group) {
       client.release();
-      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
 
     const isAdmin = role === 'admin';
-    const isOrganizer = event.user_id === userId;
+
 
     const groupAdminQuery = `
       SELECT user_id FROM group_memberships WHERE group_id = $1 AND role = 'admin'
     `;
-    const groupAdminResult = await client.query(groupAdminQuery, [event.group_id]);
+    const groupAdminResult = await client.query(groupAdminQuery, [id]);
     const isGroupAdmin = groupAdminResult.rows.some(row => row.user_id === userId);
-
-    if (!isAdmin && !isOrganizer && !isGroupAdmin) {
+ console.log(groupAdminResult.rows)
+    if (!isAdmin && !isGroupAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -46,17 +46,17 @@ export async function POST(request, { params }) {
 
     // Remove from event_invitations
     const deleteInviteQuery = `
-      DELETE FROM event_invitations WHERE id = $1
+      DELETE FROM group_invitations WHERE id = $1
     `;
     await client.query(deleteInviteQuery, [inviteId]);
     console.log("made it here1")
     // Add to event_registrations
     const insertRegistrationQuery = `
-      INSERT INTO event_registrations (event_id, user_id)
+      INSERT INTO group_memberships (group_id, user_id)
       VALUES ($1, $2)
     `;
     await client.query(insertRegistrationQuery, [id, inviteUserId]);
-    console.log("made it here2")
+
     await client.query('COMMIT');
     client.release();
 

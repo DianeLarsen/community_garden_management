@@ -6,9 +6,10 @@ import PlotsList from "@/components/PlotsList";
 import GroupList from "@/components/GroupList";
 import { BasicContext } from "@/context/BasicContext";
 import EventsList from "@/components/EventsList";
+import InvitesList from "@/components/InvitesList";
 
 const Profile = () => {
-  const { user, setUser, groups, message, setMessage } =
+  const { user, setUser, groups, message, setMessage, invites } =
     useContext(BasicContext);
 
   return (
@@ -38,6 +39,11 @@ const Profile = () => {
           <h2 className="text-2xl mb-4">Your Events</h2>
 
             <EventsList />
+        </div>
+        <div className="mt-8">
+          <h2 className="text-2xl mb-4">Your Invites</h2>
+
+            <InvitesList />
         </div>
         {message && <p className="mt-4 text-green-600">{message}</p>}
         

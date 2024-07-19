@@ -7,12 +7,12 @@ const GroupList = ({ groups, error }) => {
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
   }
-
+// console.log(groups)
   const handleRowClick = (id) => {
     router.push(`/groups/${id}`);
   };
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md mt-10">
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr>
@@ -22,7 +22,7 @@ const GroupList = ({ groups, error }) => {
           </tr>
         </thead>
         <tbody>
-          {groups?.map((group) => (
+          {groups && groups?.map((group) => (
             <tr
               key={group.id}
               className="cursor-pointer hover:bg-gray-100"

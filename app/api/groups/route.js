@@ -1,41 +1,61 @@
 import { NextResponse } from 'next/server';
 import pool from '@/db';
+import jwt from "jsonwebtoken";
 
 // GET Method
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const userId = searchParams.get('userId');
-  const gardenId = searchParams.get('gardenId');
+  const searchTerm = searchParams.get('searchTerm');
+  const userInfo = searchParams.get('userInfo' || false);
+  const limit = searchParams.get('limit' || 10);
+  const token = request.cookies.get("token")?.value;
 
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
     const client = await pool.connect();
 
     let query = `
       SELECT 
-        groups.id, groups.name, groups.description, groups.location, groups.accepting_members,
-        COALESCE(json_agg(garden_groups.garden_id) FILTER (WHERE garden_groups.garden_id IS NOT NULL), '[]') AS gardens
+        groups.*, 
+        COALESCE(json_agg(json_build_object('user_id', users.id, 'username', users.username, 'email', users.email, 'role', group_memberships.role)) FILTER (WHERE group_memberships.user_id IS NOT NULL), '[]') AS members
       FROM 
         groups
       LEFT JOIN 
-        garden_groups ON groups.id = garden_groups.group_id
-      LEFT JOIN 
         group_memberships ON groups.id = group_memberships.group_id
+      LEFT JOIN
+        users ON group_memberships.user_id = users.id
       WHERE 
         1=1
     `;
+    let index = 1;
     const values = [];
 
-    if (userId) {
-      query += ' AND group_memberships.user_id = $1';
-      values.push(userId);
+    if (searchTerm) {
+      query += ` AND (groups.name ILIKE $${index} OR groups.description ILIKE $${index} OR groups.location ILIKE $${index})`;
+      values.push(`%${searchTerm}%`);
+      index++;
     }
 
-    if (gardenId) {
-      query += values.length ? ' AND garden_groups.garden_id = $2' : ' AND garden_groups.garden_id = $1';
-      values.push(gardenId);
+    if (userInfo == 'true') {
+      console.log("userInfo")
+      query += ` AND groups.id IN (SELECT group_id FROM group_memberships WHERE user_id = $${index})`;
+      values.push(userId);
+      index++;
     }
 
     query += ' GROUP BY groups.id';
+
+    if (limit) {
+      console.log("limit")
+      query += ` LIMIT $${index}`;
+      values.push(parseInt(limit));
+      index++;
+    }
 
     const result = await client.query(query, values);
     client.release();
@@ -50,6 +70,7 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Error fetching groups' }, { status: 500 });
   }
 }
+
 
 // POST Method
 export async function POST(request) {
