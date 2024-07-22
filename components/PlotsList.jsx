@@ -1,10 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
+import { BasicContext } from "@/context/BasicContext";
 
 const PlotsList = ({
-  user = "",
-  message = "",
   gardenId = "",
   groupId = "",
   status = "available",
@@ -14,7 +13,13 @@ const PlotsList = ({
   const [loading, setLoading] = useState(true);
   const [editingPlot, setEditingPlot] = useState(null);
   const [editForm, setEditForm] = useState({ length: "", width: "", group_id: "" });
-
+  const { user, setUser, groups, message, setMessage, invites } =
+    useContext(BasicContext);
+useEffect(() => {
+ if (!user.id & !plots){
+  setLoading(true)
+ }
+}, [user?.id, plots])
 
   useEffect(() => {
     const fetchPlots = async () => {
@@ -47,7 +52,7 @@ const PlotsList = ({
       } 
     };
     fetchPlots();
-  }, [gardenId, groupId, user.id]);
+  }, [gardenId, groupId, user?.id]);
 
   const handleRemovePlot = async (plotId) => {
     try {

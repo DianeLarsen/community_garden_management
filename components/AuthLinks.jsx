@@ -53,7 +53,7 @@ if (!user){
             title={user?.email}
           >
             <Image
-              src="https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="
+              src={user?.profile_photo || "https://media.gettyimages.com/id/1572226738/vector/abstract-avatar-icon-profile-diverse-empty-face-for-social-network-and-applications-vector.jpg?s=612x612&w=gi&k=20&c=jb59dCGEzMHpKCpu2jseT5waIqAfiS3PyhE7KreoCAg="}
               alt={`Profile for ${user?.email}`}
               className="rounded-full cursor-pointer object-cover border-double border-4 border-blue-600"
               fill={true}

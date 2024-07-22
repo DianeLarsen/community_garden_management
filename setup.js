@@ -203,17 +203,16 @@ async function setupDatabase() {
     // Insert sample group memberships
     await client.query(`
      INSERT INTO group_memberships (user_id, group_id, role) VALUES 
-     (1, 2, 'member'),
-     (2, 2, 'member'),
-     (1, 1, 'admin'),
-     (2, 2, 'admin'),
-     (4, 2, 'member'),
-     (3, 3, 'admin'),
-     (4, 4, 'admin'),
-     (5, 5, 'admin'),
-     (4, 1, 'member'),
-     (4, 3, 'member'),
-     (4, 5, 'member')
+      (1, 1, 'admin'),
+  (2, 2, 'admin'),
+  (3, 3, 'admin'),
+  (4, 4, 'admin'),
+  (5, 5, 'admin'),
+  (1, 2, 'member'),
+  (2, 3, 'member'),
+  (3, 4, 'member'),
+  (4, 5, 'member'),
+  (5, 1, 'member')
     `);
     console.log("Sample group memberships inserted.");
 

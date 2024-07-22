@@ -329,7 +329,7 @@ const EventDetails = () => {
               </button>
             )}
           </div>
-          <h2 className="text-xl font-bold mb-2">Attendees</h2>
+          {isAttending && <><h2 className="text-xl font-bold mb-2">Attendees</h2>
           <ul className="list-disc pl-5">
             {attendees.length > 0 ? (
               attendees.map((attendee) => (
@@ -355,6 +355,7 @@ const EventDetails = () => {
               <p className="text-gray-500">No attendees</p>
             )}
           </ul>
+          </>}
           {(isAdmin || isGroupAdmin || isOrganizer) && (
             <>
               <h2 className="text-xl font-bold mt-4 mb-2">Invitations</h2>

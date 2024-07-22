@@ -13,7 +13,7 @@ const ProfileDetails = () => {
   const [localProfileData, setLocalProfileData] = useState({});
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(
-    user?.profilePhoto ||
+    user?.profile_photo ||
       "https://res.cloudinary.com/dqjh46sk5/image/upload/v1677786781/zpoquv2r7p88ahgupk0d.jpg"
   );
   const [usernameAvailable, setUsernameAvailable] = useState(null);

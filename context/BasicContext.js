@@ -53,9 +53,9 @@ export const BasicProvider = ({ children }) => {
     role: "",
     zip: "",
     phone: "",
-    profilePhoto: null,
+    profile_photo: null,
   });
-  // console.log(user)
+  console.log(user.profile_photo)
 useEffect(() => {
   const tokenCookie = parseCookies().token;
   const localToken = localStorage.getItem("token");
