@@ -52,7 +52,7 @@ export async function GET(request, { params }) {
 
     const groupResult = await client.query(groupQuery, [id]);
     const group = groupResult.rows[0];
-
+console.log(group)
     if (!group) {
       client.release();
       return NextResponse.json({ error: "Group not found" }, { status: 404 });

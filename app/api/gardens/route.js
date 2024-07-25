@@ -46,6 +46,7 @@ export async function GET(request) {
       }
 
       const userZip = userResult.rows[0].zip;
+
       if (!userZip) {
         client.release();
         return NextResponse.json({ error: 'User does not have a ZIP code' }, {redirect: "/profile"}, {bannerText: "Please update profile page with required information"}, {code: "error"},{ status: 400 });
@@ -69,7 +70,7 @@ export async function GET(request) {
     const client = await pool.connect();
     const result = await client.query(query, values);
     client.release();
-
+console.log(result.rows)
     if (result.rows.length === 0) {
       return NextResponse.json({ message: 'No gardens found within the specified distance' });
     }

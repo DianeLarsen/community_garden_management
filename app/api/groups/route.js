@@ -6,13 +6,14 @@ import jwt from "jsonwebtoken";
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const searchTerm = searchParams.get('searchTerm');
-  const userInfo = searchParams.get('userInfo' || false);
-  const limit = searchParams.get('limit' || 10);
+  const userInfo = searchParams.get('userInfo') === 'true';
+  const limit = parseInt(searchParams.get('limit')) || 10;
   const token = request.cookies.get("token")?.value;
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
@@ -22,13 +23,18 @@ export async function GET(request) {
     let query = `
       SELECT 
         groups.*, 
-        COALESCE(json_agg(json_build_object('user_id', users.id, 'username', users.username, 'email', users.email, 'role', group_memberships.role)) FILTER (WHERE group_memberships.user_id IS NOT NULL), '[]') AS members
+        COALESCE(json_agg(json_build_object('user_id', users.id, 'username', users.username, 'email', users.email, 'role', group_memberships.role)) FILTER (WHERE group_memberships.user_id IS NOT NULL), '[]') AS members,
+        COALESCE(json_agg(json_build_object('invite_id', group_invitations.id, 'user_id', invite_users.id, 'username', invite_users.username, 'email', invite_users.email, 'status', group_invitations.status)) FILTER (WHERE group_invitations.id IS NOT NULL), '[]') AS invitations
       FROM 
         groups
       LEFT JOIN 
         group_memberships ON groups.id = group_memberships.group_id
       LEFT JOIN
         users ON group_memberships.user_id = users.id
+      LEFT JOIN
+        group_invitations ON groups.id = group_invitations.group_id
+      LEFT JOIN
+        users AS invite_users ON group_invitations.user_id = invite_users.id
       WHERE 
         1=1
     `;
@@ -41,8 +47,7 @@ export async function GET(request) {
       index++;
     }
 
-    if (userInfo == 'true') {
-      console.log("userInfo")
+    if (userInfo) {
       query += ` AND groups.id IN (SELECT group_id FROM group_memberships WHERE user_id = $${index})`;
       values.push(userId);
       index++;
@@ -51,9 +56,8 @@ export async function GET(request) {
     query += ' GROUP BY groups.id';
 
     if (limit) {
-      console.log("limit")
       query += ` LIMIT $${index}`;
-      values.push(parseInt(limit));
+      values.push(limit);
       index++;
     }
 
@@ -70,6 +74,7 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Error fetching groups' }, { status: 500 });
   }
 }
+
 
 
 // POST Method

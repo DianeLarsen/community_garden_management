@@ -283,7 +283,7 @@ const GroupDetails = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
+console.log(events)
   return (
     <div className="container mx-auto p-4">
       {group && (
@@ -331,7 +331,7 @@ const GroupDetails = () => {
               <ul>
                 {events.map((event) => (
                   <li key={event.id}>
-                   <Link href={`/events/${event.id}`} className="text-blue-500 hover:underline">{event.name} - {new Date(event.date).toLocaleDateString()}</Link> 
+                   <Link href={`/events/${event.id}`} className="text-blue-500 hover:underline">{event.name} - {new Date(event.start_date).toLocaleString()} to {new Date(event.end_date).toLocaleString()}</Link> 
                   </li>
                 ))}
               </ul>

@@ -51,26 +51,27 @@ export const BasicProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    const tokenCookie = parseCookies().token;
-    const localToken = localStorage.getItem("token");
+    const checkToken = () => {
+      const tokenCookie = parseCookies().token;
+      const localToken = localStorage.getItem("token");
 
-    if (localToken || tokenCookie) {
-      setToken(localToken || tokenCookie);
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-      router.push("/");
-    }
+      if (localToken || tokenCookie) {
+        setToken(localToken || tokenCookie);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        setTimeout(() => {
+          if (!localToken && !tokenCookie) {
+            router.push("/");
+          }
+        }, 2000); // Delay of 2000 milliseconds (2 seconds)
+      }
+    };
+
+    checkToken();
   }, [router]);
 
-  useEffect(() => {
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-      router.push("/");
-    }
-  }, [token, router]);
+
 
   // Fetch all users
   useEffect(() => {
@@ -157,7 +158,7 @@ export const BasicProvider = ({ children }) => {
           },
         });
         const data = await response.json();
-
+console.log(data.profile)
         if (response.ok) {
           setUser(data.profile);
 

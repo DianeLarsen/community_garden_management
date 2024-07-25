@@ -57,7 +57,7 @@ console.log(allGroups)
       : null,
     fetcher
   );
-  console.log(plotsData);
+
   useEffect(() => {
     if (plotsData) {
       setReservedPlots(plotsData.plots);
@@ -184,6 +184,9 @@ console.log(allGroups)
                   className="text-blue-500 hover:underline"
                 >
                   {group.name}
+                  {group.invitations.length > 0 && (
+                    <span className="ml-2 text-red-500">!</span>
+                  )}
                 </Link>
               </li>
             ))

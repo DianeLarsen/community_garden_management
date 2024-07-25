@@ -8,25 +8,34 @@ const GardenList = () => {
   const [error, setError] = useState('');
   const router = useRouter();
   const {
-    user,
+    user, loading, setLoading
     } = useContext(BasicContext);
+useEffect(() => {
+if (!user.id){
+  setLoading(true)
+} else {
+  setLoading(false)
+}
+}, [router]);
   useEffect(() => {
     const fetchGardens = async () => {
       try {
         const response = await fetch('/api/gardens');
         const data = await response.json();
+
         if (response.ok) {
           setGardens(data);
         } else {
           setError(data.error);
         }
       } catch (err) {
-        setError('Failed to fetch gardens.');
+        setError('Failed to fetch gardens.', err);
       }
     };
-    setError('Failed to fetch gardens.');
-    if (user.zip){ fetchGardens();} else {setError('Update Profile with zip to see Gadens near you!.');}
-  }, []);
+
+
+    fetchGardens();
+  }, [loading]);
 
   const handleGardenClick = (id) => {
     router.push(`/gardens/${id}`);
@@ -35,7 +44,9 @@ const GardenList = () => {
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
   }
-
+if (loading) {
+  return <p>Loading...</p>
+}
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Community Gardens Near You</h1>
