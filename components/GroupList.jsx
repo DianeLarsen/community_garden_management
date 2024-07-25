@@ -1,12 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useContext } from "react";
-import { BasicContext } from "@/context/BasicContext";
 
-const GroupList = ({ error }) => {
+const GroupList = ({ error, groups }) => {
   const router = useRouter();
-  const { groups } = useContext(BasicContext);
+
 
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;

@@ -5,10 +5,10 @@ import { useRouter, useParams } from "next/navigation";
 
 const GroupDetails = () => {
   const { id } = useParams();
-  const { user, token, } = useContext(BasicContext);
+  const { user, token } = useContext(BasicContext);
   const [group, setGroup] = useState(null);
-  const [error, setError] = useState("")
-  const [message, setMessage] = useState("")
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [members, setMembers] = useState([]);
   const [events, setEvents] = useState([]);
   const [plots, setPlots] = useState([]);
@@ -37,7 +37,7 @@ const GroupDetails = () => {
           throw new Error("Error fetching group details");
         }
         const groupData = await groupResponse.json();
-// console.log(groupData)
+        // console.log(groupData)
         setGroup(groupData.group);
         setMembers(groupData.members);
         setEvents(groupData.events);
@@ -59,7 +59,7 @@ const GroupDetails = () => {
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-        const response = await fetch('/api/users', {
+        const response = await fetch("/api/users", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -70,7 +70,7 @@ const GroupDetails = () => {
         console.error("Error fetching all users:", error);
       }
     };
-  
+
     if (isAdmin) {
       fetchAllUsers();
     }
@@ -85,12 +85,12 @@ const GroupDetails = () => {
         },
         body: JSON.stringify({ userId: user.id }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error requesting membership");
       }
-  
+
       const inviteData = await response.json();
       setInvitations((prevInvitations) => [...prevInvitations, inviteData]);
       alert("Request Sent, awaiting approval!");
@@ -100,10 +100,9 @@ const GroupDetails = () => {
       setLoading(false);
     }
   };
-  
 
   const handleRemoveMember = async (memberId) => {
-    console.log(memberId)
+    console.log(memberId);
     try {
       const response = await fetch(`/api/groups/${id}/remove-user`, {
         method: "DELETE",
@@ -114,16 +113,14 @@ const GroupDetails = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-
-        setError(data.error)
+        setError(data.error);
         throw new Error("Error removing member");
       }
-      alert(data.message)
+      alert(data.message);
       setMembers(members.filter((member) => member.id !== memberId));
       window.location.reload();
     } catch (err) {
       console.error("Error:", err.error);
-
     }
   };
 
@@ -231,7 +228,6 @@ const GroupDetails = () => {
     inviteUserId,
     inviteUsername
   ) => {
-  
     try {
       const response = await fetch(`/api/groups/${id}/approve-invite`, {
         method: "POST",
@@ -307,7 +303,7 @@ const GroupDetails = () => {
             </button>
           )}
 
-          {(isPending ) && (
+          {isPending && (
             <>
               <p className="text-red-500">Awaiting verification by admin.</p>
               <button
@@ -325,7 +321,7 @@ const GroupDetails = () => {
               <ul>
                 {plots.map((plot) => (
                   <li key={plot.id}>
-                    <Link href={`/plots/${plot.id}`}>Plot {plot.id}</Link> -{" "}
+                    <Link href={`/plots/${plot.id}`} className="text-blue-500 hover:underline">Plot {plot.id}</Link> -{" "}
                     {plot.length} x {plot.width}
                   </li>
                 ))}
@@ -335,7 +331,7 @@ const GroupDetails = () => {
               <ul>
                 {events.map((event) => (
                   <li key={event.id}>
-                    {event.name} - {new Date(event.date).toLocaleDateString()}
+                   <Link href={`/events/${event.id}`} className="text-blue-500 hover:underline">{event.name} - {new Date(event.date).toLocaleDateString()}</Link> 
                   </li>
                 ))}
               </ul>
@@ -371,15 +367,19 @@ const GroupDetails = () => {
               </ul>
 
               {isAdmin && (
-   <button
-   onClick={() => setShowInviteModal(true)}
-   className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
- >
-   Invite Member
- </button>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                >
+                  Invite Member
+                </button>
               )}
-               {error && error ? <p className="mt-4 text-red-600">{error}</p> :<p className="mt-4 text-green-600">{message}</p>}
-              {(isAdmin || isGroupAdmin) && (
+              {error && error ? (
+                <p className="mt-4 text-red-600">{error}</p>
+              ) : (
+                <p className="mt-4 text-green-600">{message}</p>
+              )}
+              {isAdmin && (
                 <>
                   <h2 className="text-xl font-bold mt-4 mb-2">Invitations</h2>
                   <ul className="list-disc pl-5">
@@ -461,7 +461,6 @@ const GroupDetails = () => {
                 Invite Selected User
               </button>
             </div>
-           
           </div>
         </div>
       )}

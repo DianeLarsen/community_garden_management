@@ -47,10 +47,10 @@ async function setupDatabase() {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
-      console.log("Groups table created.");
+    console.log("Groups table created.");
 
-      // Create group memberships table
-      await client.query(`
+    // Create group memberships table
+    await client.query(`
       CREATE TABLE IF NOT EXISTS group_memberships (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
@@ -113,7 +113,8 @@ async function setupDatabase() {
         user_id INTEGER REFERENCES users(id),
         group_id INTEGER REFERENCES groups(id),
         reserved_at TIMESTAMP,
-        occupied_at TIMESTAMP
+        occupied_at TIMESTAMP,
+        CHECK (status = 'available' OR (user_id IS NOT NULL OR group_id IS NOT NULL))
       )
     `);
     console.log("Garden plots table created.");
@@ -132,46 +133,47 @@ async function setupDatabase() {
     `);
     console.log("Plot history table created.");
 
-    // Create events table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS events (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        date TIMESTAMP NOT NULL,
-        plot_id INTEGER REFERENCES garden_plots(id),
-        group_id INTEGER REFERENCES groups(id),
-        user_id INTEGER REFERENCES users(id),
-        garden_id INTEGER REFERENCES gardens(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log("Events table created.");
+  // Create events table
+await client.query(`
+  CREATE TABLE IF NOT EXISTS events (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    plot_id INTEGER REFERENCES garden_plots(id),
+    group_id INTEGER REFERENCES groups(id),
+    user_id INTEGER REFERENCES users(id),
+    garden_id INTEGER REFERENCES gardens(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_public BOOLEAN DEFAULT TRUE
+  )
+`);
+console.log("Events table created.");
 
-    // Create event registrations table
-    await client.query(`
- CREATE TABLE IF NOT EXISTS event_invitations (
-  id SERIAL PRIMARY KEY,
-  event_id INTEGER REFERENCES events(id),
-  user_id INTEGER REFERENCES users(id),
-  requester_id INTEGER REFERENCES users(id),
-  status VARCHAR(50) NOT NULL
-);
+// Create event invitations table
+await client.query(`
+  CREATE TABLE IF NOT EXISTS event_invitations (
+    id SERIAL PRIMARY KEY,
+    event_id INTEGER REFERENCES events(id),
+    user_id INTEGER REFERENCES users(id),
+    requester_id INTEGER REFERENCES users(id),
+    status VARCHAR(50) NOT NULL
+  )
+`);
+console.log("Event invitations table created.");
 
-        `);
-    console.log("Event invitations table created.");
-
-    // Create event registrations table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS event_registrations (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id),
-        event_id INTEGER REFERENCES events(id),
-        group_id INTEGER REFERENCES groups(id),
-        registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    console.log("Event registrations table created.");
+// Create event registrations table
+await client.query(`
+  CREATE TABLE IF NOT EXISTS event_registrations (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    event_id INTEGER REFERENCES events(id),
+    group_id INTEGER REFERENCES groups(id),
+    registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`);
+console.log("Event registrations table created.");
 
     // Insert sample users
     const hashedPassword1 = await bcrypt.hash("password1", 10);
@@ -181,12 +183,12 @@ async function setupDatabase() {
     const hashedPassword5 = await bcrypt.hash("password5", 10);
 
     await client.query(`
-     INSERT INTO users (email, username, street_address, city, state, zip, phone, password, verified, role) VALUES 
-     ('user1@example.com', 'user1', '123 Main St', 'Everett', 'WA', '98201', '555-1234', '${hashedPassword1}', true, 'member'),
-     ('user2@example.com', 'user2', '456 Oak St', 'Lynnwood', 'WA', '98036', '555-5678', '${hashedPassword2}', true, 'member'),
-     ('admin@example.com', 'admin', '789 Pine St', 'Snohomish', 'WA', '98290', '555-9012', '${hashedPassword3}', true, 'admin'),
-     ('user3@example.com', 'user3', '101 Elm St', 'Everett', 'WA', '98201', '555-0000', '${hashedPassword4}', true, 'member'),
-     ('user4@example.com', 'user4', '202 Birch St', 'Lynnwood', 'WA', '98036', '555-1111', '${hashedPassword5}', true, 'member')
+     INSERT INTO users (email, username, street_address, city, state, zip, phone, password, verified, role, profile_photo) VALUES 
+     ('user1@example.com', 'user1', '123 Main St', 'Everett', 'WA', '98201', '555-1234', '${hashedPassword1}', true, 'member', 'https://res.cloudinary.com/dqjh46sk5/image/upload/v1721671734/oog637olg8zbgyrhwaia.png'),
+     ('user2@example.com', 'user2', '456 Oak St', 'Lynnwood', 'WA', '98036', '555-5678', '${hashedPassword2}', true, 'member', null),
+     ('admin@example.com', 'admin', '789 Pine St', 'Snohomish', 'WA', '98290', '555-9012', '${hashedPassword3}', true, 'admin', 'https://res.cloudinary.com/dqjh46sk5/image/upload/v1690320204/u2adaxxniq1jge3nmggd.jpg'),
+     ('user3@example.com', 'user3', '101 Elm St', 'Everett', 'WA', '98201', '555-0000', '${hashedPassword4}', true, 'member', 'https://res.cloudinary.com/dqjh46sk5/image/upload/v1689184463/ji2wveaa129ihu1rnh8u.jpg'),
+     ('user4@example.com', 'user4', '202 Birch St', 'Lynnwood', 'WA', '98036', '555-1111', '${hashedPassword5}', true, 'member', 'https://res.cloudinary.com/dqjh46sk5/image/upload/v1690383115/anakkjb4jr9ebbwqb6eh.jpg')
    `);
     console.log("Sample users inserted.");
 
@@ -254,68 +256,82 @@ async function setupDatabase() {
 
     // Insert sample garden plots
     const plotSizes = ["4x4", "4x6", "4x8", "4x10", "4x12"];
-    const plotStatuses = ["available", "reserved", "occupied"];
+const plotStatuses = ["available", "reserved"];
 
-    const gardensWithRentalBeds = await client.query(
-      "SELECT id, name FROM gardens WHERE rentalBeds = true"
+const gardensWithRentalBeds = await client.query(
+  "SELECT id, name FROM gardens WHERE rentalBeds = true"
+);
+
+for (const garden of gardensWithRentalBeds.rows) {
+  for (let i = 1; i <= 20; i++) {
+    const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
+    const length = size.split("x")[0];
+    const width = size.split("x")[1];
+    const status =
+      plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
+    const plotName = `${garden.name} Plot ${i}`;
+    
+    let user_id = null;
+    let group_id = null;
+    let reserved_at = null;
+    let duration = null;
+    let purpose = null;
+
+    if (status === 'reserved') {
+      user_id = Math.floor(Math.random() * 5) + 1; // Random user_id between 1 and 5
+      reserved_at = new Date();
+      duration = Math.floor(Math.random() * 12) + 1; // Random duration between 1 and 12 weeks
+      purpose = 'Random purpose'; // Example purpose, replace as needed
+    }
+
+    const result = await client.query(
+      `
+      INSERT INTO garden_plots (garden_id, name, location, length, width, status, user_id) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id
+      `,
+      [garden.id, plotName, `Plot ${i}`, length, width, status, user_id]
     );
 
-    for (const garden of gardensWithRentalBeds.rows) {
-      for (let i = 1; i <= 20; i++) {
-        const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
-        const length = size.split("x")[0];
-        const width = size.split("x")[1];
-        const status =
-          plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
-        const plotName = `${garden.name} Plot ${i}`;
-        await client.query(
-          `
-       INSERT INTO garden_plots (garden_id, name, location, length, width, status) VALUES 
-       ($1, $2, $3, $4, $5, $6)
-     `,
-          [garden.id, plotName, `Plot ${i}`, length, width, status]
-        );
-      }
+    const plot_id = result.rows[0].id;
+
+    if (status === 'reserved') {
+      await client.query(
+        `
+        INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+        [plot_id, user_id, group_id, reserved_at, duration, purpose]
+      );
     }
-    console.log("Sample garden plots inserted.");
+  }
+}
+console.log("Sample garden plots and plot history inserted.");
 
-    // Insert sample plot history
-    await client.query(`
-     INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose ) VALUES 
-          (1, 1, null, '2024-01-01', 12, 'Personal gardening'),
-     (2, 2, null, '2024-02-01', 6, 'Community event'),
-     (3, 3, 1, '2024-03-01', 8, 'Group gardening project'),
-       (4, 1, null, '2024-01-01', 12, 'Personal gardening'),
-  (5, 2, null, '2024-02-01', 6, 'Community event'),
-  (6, 3, 1, '2024-03-01', 8, 'Group gardening project'),
-  (7, 4, 2, '2024-04-01', 4, 'Vegetable planting session'),
-  (8, 5, 3, '2024-05-01', 10, 'Herb growing workshop')
-   `);
-    console.log("Sample plot history inserted.");
+
 
     await client.query(`
-      INSERT INTO events (name, description, date, group_id, user_id, garden_id, plot_id) VALUES
-    ('Community Gardening Day', 'Join us for a community gardening day!', '2024-07-20 09:00:00',  1, 1, 1, 1),
-    ('Organic Farming Workshop', 'Learn about organic farming techniques.', '2024-07-22 14:00:00',  2, 2, 2, 21),
-    ('Urban Farming Meetup', 'Meet other urban farmers and share tips.', '2024-07-25 18:00:00',  3, 3, 3, 41),
-    ('Herb Gardening Class', 'Discover the secrets of herb gardening.', '2024-07-28 10:00:00',  4, 4, 4, 61),
-    ('Vegetable Planting Session', 'Hands-on vegetable planting session.', '2024-07-30 15:00:00',  5, 5, 5, 81);
+      INSERT INTO events (name, description, start_date, end_date, group_id, user_id, garden_id, plot_id, is_public) VALUES
+      ('Community Gardening Day', 'Join us for a community gardening day!', '2024-08-20 09:00:00', '2024-08-20 12:00:00', 1, 1, 1, 1, TRUE),
+      ('Organic Farming Workshop', 'Learn about organic farming techniques.', '2024-08-22 14:00:00', '2024-08-22 17:00:00', 2, 2, 2, 21, FALSE),
+      ('Urban Farming Meetup', 'Meet other urban farmers and share tips.', '2024-07-25 18:00:00', '2024-07-25 21:00:00', 3, 3, 3, 41, TRUE),
+      ('Herb Gardening Class', 'Discover the secrets of herb gardening.', '2024-07-28 10:00:00', '2024-07-28 13:00:00', 4, 4, 4, 61, TRUE),
+      ('Vegetable Planting Session', 'Hands-on vegetable planting session.', '2024-07-30 15:00:00', '2024-07-30 18:00:00', 5, 5, 5, 81, FALSE)
     `);
     console.log("Sample events inserted.");
-
+    
     await client.query(`
-     INSERT INTO event_registrations (user_id, event_id, group_id) VALUES
-(1, 1, 1),
-(2, 2, 2),
-(3, 3, 3),
-(4, 4, 4),
-(5, 5, 5),
-(1, 2, 1),
-(2, 3, 2),
-(3, 4, 3),
-(4, 5, 4),
-(5, 1, 5);
-
+      INSERT INTO event_registrations (user_id, event_id, group_id) VALUES
+      (1, 1, 1),
+      (2, 2, 2),
+      (3, 3, 3),
+      (4, 4, 4),
+      (5, 5, 5),
+      (1, 2, 1),
+      (2, 3, 2),
+      (3, 4, 3),
+      (4, 5, 4),
+      (5, 1, 5)
     `);
     console.log("Sample event registration inserted.");
   } catch (error) {

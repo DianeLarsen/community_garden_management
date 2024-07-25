@@ -4,8 +4,7 @@ import { BasicContext } from "@/context/BasicContext";
 import { useRouter } from 'next/navigation';
 
 const RegistrationForm = () => {
-  const { showBanner } =
-  useContext(BasicContext);
+  const { showBanner } = useContext(BasicContext);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -29,27 +28,32 @@ const RegistrationForm = () => {
       return;
     }
 
-    const response = await fetch('/api/registration', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: formData.email, password: formData.password }),
-    });
+    try {
+      const response = await fetch('/api/registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email, password: formData.password }),
+      });
 
-    const results = await response.json();
-    if (response.ok) {
-      showBanner("Registration successful!  Check Email!", "success");
-      router.push('/profile');
-    } else {
-      setData(results);
+      const results = await response.json();
+      if (response.ok) {
+        showBanner("Registration successful! Check Email!", "success");
+        router.push('/');
+      } else {
+        setData(results);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setData({ error: 'An unexpected error occurred. Please try again later.' });
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center max-h-screen p-8 bg-gray-100">
       <div className="p-8 bg-white rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl mb-4">Register</h2>
+        <h1 className="text-3xl mb-4">Register</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>

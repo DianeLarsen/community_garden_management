@@ -11,7 +11,7 @@ const Login = () => {
     useContext(BasicContext);
   const handleLogin = async (e) => {
     e.preventDefault();
-console.log(email, password)
+
     try {
       const response = await fetch("/api/community-garden/login", {
         method: "POST",

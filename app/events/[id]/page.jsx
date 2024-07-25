@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
 
+
 const EventDetails = () => {
   const { id } = useParams();
   const { user, groups, token } = useContext(BasicContext);
@@ -26,13 +27,24 @@ const EventDetails = () => {
   const isAdmin = user.role === "admin";
   const isGroupAdmin = event?.group_admins?.includes(user.id);
   const isOrganizer = event?.user_id === user.id;
+
+  // get all events
   useEffect(() => {
     const fetchEventDetails = async () => {
       setLoading(true);
       try {
         const response = await fetch(`/api/events/${id}`);
         const data = await response.json();
+        console.log(data.event)
+        if (!data.error && !data.event.is_public && !data.event.group_admins.includes(user.id)) {
+          router.push("/events");
+          return;
+        }
+        if(data.error){
+          alert(data.error)
+        }
         setEvent(data.event || {});
+        console.log(data)
         setAttendees(data.attendees || []);
         setInvitations(data.invitations || []);
         setLoading(false);
@@ -42,11 +54,14 @@ const EventDetails = () => {
       }
     };
     fetchEventDetails();
-  }, [id]);
+  }, [id, showInviteModal]);
+
+
+  // get all users
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-        const response = await fetch('/api/users', {
+        const response = await fetch("/api/users", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -57,12 +72,11 @@ const EventDetails = () => {
         console.error("Error fetching all users:", error);
       }
     };
-  
+
     if (isAdmin || isGroupAdmin || isOrganizer) {
       fetchAllUsers();
     }
   }, [isAdmin, isGroupAdmin, isOrganizer, token]);
-
 
   const handleAcceptInvite = async () => {
     try {
@@ -117,7 +131,6 @@ const EventDetails = () => {
     inviteUserId,
     inviteUsername
   ) => {
-    console.log(inviteId)
     try {
       const response = await fetch(`/api/events/${id}/approve-invite`, {
         method: "POST",
@@ -189,7 +202,7 @@ const EventDetails = () => {
     }
   };
 
-  const handleCancelInvite = async () => {
+  const handleCancelInvite = async (userId) => {
     try {
       const response = await fetch(`/api/events/${id}/cancel-invite`, {
         method: "POST",
@@ -197,13 +210,13 @@ const EventDetails = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({ userId }),
       });
       if (response.ok) {
-        alert("Invite cancelled!");
         setInvitations(
           invitations.filter((invite) => invite.user_id !== user.id)
         );
+        alert("Invite cancelled!");
       } else {
         alert("Failed to cancel invite.");
       }
@@ -247,8 +260,9 @@ const EventDetails = () => {
         body: JSON.stringify({ email: inviteEmail }),
       });
       if (response.ok) {
-        alert("User invited!");
         setShowInviteModal(false);
+        alert("User invited!");
+
         setInviteEmail("");
       } else {
         alert("Failed to invite user.");
@@ -258,11 +272,15 @@ const EventDetails = () => {
     }
   };
 
+  const handleEditEvent = () => {
+    router.push(`/events/${id}/edit`);
+  };
+
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
 
-    return (
+  return (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-md shadow-md mt-10">
       {event && (
         <>
@@ -274,6 +292,9 @@ const EventDetails = () => {
           <p className="text-gray-600 mb-4">Garden: {event.garden_name}</p>
           <p className="text-gray-600 mb-4">Plot: {event.plot_name}</p>
           <p className="text-gray-600 mb-4">Organizer: {event.organizer}</p>
+          {event.group_name && (
+            <p className="text-gray-600 mb-4">Group: {event.group_name}</p>
+          )}
           <div className="flex space-x-4 mb-4">
             {!isAttending && !isInvited && !isPending && (
               <button
@@ -289,7 +310,7 @@ const EventDetails = () => {
                   Invite Pending
                 </p>
                 <button
-                  onClick={handleCancelInvite}
+                  onClick={() => handleCancelInvite(user.id)}
                   className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
                 >
                   Cancel Invite Request
@@ -313,12 +334,20 @@ const EventDetails = () => {
               </button>
             )}
             {(isAdmin || isGroupAdmin || isOrganizer) && (
-              <button
-                onClick={handleDeleteEvent}
-                className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
-              >
-                Delete Event
-              </button>
+              <>
+                <button
+                  onClick={handleDeleteEvent}
+                  className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600"
+                >
+                  Delete Event
+                </button>
+                <button
+                  onClick={handleEditEvent}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                >
+                  Edit Event
+                </button>
+              </>
             )}
             {(isAdmin || isGroupAdmin || isOrganizer) && (
               <button
@@ -329,33 +358,36 @@ const EventDetails = () => {
               </button>
             )}
           </div>
-          {isAttending && <><h2 className="text-xl font-bold mb-2">Attendees</h2>
-          <ul className="list-disc pl-5">
-            {attendees.length > 0 ? (
-              attendees.map((attendee) => (
-                <li
-                  key={attendee.user_id}
-                  className="text-gray-700 flex items-center"
-                >
-                  {attendee.username}
-                  {(isAdmin || isGroupAdmin || isOrganizer) && (
-                    <>
-                      <span className="ml-2 text-green-500">&#10003;</span>
-                      <button
-                        onClick={() => handleRemoveUser(attendee.user_id)}
-                        className="ml-2 bg-red-500 text-white py-1 px-2 rounded-md hover:bg-red-600"
-                      >
-                        X
-                      </button>
-                    </>
-                  )}
-                </li>
-              ))
-            ) : (
-              <p className="text-gray-500">No attendees</p>
-            )}
-          </ul>
-          </>}
+          {isAttending && (
+            <>
+              <h2 className="text-xl font-bold mb-2">Attendees</h2>
+              <ul className="list-disc pl-5">
+                {attendees.length > 0 ? (
+                  attendees.map((attendee) => (
+                    <li
+                      key={attendee.user_id}
+                      className="text-gray-700 flex items-center"
+                    >
+                      {attendee.username}
+                      {(isAdmin || isGroupAdmin || isOrganizer) && (
+                        <>
+                          <span className="ml-2 text-green-500">&#10003;</span>
+                          <button
+                            onClick={() => handleRemoveUser(attendee.user_id)}
+                            className="ml-2 bg-red-500 text-white py-1 px-2 rounded-md hover:bg-red-600"
+                          >
+                            X
+                          </button>
+                        </>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No attendees</p>
+                )}
+              </ul>
+            </>
+          )}
           {(isAdmin || isGroupAdmin || isOrganizer) && (
             <>
               <h2 className="text-xl font-bold mt-4 mb-2">Invitations</h2>
@@ -381,6 +413,14 @@ const EventDetails = () => {
                           Approve
                         </button>
                       )}
+                      {invite.status === "invited" && (
+                        <button
+                          onClick={() => handleCancelInvite(invite.user_id)}
+                          className="ml-4 bg-green-500 text-white py-1 px-2 rounded-md hover:bg-green-600"
+                        >
+                          Cancel Invite
+                        </button>
+                      )}
                     </li>
                   ))
                 ) : (
@@ -392,53 +432,59 @@ const EventDetails = () => {
         </>
       )}
       {showInviteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-md shadow-md">
-              <h2 className="text-xl font-bold mb-4">Invite User</h2>
-              <input
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="Enter email"
-                className="w-full p-2 border border-gray-300 rounded-md mb-4"
-              />
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleInviteUser}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-                >
-                  Send Invite
-                </button>
-                <button
-                  onClick={() => setShowInviteModal(false)}
-                  className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-              </div>
-              <h3 className="text-lg font-bold mt-4">Invite Existing User</h3>
-              <select
-                onChange={(e) => setInviteEmail(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md mb-4"
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <h2 className="text-xl font-bold mb-4">Invite User</h2>
+            <input
+              type="email"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder="Enter email"
+              className="w-full p-2 border border-gray-300 rounded-md mb-4"
+            />
+            <div className="flex space-x-4">
+              <button
+                onClick={handleInviteUser}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
-                <option value="">Select User</option>
-                {allUsers.map((user) => (
+                Send Invite
+              </button>
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+            <h3 className="text-lg font-bold mt-4">Invite Existing User</h3>
+            <select
+              onChange={(e) => setInviteEmail(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md mb-4"
+            >
+              <option value="">Select User</option>
+              {allUsers
+                .filter(
+                  (user) =>
+                    !invitations.some((invite) => invite.user_id === user.id) &&
+                    !attendees.some((attendee) => attendee.user_id === user.id)
+                )
+                .map((user) => (
                   <option key={user.id} value={user.email}>
                     {user.username} ({user.email})
                   </option>
                 ))}
-              </select>
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleInviteUser}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-                >
-                  Invite Selected User
-                </button>
-              </div>
+            </select>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleInviteUser}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              >
+                Invite Selected User
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 };

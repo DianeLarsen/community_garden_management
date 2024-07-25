@@ -11,6 +11,7 @@ const FindGroups = ({ userInfo = false }) => {
   const [message, setMessage] = useState("");
   const [limit, setLimit] = useState(10);
   const [groups, setGroups] = useState([]);
+  const [showAllGroups, setShowAllGroups] = useState(false);
 
   const fetchGroups = async (e) => {
     e.preventDefault();
@@ -29,9 +30,9 @@ const FindGroups = ({ userInfo = false }) => {
       setError('Failed to fetch groups.');
     }
   };
-
-  const showAllGroups = () => {
-    setGroups(allGroups);
+console.log(allGroups)
+  const handleShowAllGroups = () => {
+    setShowAllGroups((prev)=> !prev);
   };
 
   return (
@@ -71,13 +72,14 @@ const FindGroups = ({ userInfo = false }) => {
         </div>
       </form>
       <button
-        onClick={showAllGroups}
+        onClick={handleShowAllGroups}
         className="bg-green-500 text-white p-2 rounded mb-4"
       >
-        Show All Groups
+        {showAllGroups ? "Show Searched Groups" : "Show All Groups"}
       </button>
-
-      <GroupList groups={groups} error={error} />
+    {  showAllGroups ? 
+      <GroupList groups={allGroups} error={error} userInfo={false}/> : 
+      <GroupList groups={groups} error={error} userInfo={false}/>}
     </div>
   );
 };

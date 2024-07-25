@@ -2,24 +2,19 @@
 import { createContext, useState, useEffect } from "react";
 import {
   addMonths,
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  getDay,
-  isSameDay,
   isSameMonth,
   isBefore,
   isToday,
-  loading,
 } from "date-fns";
 import { parseCookies } from "nookies";
+import { useRouter } from "next/navigation";
 
 export const BasicContext = createContext();
 
 export const BasicProvider = ({ children }) => {
+  const router = useRouter();
   const [plot, setPlot] = useState(null);
-  const [error, setError] = useState("")
+  const [error, setError] = useState("");
   const [garden, setGarden] = useState(null);
   const [gardens, setGardens] = useState([]);
   const [history, setHistory] = useState([]);
@@ -27,11 +22,10 @@ export const BasicProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [banner, setBanner] = useState({ message: "", type: "" });
   const [isAdmin, setIsAdmin] = useState(false);
-  const [token, setToken] = useState("")
+  const [token, setToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [message, setMessage] = useState("");
   const [group, setGroup] = useState("");
-  //   const [location, setLocation] = useState("");
   const [events, setEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
@@ -43,7 +37,7 @@ export const BasicProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [invites, setInvites] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  // console.log(isAuthenticated)
+
   const [user, setUser] = useState({
     email: "",
     username: "",
@@ -51,48 +45,59 @@ export const BasicProvider = ({ children }) => {
     city: "",
     state: "",
     role: "",
-    zip: "",
+    zip: null,
     phone: "",
     profile_photo: null,
   });
-  console.log(user.profile_photo)
-useEffect(() => {
-  const tokenCookie = parseCookies().token;
-  const localToken = localStorage.getItem("token");
-  setToken(localToken || tokenCookie)
-}, [])
 
-// Fetch all users
-useEffect(() => {
-  const fetchAllUsers = async () => {
-    try {
-      let url = `/api/users`;
+  useEffect(() => {
+    const tokenCookie = parseCookies().token;
+    const localToken = localStorage.getItem("token");
 
-      const response = await fetch(url);
-      const data = await response.json();
-      if (response.ok) {
-        setUsers(data.users);
-      } else {
-        setError(data.error);
-      }
-    } catch (err) {
-      setError("Failed to fetch groups.");
+    if (localToken || tokenCookie) {
+      setToken(localToken || tokenCookie);
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+      router.push("/");
     }
-  };
-  fetchAllUsers();
-}, []);
+  }, [router]);
 
-// Fetch all groups
+  useEffect(() => {
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+      router.push("/");
+    }
+  }, [token, router]);
+
+  // Fetch all users
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const response = await fetch("/api/users");
+        const data = await response.json();
+        if (response.ok) {
+          setUsers(data.users);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch users.");
+      }
+    };
+    if (isAuthenticated) fetchAllUsers();
+  }, [isAuthenticated]);
+
+  // Fetch all groups
   useEffect(() => {
     const fetchAllGroups = async () => {
       try {
-        let url = `/api/groups`;
-
-        const response = await fetch(url);
+        const response = await fetch("/api/groups");
         const data = await response.json();
         if (response.ok) {
           setAllGroups(data);
-       
         } else {
           setError(data.error);
         }
@@ -100,17 +105,14 @@ useEffect(() => {
         setError("Failed to fetch groups.");
       }
     };
-    fetchAllGroups();
-  }, []);
+    if (isAuthenticated) fetchAllGroups();
+  }, [isAuthenticated]);
 
-// Fetch all events
+  // Fetch all events
   useEffect(() => {
     const handleEventSearch = async () => {
-   
       try {
-        let url = `/api/events`;
-  
-        const response = await fetch(url);
+        const response = await fetch("/api/events");
         const data = await response.json();
         if (response.ok) {
           setEvents(data);
@@ -118,39 +120,36 @@ useEffect(() => {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch groups.");
+        setError("Failed to fetch events.");
       }
     };
-    handleEventSearch()
-  }, []);
+    if (isAuthenticated && user.zip) handleEventSearch();
+  }, [isAuthenticated, user.zip]);
 
-// Fetch all gardens
-useEffect(() => {
-  const maxDistance = 1000
-  const limit = 1000
-  const fetchAllGardens = async () => {
-    try {
-      let url = `/api/gardens?maxDistance=${maxDistance}&limit=${limit}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-      if (response.ok) {
-        setGardens(data);
-      } else {
-        setError(data.error);
+  // Fetch all gardens
+  useEffect(() => {
+    const maxDistance = 1000;
+    const limit = 1000;
+    const fetchAllGardens = async () => {
+      try {
+        const response = await fetch(`/api/gardens?maxDistance=${maxDistance}&limit=${limit}`);
+        const data = await response.json();
+        if (response.ok) {
+          setGardens(data);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch gardens.");
       }
-    } catch (err) {
-      setError("Failed to fetch groups.");
-    }
-  };
-  fetchAllGardens();
-}, []);
+    };
+    if (isAuthenticated) fetchAllGardens();
+  }, [isAuthenticated]);
 
-  // fetch one user info
+  // Fetch profile data
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        // const token = localStorage.getItem("token");
         const response = await fetch("/api/profile", {
           method: "GET",
           headers: {
@@ -158,16 +157,20 @@ useEffect(() => {
           },
         });
         const data = await response.json();
-       
-        setUser(data.profile);
 
-        if (data.profile.role === "admin") {
-          setIsAdmin(true);
+        if (response.ok) {
+          setUser(data.profile);
+
+          if (data.profile.role === "admin") {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+          setGroups(data.groups);
+          setInvites(data.invites);
         } else {
-          setIsAdmin(false);
+          setMessage(data.error);
         }
-        setGroups(data.groups);
-        setInvites(data.invites)
       } catch (error) {
         setMessage("Error fetching profile data");
       }
@@ -179,23 +182,13 @@ useEffect(() => {
 
   const showBanner = (message, type) => {
     setBanner({ message, type });
-    setTimeout(() => setBanner({ message: "", type: "" }), 30000); // Hide banner after 3 seconds
   };
-// Check if the user is authenticated by looking for a token in localStorage
-  useEffect(() => {
-    
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [token]);
 
-  const handleEventSearch = async () => {
+  // Event search handler
+  const handleEventSearch = async (e) => {
     e.preventDefault();
     try {
-      let url = `/api/events?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
-
+      const url = `/api/events?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
       const response = await fetch(url);
       const data = await response.json();
       if (response.ok) {
@@ -204,39 +197,37 @@ useEffect(() => {
         setError(data.error);
       }
     } catch (err) {
-      setError("Failed to fetch groups.");
+      setError("Failed to fetch events.");
     }
   };
 
-  // fetch all events
+  // Fetch events and filter them
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch(`/api/events`);
+        const response = await fetch("/api/events");
         const data = await response.json();
-        // Initial filtering logic
+
         const filtered = data.filter((event) => {
           const eventDate = new Date(event.date);
           const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
-          const isPastEvent =
-            isBefore(eventDate, new Date()) && !isToday(eventDate);
-          //   console.log("distance", distance * 1609.34 >= event.distance);
+          const isPastEvent = isBefore(eventDate, new Date()) && !isToday(eventDate);
           const isWithinDistance = event.distance <= distance * 1609.34; // Convert miles to meters
 
           if (user.role === "admin") return isEventInCurrentMonth;
-          if (isPastEvent || !isWithinDistance) return false;
-          //   console.log("selectedGroup", selectedGroup);
+
           const isEventRelevant =
-            ((selectedGroup === "" ||
-              event.group_id === parseInt(selectedGroup)) &&
-              (selectedGarden === "" ||
-                event.garden_id === parseInt(selectedGarden)) &&
+            ((selectedGroup === "" || event.group_id === parseInt(selectedGroup)) &&
+              (selectedGarden === "" || event.garden_id === parseInt(selectedGarden)) &&
               (availablePlots === "all" ||
                 (availablePlots === "yes" && event.available_plots > 0) ||
                 (availablePlots === "no" && event.available_plots === 0))) ||
             event.user_id === user.id;
 
-          return isEventInCurrentMonth && isEventRelevant;
+          const isUserAuthorized =
+            event.is_public || event.group_id === user.group_id;
+
+          return isEventInCurrentMonth && isEventRelevant && isUserAuthorized;
         });
 
         setFilteredEvents(filtered);
@@ -245,7 +236,7 @@ useEffect(() => {
         console.error("Error fetching events:", err);
       }
     };
-    if (isAuthenticated) {
+    if (isAuthenticated && user.zip) {
       fetchEvents();
     }
   }, [
@@ -256,7 +247,6 @@ useEffect(() => {
     distance,
     user,
     isAuthenticated,
-    
   ]);
 
   const handlePrevMonth = () => {
@@ -302,12 +292,14 @@ useEffect(() => {
     setDistance,
     filteredEvents,
     setFilteredEvents,
-    isDropdownVisible, setIsDropdownVisible,
+    isDropdownVisible,
+    setIsDropdownVisible,
     groups,
     users,
     gardens,
     allGroups,
-    invites
+    invites,
+    setLoading
   };
 
   return (

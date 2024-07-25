@@ -10,12 +10,13 @@ const PlotDetails = () => {
   const [plot, setPlot] = useState(null);
   const [garden, setGarden] = useState(null);
   const [history, setHistory] = useState([]);
-  const [groups, setGroups] = useState([]);
+  // const [groups, setGroups] = useState([]);
 
   const {
     user,
     showBanner,
-    isAdmin
+    isAdmin,
+    groups
   } = useContext(BasicContext);
 
 
@@ -34,7 +35,7 @@ const PlotDetails = () => {
         setHistory(data.history);
 
 
-        setGroups(data.groups);
+        // setGroups(data.groups);
       } catch (error) {
         setError(error.message);
       }

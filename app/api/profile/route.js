@@ -25,7 +25,7 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
-
+    
     const client = await pool.connect();
     
     const userQuery = `
@@ -39,14 +39,28 @@ export async function GET(request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const groupsQuery = `
-      SELECT g.id, g.name, g.description, g.location, gm.role,
-        (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count
-      FROM groups g
-      JOIN group_memberships gm ON g.id = gm.group_id
-      WHERE gm.user_id = $1
-    `;
-    const groupsResult = await client.query(groupsQuery, [userId]);
+    const user = userResult.rows[0];
+
+    let groupsQuery;
+    let groupsResult;
+
+    if (user.role === 'admin') {
+      groupsQuery = `
+        SELECT g.id, g.name, g.description, g.location,
+          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count
+        FROM groups g
+      `;
+      groupsResult = await client.query(groupsQuery);
+    } else {
+      groupsQuery = `
+        SELECT g.id, g.name, g.description, g.location, gm.role,
+          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count
+        FROM groups g
+        JOIN group_memberships gm ON g.id = gm.group_id
+        WHERE gm.user_id = $1
+      `;
+      groupsResult = await client.query(groupsQuery, [userId]);
+    }
 
     const invitesQuery = `
       SELECT g.id, g.name, g.description, g.location, gi.status
@@ -66,7 +80,7 @@ export async function GET(request) {
 
     client.release();
 
-    return NextResponse.json({ profile: userResult.rows[0], groups: groupsResult.rows, invites: invitesResult.rows });
+    return NextResponse.json({ profile: user, groups: groupsResult.rows, invites: invitesResult.rows });
   } catch (error) {
     console.error('Error fetching profile:', error);
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });

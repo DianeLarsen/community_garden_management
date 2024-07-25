@@ -15,6 +15,8 @@ import {
   isBefore,
   isToday,
 } from "date-fns";
+import useReloadOnLoading from "@/hooks/useReloadOnLoading";
+
 
 const EventCalendar = () => {
   const {
@@ -25,8 +27,6 @@ const EventCalendar = () => {
     handleNextMonth,
     handlePrevMonth,
     currentDate,
-    availablePlots,
-    setAvailablePlots,
     selectedGarden,
     setSelectedGarden,
     selectedGroup,
@@ -36,39 +36,67 @@ const EventCalendar = () => {
     filteredEvents,
     setFilteredEvents,
     loading,
-    showBanner
+    setLoading,
+    showBanner,
+    groups,
+    isAuthenticated
   } = useContext(BasicContext);
   const router = useRouter();
-  const [groups, setGroups] = useState([]);
+  const [allGroups, setAllGroups] = useState([]);
   const [gardens, setGardens] = useState([]);
   const [view, setView] = useState("calendar");
+  const [showAllEvents, setShowAllEvents] = useState(false);
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
+  useReloadOnLoading(loading);
 
+  useEffect(() => {
+    if (user.zip) {
+      if (allGroups && gardens.length > 0){
+        setLoading(false)
+      }
+        
+      } else {
+        showBanner("Please update profile page with required information", "error");
+        setTimeout(() => {
+          router.push("/profile");
+        }, 1000); // Adjust the delay as needed
+      }
+
+  
+    
+  }, [user, allGroups, gardens]);
+
+  //fetch groups
   useEffect(() => {
     const fetchGroups = async () => {
       try {
         const response = await fetch(`/api/groups`);
         const data = await response.json();
-        setGroups(data);
+        setAllGroups(data);
       } catch (err) {
         console.error("Error fetching groups:", err);
       }
     };
 
-    fetchGroups();
+    if (user.zip) fetchGroups();
   }, []);
 
+  // fetch gardens
   useEffect(() => {
     const fetchGardens = async () => {
       try {
         const response = await fetch(`/api/gardens?distance=${distance}`);
         const data = await response.json();
+        if (data.error){
+          showBanner(data.error, "error")
+        }
         setGardens(data);
       } catch (err) {
         console.error("Error fetching gardens:", err);
       }
     };
 
-    fetchGardens();
+    if (user.zip) fetchGardens();
   }, [distance]);
 
   useEffect(() => {
@@ -98,8 +126,8 @@ const EventCalendar = () => {
     setSelectedGarden(e.target.value);
   };
 
-  const handleAvailablePlotsChange = (e) => {
-    setAvailablePlots(e.target.value);
+  const handleToggleShowAllEvents = () => {
+    setShowAllEvents(!showAllEvents);
   };
 
   const daysInMonth = eachDayOfInterval({
@@ -108,10 +136,23 @@ const EventCalendar = () => {
   });
   const startDay = getDay(startOfMonth(currentDate));
 
-  if (!user.zip) {
-    showBanner("Please update profile page with required information", "error")
-    router.push("/profile");
-  }
+
+
+  // fetch events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(`/api/events`);
+        const data = await response.json();
+        console.log(data)
+        setFilteredEvents(data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      }
+    };
+
+    if (isAuthenticated && user.zip) fetchEvents();
+  }, [currentDate, selectedGroup, selectedGarden, distance, showAllEvents, isAuthenticated, user]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -119,23 +160,13 @@ const EventCalendar = () => {
 
   return (
     <div>
-      {error ||
-        (events.error && (
-          <p className="text-red-500">{error || events.error}</p>
-        ))}
-      {message ||
-        (events.message && (
-          <p className="text-yellow-500">{message || events.message}</p>
-        ))}
+      {error || (events.error && <p className="text-red-500">{error || events.error}</p>)}
+      {message || (events.message && <p className="text-yellow-500">{message || events.message}</p>)}
 
       <div className="filters flex flex-wrap gap-4 mb-4">
         <label>
           Distance:
-          <select
-            value={distance}
-            onChange={handleDistanceChange}
-            className="ml-2 p-1 border rounded"
-          >
+          <select value={distance} onChange={handleDistanceChange} className="ml-2 p-1 border rounded">
             <option value="5">5 miles</option>
             <option value="10">10 miles</option>
             <option value="20">20 miles</option>
@@ -146,11 +177,7 @@ const EventCalendar = () => {
 
         <label>
           Group:
-          <select
-            value={selectedGroup}
-            onChange={handleGroupChange}
-            className="ml-2 p-1 border rounded"
-          >
+          <select value={selectedGroup} onChange={handleGroupChange} className="ml-2 p-1 border rounded">
             <option value="">All</option>
             {groups.map((group) => (
               <option key={group.id} value={group.id}>
@@ -162,11 +189,7 @@ const EventCalendar = () => {
 
         <label>
           Garden:
-          <select
-            value={selectedGarden}
-            onChange={handleGardenChange}
-            className="ml-2 p-1 border rounded"
-          >
+          <select value={selectedGarden} onChange={handleGardenChange} className="ml-2 p-1 border rounded">
             <option value="">All</option>
             {gardens.map((garden) => (
               <option key={garden.id} value={garden.id}>
@@ -176,24 +199,11 @@ const EventCalendar = () => {
           </select>
         </label>
 
-        <label>
-          Available Plots:
-          <select
-            value={availablePlots}
-            onChange={handleAvailablePlotsChange}
-            className="ml-2 p-1 border rounded"
-          >
-            <option value="all">All</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </label>
-
-        <button
-          onClick={() => setView(view === "calendar" ? "list" : "calendar")}
-          className="ml-auto p-2 bg-gray-200 rounded"
-        >
+        <button onClick={() => setView(view === "calendar" ? "list" : "calendar")} className="ml-auto p-2 bg-gray-200 rounded">
           Toggle View
+        </button>
+        <button onClick={handleToggleShowAllEvents} className="ml-auto p-2 bg-gray-200 rounded">
+          {showAllEvents ? "Show Filtered Events" : "Show All Events"}
         </button>
       </div>
 
@@ -201,9 +211,7 @@ const EventCalendar = () => {
         <button onClick={handlePrevMonth} className="p-2 bg-gray-200 rounded">
           Previous Month
         </button>
-        <h2 className="text-xl font-bold">
-          {format(currentDate, "MMMM yyyy")}
-        </h2>
+        <h2 className="text-xl font-bold">{format(currentDate, "MMMM yyyy")}</h2>
         <button onClick={handleNextMonth} className="p-2 bg-gray-200 rounded">
           Next Month
         </button>
@@ -217,28 +225,26 @@ const EventCalendar = () => {
           {daysInMonth.map((day) => (
             <div
               key={day}
-              className={`calendar-day p-2 border rounded bg-white ${
-                isBefore(day, new Date()) && !isToday(day) ? "bg-gray-200" : ""
-              }`}
+              className={`calendar-day p-2 border rounded bg-white ${isBefore(day, new Date()) && !isToday(day) ? "bg-gray-200" : ""}`}
             >
               <div className="date font-bold mb-2">{format(day, "d")}</div>
               <div className="events">
                 {filteredEvents
-                  .filter((event) => isSameDay(new Date(event.date), day))
+                  .filter(
+                    (event) =>
+                      isSameDay(new Date(event.start_date), day) &&
+                      (event.is_public || groups.some((group) => group.id === event.group_id))
+                  )
                   .map((event) => (
                     <Link
                       href={`/events/${event.id}`}
                       key={event.id}
                       className={`event block mb-2 p-1 rounded ${
-                        isBefore(new Date(event.date), new Date())
-                          ? "text-gray-500 line-through"
-                          : ""
+                        isBefore(new Date(event.start_date), new Date()) ? "text-gray-500 line-through" : ""
                       }`}
                     >
                       <h3 className="font-semibold">{event.name}</h3>
-                      <p className="text-sm">
-                        {new Date(event.date).toLocaleDateString()}
-                      </p>
+                      <p className="text-sm">{new Date(event.start_date).toLocaleDateString()}</p>
                     </Link>
                   ))}
               </div>
@@ -247,16 +253,19 @@ const EventCalendar = () => {
         </div>
       ) : (
         <ul className="list-disc pl-5">
-          {filteredEvents.map((event) => (
-            <li key={event.id} className="mb-2">
-              <Link
-                href={`/events/${event.id}`}
-                className="text-blue-500 hover:underline"
-              >
-                {event.name} - {new Date(event.date).toLocaleDateString()}
-              </Link>
-            </li>
-          ))}
+          {filteredEvents.length === 0 ? (
+            <p>No events listed within {distance} miles, {selectedGroup}</p>
+          ) : (
+            filteredEvents
+              .filter((event) => event.is_public || allGroups.some((group) => group.id === event.group_id))
+              .map((event) => (
+                <li key={event.id} className="mb-2">
+                  <Link href={`/events/${event.id}`} className="text-blue-500 hover:underline">
+                    {event.name} - {new Date(event.start_date).toLocaleDateString()}
+                  </Link>
+                </li>
+              ))
+          )}
         </ul>
       )}
     </div>

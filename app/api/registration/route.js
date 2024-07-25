@@ -35,14 +35,14 @@ export async function POST(request) {
         host: 'smtp-mail.outlook.com',
         port: 587,
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            user: process.env.NEXT_EMAIL_USER,
+            pass: process.env.NEXT_EMAIL_PASS,
         },
     });
 
     // Define the email options
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.NEXT_EMAIL_USER,
       to: email,
       subject: 'Email Verification',
       text: `Please verify your email by clicking the following link: ${process.env.BASE_URL}/api/verify?token=${token}`,

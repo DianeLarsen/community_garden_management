@@ -11,7 +11,7 @@ import CreateEvent from "@/components/CreateEvent";
 const GardenDetails = () => {
   const { id } = useParams();
   const [garden, setGarden] = useState(null);
-  const [plots, setPlots] = useState([]);
+
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [directionAddress, setDirectionAddress] = useState("");
@@ -34,7 +34,7 @@ const GardenDetails = () => {
         }
         const data = await response.json();
         setGarden(data);
-        fetchPlots(id);
+
       } catch (error) {
         setError(error.message);
       }
@@ -45,18 +45,7 @@ const GardenDetails = () => {
     }
   }, [id]);
 
-  const fetchPlots = async (gardenId) => {
-    try {
-      const response = await fetch(`/api/plots?gardenId=${gardenId}`);
-      if (!response.ok) {
-        throw new Error("Error fetching plots");
-      }
-      const data = await response.json();
-      setPlots(data.length > 0 ? [...data] : [data]);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+
 
   const handleAddressChange = (e) => {
     setDirectionAddress(e.target.value);
@@ -147,7 +136,7 @@ const GardenDetails = () => {
           <PlotCreate
             newPlot={newPlot}
             setNewPlot={setNewPlot}
-            fetchPlots={fetchPlots}
+  
             gardenId={id}
             groups={groups}
             role={user?.role}

@@ -18,7 +18,7 @@ export async function POST(request) {
     const userResult = await pool.query(userQuery, [email]);
 
     if (userResult.rowCount === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Email/Password not found' }, { status: 404 });
     }
 
     const user = userResult.rows[0];

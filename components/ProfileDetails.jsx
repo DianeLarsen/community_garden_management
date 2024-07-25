@@ -20,7 +20,7 @@ const ProfileDetails = () => {
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const router = useRouter();
 
-console.log(user)
+// console.log(user)
   useEffect(() => {
     if (!user?.id){
       setLoading(true)

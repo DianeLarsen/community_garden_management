@@ -7,13 +7,14 @@ const PlotsList = ({
   gardenId = "",
   groupId = "",
   status = "available",
-  userInfo = false
+  userInfo = false,
+  message = ""
 }) => {
   const [plots, setPlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingPlot, setEditingPlot] = useState(null);
   const [editForm, setEditForm] = useState({ length: "", width: "", group_id: "" });
-  const { user, setUser, groups, message, setMessage, invites } =
+  const { user } =
     useContext(BasicContext);
 useEffect(() => {
  if (!user.id & !plots){
@@ -22,6 +23,7 @@ useEffect(() => {
 }, [user?.id, plots])
 
   useEffect(() => {
+  
     const fetchPlots = async () => {
       setLoading(true);
       try {
@@ -51,7 +53,9 @@ useEffect(() => {
         console.log(error.message);
       } 
     };
+    if (gardenId){
     fetchPlots();
+  }
   }, [gardenId, groupId, user?.id]);
 
   const handleRemovePlot = async (plotId) => {

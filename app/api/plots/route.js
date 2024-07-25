@@ -7,8 +7,8 @@ export async function GET(request) {
   const token = request.cookies.get('token')?.value;
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
-  const userInfo = searchParams.get('userInfo');
-console.log(groupId, gardenId, userInfo)
+  const userInfo = searchParams.get('userInfo') || false;
+// console.log(groupId, gardenId, userInfo)
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -26,7 +26,7 @@ console.log(groupId, gardenId, userInfo)
     // Build dynamic query
     let plotQuery = `
       SELECT 
-        gp.id, gp.length,gp.width,  gp.status, gp.garden_id, gp.user_id, gp.group_id, 
+        gp.id, gp.length, gp.width, gp.status, gp.garden_id, gp.user_id, gp.group_id, 
         g.name AS garden_name, u.email AS user_email, gr.name AS group_name
       FROM 
         garden_plots gp
@@ -44,30 +44,25 @@ console.log(groupId, gardenId, userInfo)
 
     // Add conditions based on the presence of parameters
     if (userInfo == "true" && userId) {
-      console.log(userId)
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(userId);
       index++;
     }
 
     if (groupId) {
-
       plotQuery += ` AND gp.group_id = $${index}`;
       values.push(groupId);
       index++;
-    }
+    } 
 
     if (gardenId) {
-
       plotQuery += ` AND gp.garden_id = $${index}`;
-      
       values.push(gardenId);
       index++;
     }
-    // console.log(plotQuery)
-    // console.log(values)
+
     const plotResult = await client.query(plotQuery, values);
-    // console.log(plotResult)
+
     client.release();
 
     if (plotResult.rows.length === 0) {

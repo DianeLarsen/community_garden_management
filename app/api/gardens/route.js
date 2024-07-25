@@ -38,13 +38,18 @@ export async function GET(request) {
       const client = await pool.connect();
       const userQuery = 'SELECT zip FROM users WHERE id = $1';
       const userResult = await client.query(userQuery, [userId]);
-      client.release();
+      
 
       if (userResult.rowCount === 0) {
+        client.release();
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
       }
 
       const userZip = userResult.rows[0].zip;
+      if (!userZip) {
+        client.release();
+        return NextResponse.json({ error: 'User does not have a ZIP code' }, {redirect: "/profile"}, {bannerText: "Please update profile page with required information"}, {code: "error"},{ status: 400 });
+      }
       ({ lat, lon } = await getLatLonFromZipCode(userZip));
     }
 

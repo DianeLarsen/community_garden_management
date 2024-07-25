@@ -4,16 +4,16 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(request, { params }) {
   const { id } = params; // event
-
+  const { userId } = await request.json();
   const token = request.cookies.get('token')?.value;
-
+console.log(userId)
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
+    // const userId = decoded.userId;
     const role = decoded.role;
 
     const client = await pool.connect();

@@ -1,12 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { BasicContext } from "@/context/BasicContext";
 import { useRouter } from "next/navigation";
 
 const GardenList = () => {
   const [gardens, setGardens] = useState([]);
   const [error, setError] = useState('');
   const router = useRouter();
-
+  const {
+    user,
+    } = useContext(BasicContext);
   useEffect(() => {
     const fetchGardens = async () => {
       try {
@@ -21,8 +24,8 @@ const GardenList = () => {
         setError('Failed to fetch gardens.');
       }
     };
-
-    fetchGardens();
+    setError('Failed to fetch gardens.');
+    if (user.zip){ fetchGardens();} else {setError('Update Profile with zip to see Gadens near you!.');}
   }, []);
 
   const handleGardenClick = (id) => {
