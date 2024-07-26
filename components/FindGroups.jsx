@@ -10,10 +10,10 @@ const FindGroups = ({ userInfo = false }) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [limit, setLimit] = useState(10);
-  const [groups, setGroups] = useState([]);
+  const [searchedGroups, setSearchedGroups] = useState([]);
   const [showAllGroups, setShowAllGroups] = useState(false);
 
-  const fetchGroups = async (e) => {
+  const searchGroups = async (e) => {
     e.preventDefault();
     try {
       let url = `/api/groups?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
@@ -21,12 +21,13 @@ const FindGroups = ({ userInfo = false }) => {
       const response = await fetch(url);
       const data = await response.json();
       if (response.ok) {
-        setGroups(data);
-        console.log(groups)
+        setSearchedGroups(data);
+
       } else {
         setError(data.error);
       }
     } catch (err) {
+      console.log(err)
       setError('Failed to fetch groups.');
     }
   };
@@ -40,7 +41,7 @@ const FindGroups = ({ userInfo = false }) => {
       <h1 className="text-2xl font-bold mb-4">Find a Community Garden Group</h1>
       {error && <p className="text-red-500">{error}</p>}
       {message && <p className="text-yellow-500">{message}</p>}
-      <form onSubmit={fetchGroups} className="mb-4">
+      <form onSubmit={searchGroups} className="mb-4">
         <div className="flex items-center justify-center gap-12">
           <div className="flex flex-col w-96">
             <label className="mb-1">Search Term:</label>
@@ -79,7 +80,7 @@ const FindGroups = ({ userInfo = false }) => {
       </button>
     {  showAllGroups ? 
       <GroupList groups={allGroups} error={error} userInfo={false}/> : 
-      <GroupList groups={groups} error={error} userInfo={false}/>}
+      <GroupList groups={searchedGroups} error={error} userInfo={false}/>}
     </div>
   );
 };

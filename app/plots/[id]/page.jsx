@@ -16,7 +16,7 @@ const PlotDetails = () => {
     user,
     showBanner,
     isAdmin,
-    groups
+    userGroups
   } = useContext(BasicContext);
 
 
@@ -123,7 +123,7 @@ const PlotDetails = () => {
         <PlotReservation
           plot={plot}
           user={user}
-          groups={groups}
+          groups={userGroups}
           handleReservePlot={handleReservePlot}
           showBanner={showBanner}
         />

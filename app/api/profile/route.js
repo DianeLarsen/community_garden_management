@@ -46,18 +46,37 @@ export async function GET(request) {
 
     if (user.role === 'admin') {
       groupsQuery = `
-        SELECT g.id, g.name, g.description, g.location,
-          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count
+        SELECT 
+          g.id, g.name, g.description, g.location, g.accepting_members,
+          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count,
+          COALESCE(json_agg(json_build_object('user_id', u.id, 'username', u.username, 'email', u.email, 'role', gm.role)) FILTER (WHERE gm.user_id IS NOT NULL), '[]') AS members,
+          COALESCE(json_agg(json_build_object('invite_id', gi.id, 'user_id', iu.id, 'username', iu.username, 'email', iu.email, 'status', gi.status)) FILTER (WHERE gi.id IS NOT NULL), '[]') AS invitations,
+          COUNT(gp.id) FILTER (WHERE gp.group_id = g.id) AS reserved_plots
         FROM groups g
+        LEFT JOIN group_memberships gm ON g.id = gm.group_id
+        LEFT JOIN users u ON gm.user_id = u.id
+        LEFT JOIN group_invitations gi ON g.id = gi.group_id
+        LEFT JOIN users iu ON gi.user_id = iu.id
+        LEFT JOIN garden_plots gp ON g.id = gp.group_id
+        GROUP BY g.id
       `;
       groupsResult = await client.query(groupsQuery);
     } else {
       groupsQuery = `
-        SELECT g.id, g.name, g.description, g.location, gm.role,
-          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count
+        SELECT 
+          g.id, g.name, g.description, g.location, gm.role, g.accepting_members,
+          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count,
+          COALESCE(json_agg(json_build_object('user_id', u.id, 'username', u.username, 'email', u.email, 'role', gm.role)) FILTER (WHERE gm.user_id IS NOT NULL), '[]') AS members,
+          COALESCE(json_agg(json_build_object('invite_id', gi.id, 'user_id', iu.id, 'username', iu.username, 'email', iu.email, 'status', gi.status)) FILTER (WHERE gi.id IS NOT NULL), '[]') AS invitations,
+          COUNT(gp.id) FILTER (WHERE gp.group_id = g.id) AS reserved_plots
         FROM groups g
-        JOIN group_memberships gm ON g.id = gm.group_id
+        LEFT JOIN group_memberships gm ON g.id = gm.group_id
+        LEFT JOIN users u ON gm.user_id = u.id
+        LEFT JOIN group_invitations gi ON g.id = gi.group_id
+        LEFT JOIN users iu ON gi.user_id = iu.id
+        LEFT JOIN garden_plots gp ON g.id = gp.group_id
         WHERE gm.user_id = $1
+        GROUP BY g.id, gm.role
       `;
       groupsResult = await client.query(groupsQuery, [userId]);
     }
@@ -86,6 +105,7 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });
   }
 }
+
 
 export async function POST(request) {
   const token = request.headers.get('authorization')?.split(' ')[1];
@@ -160,6 +180,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
   }
 }
+
 export async function PATCH(request) {
   const token = request.headers.get('authorization')?.split(' ')[1];
 

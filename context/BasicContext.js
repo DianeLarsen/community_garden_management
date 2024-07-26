@@ -20,6 +20,7 @@ export const BasicProvider = ({ children }) => {
   const [history, setHistory] = useState([]);
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
+  const [userGroups, setUserGroups] = useState([]);
   const [banner, setBanner] = useState({ message: "", type: "" });
   const [isAdmin, setIsAdmin] = useState(false);
   const [token, setToken] = useState("");
@@ -167,7 +168,7 @@ console.log(groups)
           } else {
             setIsAdmin(false);
           }
-          setGroups(data.groups);
+          setUserGroups(data.groups);
           setInvites(data.invites);
         } else {
           setMessage(data.error);
@@ -181,9 +182,33 @@ console.log(groups)
     }
   }, [isAuthenticated, token]);
 
-  const showBanner = (message, type) => {
-    setBanner({ message, type });
+useEffect(() => {
+  const fetchGroups = async () => {
+
+    try {
+      let url = `/api/groups?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(data)
+      if (response.ok) {
+        setGroups(data);
+
+      } else {
+        setError(data.error);
+      }
+    } catch (err) {
+      setError('Failed to fetch groups.');
+    }
   };
+
+  
+}, [])
+
+const showBanner = (message, type) => {
+  setBanner({ message, type });
+};
+
 
   // Event search handler
   const handleEventSearch = async (e) => {
@@ -301,7 +326,8 @@ console.log(groups)
     allGroups,
     invites,
     setLoading,
-    setGroups
+    setGroups,
+    userGroups
   };
 
   return (

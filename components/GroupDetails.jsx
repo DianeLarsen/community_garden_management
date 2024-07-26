@@ -29,6 +29,7 @@ const GroupDetails = () => {
     );
 
   const isMember = members.some((member) => member.user_id === user.id);
+
   useEffect(() => {
     const fetchGroupDetails = async () => {
       try {
@@ -37,7 +38,6 @@ const GroupDetails = () => {
           throw new Error("Error fetching group details");
         }
         const groupData = await groupResponse.json();
-        // console.log(groupData)
         setGroup(groupData.group);
         setMembers(groupData.members);
         setEvents(groupData.events);
@@ -47,7 +47,7 @@ const GroupDetails = () => {
           groupData.group.admin.username == user.username || groupData.isAdmin
         );
 
-        setAdminUsername(groupData.group.admin.username); // Assuming the API returns adminUsername
+        setAdminUsername(groupData.group.admin.username);
         setLoading(false);
       } catch (error) {
         console.error(error.message);
@@ -56,6 +56,7 @@ const GroupDetails = () => {
     };
     fetchGroupDetails();
   }, [id]);
+
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
@@ -75,6 +76,7 @@ const GroupDetails = () => {
       fetchAllUsers();
     }
   }, [isAdmin, token]);
+
   const handleRequestMembership = async () => {
     setLoading(true);
     try {
@@ -283,7 +285,7 @@ const GroupDetails = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-console.log(events)
+
   return (
     <div className="container mx-auto p-4">
       {group && (
@@ -321,8 +323,13 @@ console.log(events)
               <ul>
                 {plots.map((plot) => (
                   <li key={plot.id}>
-                    <Link href={`/plots/${plot.id}`} className="text-blue-500 hover:underline">Plot {plot.id}</Link> -{" "}
-                    {plot.length} x {plot.width}
+                    <Link
+                      href={`/plots/${plot.id}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      Plot {plot.id}
+                    </Link>{" "}
+                    - {plot.length} x {plot.width}
                   </li>
                 ))}
               </ul>
@@ -331,7 +338,14 @@ console.log(events)
               <ul>
                 {events.map((event) => (
                   <li key={event.id}>
-                   <Link href={`/events/${event.id}`} className="text-blue-500 hover:underline">{event.name} - {new Date(event.start_date).toLocaleString()} to {new Date(event.end_date).toLocaleString()}</Link> 
+                    <Link
+                      href={`/events/${event.id}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      {event.name} -{" "}
+                      {new Date(event.start_date).toLocaleString()} to{" "}
+                      {new Date(event.end_date).toLocaleString()}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -367,18 +381,25 @@ console.log(events)
               </ul>
 
               {isAdmin && (
-                <button
-                  onClick={() => setShowInviteModal(true)}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-                >
-                  Invite Member
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowInviteModal(true)}
+                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                  >
+                    Invite Member
+                  </button>
+                  <Link
+                    href={`/groups/${id}/admin`}
+                    className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 ml-4"
+                  >
+                    Group Admin
+                  </Link>
+                </>
               )}
-              {error && error ? (
-                <p className="mt-4 text-red-600">{error}</p>
-              ) : (
-                <p className="mt-4 text-green-600">{message}</p>
-              )}
+
+              {error && <p className="mt-4 text-red-600">{error}</p>}
+              {message && <p className="mt-4 text-green-600">{message}</p>}
+
               {isAdmin && (
                 <>
                   <h2 className="text-xl font-bold mt-4 mb-2">Invitations</h2>
@@ -459,6 +480,12 @@ console.log(events)
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
                 Invite Selected User
+              </button>
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+              >
+                Cancel
               </button>
             </div>
           </div>

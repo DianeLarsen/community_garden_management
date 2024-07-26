@@ -5,6 +5,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import { BasicContext } from "@/context/BasicContext";
 import useReloadOnLoading from "@/hooks/useReloadOnLoading";
+import { differenceInDays } from "date-fns";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -46,7 +47,7 @@ const AdminPage = () => {
     error: groupsError,
     isLoading: groupsLoading,
   } = useSWR(token ? ["/api/groups"] : null, fetcher);
-console.log(allGroups)
+
   const {
     data: plotsData,
     error: reservedPlotsError,
@@ -101,6 +102,24 @@ console.log(allGroups)
     }
   };
 
+  const calculateRemainingTime = (endDate) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    const totalDays = differenceInDays(end, now);
+
+    if (totalDays <= 0) return "Expired";
+
+    const weeks = Math.floor(totalDays / 7);
+    const days = totalDays % 7;
+
+    if (weeks > 0) {
+      return `${weeks} wk${weeks !== 1 ? "s" : ""} / ${days} day${
+        days !== 1 ? "s" : ""
+      }`;
+    } else {
+      return `${days} day${days !== 1 ? "s" : ""}`;
+    }
+  };
   return (
     <div className="max-w-7xl mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Admin Page</h1>
@@ -312,7 +331,7 @@ console.log(allGroups)
                     <td className="py-2 px-4">
                       {new Date(plot.reserved_at).toLocaleString()}
                     </td>
-                    <td className="py-2 px-4">{plot.duration}</td>
+                    <td className="py-2 px-4">{calculateRemainingTime(plot.end_date)}</td>
                   </tr>
                 )): (
                   <tr>

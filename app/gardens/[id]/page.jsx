@@ -12,6 +12,7 @@ const GardenDetails = () => {
   const { id } = useParams();
   const [garden, setGarden] = useState(null);
   const [error, setError] = useState("");
+  const [gardenGroups, setGardenGroups] = useState([]);
   const [directionAddress, setDirectionAddress] = useState("");
   const { user, groups, setGroups } = useContext(BasicContext);
   const [showDirections, setShowDirections] = useState(false);
@@ -52,7 +53,7 @@ console.log(groups)
           throw new Error("Error fetching groups for this garden");
         }
         const data = await response.json();
-        setGroups(data);
+        setGardenGroups(data);
       } catch (error) {
         setError(error.message);
       }
@@ -119,7 +120,7 @@ console.log(groups)
         <h2 className="text-xl font-bold mb-4">
           Your Groups Using This Garden
         </h2>
-        {(groups.length === 0 || (groups.reserved_plots === 0 || !groups.reserved_plots)) ? (
+        {(gardenGroups.length === 0 || (gardenGroups.reserved_plots === 0 || !gardenGroups.reserved_plots)) ? (
           <p>No groups associated with this garden.</p>
         ) : (
           <GroupList groups={groups} error={error} />

@@ -24,7 +24,8 @@ export async function GET(request) {
       SELECT 
         groups.*, 
         COALESCE(json_agg(json_build_object('user_id', users.id, 'username', users.username, 'email', users.email, 'role', group_memberships.role)) FILTER (WHERE group_memberships.user_id IS NOT NULL), '[]') AS members,
-        COALESCE(json_agg(json_build_object('invite_id', group_invitations.id, 'user_id', invite_users.id, 'username', invite_users.username, 'email', invite_users.email, 'status', group_invitations.status)) FILTER (WHERE group_invitations.id IS NOT NULL), '[]') AS invitations
+        COALESCE(json_agg(json_build_object('invite_id', group_invitations.id, 'user_id', invite_users.id, 'username', invite_users.username, 'email', invite_users.email, 'status', group_invitations.status)) FILTER (WHERE group_invitations.id IS NOT NULL), '[]') AS invitations,
+        COUNT(garden_plots.id) FILTER (WHERE garden_plots.group_id = groups.id) AS reserved_plots
       FROM 
         groups
       LEFT JOIN 
@@ -35,6 +36,8 @@ export async function GET(request) {
         group_invitations ON groups.id = group_invitations.group_id
       LEFT JOIN
         users AS invite_users ON group_invitations.user_id = invite_users.id
+      LEFT JOIN
+        garden_plots ON garden_plots.group_id = groups.id
       WHERE 
         1=1
     `;
@@ -74,6 +77,7 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Error fetching groups' }, { status: 500 });
   }
 }
+
 
 
 

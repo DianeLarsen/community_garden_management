@@ -9,9 +9,11 @@ const PlotsList = ({
   groupId = "",
   status = "available",
   userInfo = false,
+  groupInfo = false,
   message = "",
 }) => {
   const [plots, setPlots] = useState([]);
+  const [returnMessage, setReturnMessage] = useState("")
   const [loading, setLoading] = useState(true);
   const [editingPlot, setEditingPlot] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -21,7 +23,7 @@ const PlotsList = ({
   });
   const { user } = useContext(BasicContext);
   const [groupLegend, setGroupLegend] = useState({});
-  
+console.log(plots)
   useEffect(() => {
     if (!user.id && !plots) {
       setLoading(true);
@@ -32,21 +34,28 @@ const PlotsList = ({
     const fetchPlots = async () => {
       setLoading(true);
       let url = `/api/plots?`;
-      if (groupId) {
+      if (groupInfo) {
         url += `&groupId=${groupId}`;
       }
       if (gardenId) {
         url += `&gardenId=${gardenId}`;
       }
       if (userInfo) {
-        url += `&userId=${user.id}`;
+        url += `&userInfo=${userInfo}`;
       }
+
+
       try {
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Error fetching plots");
         }
         const data = await response.json();
+console.log(status)
+        if (data.message){
+          setReturnMessage(data.message)
+          setLoading(false);
+        }
         if (userInfo) {
           const userPlots = data.filter((plot) => plot.user_id === user.id);
           setPlots(userPlots);
@@ -142,35 +151,41 @@ const PlotsList = ({
     const now = new Date();
     const end = new Date(endDate);
     const totalDays = differenceInDays(end, now);
-  
+
     if (totalDays <= 0) return "Expired";
-  
+
     const weeks = Math.floor(totalDays / 7);
     const days = totalDays % 7;
-  
+
     if (weeks > 0) {
-      return `${weeks} wk${weeks !== 1 ? "s" : ""} / ${days} day${days !== 1 ? "s" : ""}`;
+      return `${weeks} wk${weeks !== 1 ? "s" : ""} / ${days} day${
+        days !== 1 ? "s" : ""
+      }`;
     } else {
       return `${days} day${days !== 1 ? "s" : ""}`;
     }
   };
 
   const formatDate = (date) => {
-    const options = { month: 'short', day: 'numeric' };
-    const formattedDate = new Date(date).toLocaleDateString('en-US', options);
-  
+    const options = { month: "short", day: "numeric" };
+    const formattedDate = new Date(date).toLocaleDateString("en-US", options);
+
     // Add ordinal suffix
     const day = new Date(date).getDate();
     const suffix = (day) => {
-      if (day > 3 && day < 21) return 'th';
+      if (day > 3 && day < 21) return "th";
       switch (day % 10) {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        default: return 'th';
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
       }
     };
-  
+
     return formattedDate.replace(/\d+/, `${day}${suffix(day)}`);
   };
 
@@ -318,23 +333,25 @@ const PlotsList = ({
               ))}
             </tbody>
           </table>
-          <div className="mt-4">
-            <h3 className="text-lg font-bold">Group Legend</h3>
-            <ul>
-              {Object.entries(groupLegend).map(([groupId, groupName]) => (
-                <li key={groupId}>
-                  <sup>{groupId}</sup>: {groupName}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {groupInfo && (
+            <div className="mt-4">
+              <h3 className="text-lg font-bold">Group Legend</h3>
+              <ul>
+                {Object.entries(groupLegend).map(([groupId, groupName]) => (
+                  <li key={groupId}>
+                    <sup>{groupId}</sup>: {groupName}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </>
       ) : (
         <div>{message}</div>
       )}
+      <div>{returnMessage}</div>
     </div>
   );
 };
 
 export default PlotsList;
-
