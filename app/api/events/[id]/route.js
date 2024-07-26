@@ -6,7 +6,12 @@ export async function GET(request, { params }) {
   const { id } = params;
   const token = request.cookies.get("token")?.value;
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.log("no token");
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 },
+      { route: "/" }
+    );
   }
 
   try {
@@ -30,14 +35,26 @@ export async function GET(request, { params }) {
     if (eventResult.rows.length === 0) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
-    const event = eventResult.rows[0]
+    const event = eventResult.rows[0];
     const groupAdmins = eventResult.rows.map((row) => row.group_admin_id);
 
     if (
       (!groupAdmins.includes(userId) && role != "admin") ||
       eventResult.rows[0]?.is_public == "false"
     ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      console.log("not group admin or admin");
+      if (eventResult.rows[0]?.is_public == "false") {
+        console.log("not public, and not admin, or organizer");
+      }
+
+      return NextResponse.json(
+        {
+          error: "Unauthorized: not event orginizer, group admin or admin",
+          route: "/events",
+          status: 403
+        },
+        { status: 403 }
+      );
     }
 
     const attendeesQuery = `

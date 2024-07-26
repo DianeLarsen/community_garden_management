@@ -49,7 +49,7 @@ export const BasicProvider = ({ children }) => {
     phone: "",
     profile_photo: null,
   });
-
+console.log(groups)
   useEffect(() => {
     const checkToken = () => {
       const tokenCookie = parseCookies().token;
@@ -158,7 +158,7 @@ export const BasicProvider = ({ children }) => {
           },
         });
         const data = await response.json();
-console.log(data.profile)
+
         if (response.ok) {
           setUser(data.profile);
 
@@ -300,7 +300,8 @@ console.log(data.profile)
     gardens,
     allGroups,
     invites,
-    setLoading
+    setLoading,
+    setGroups
   };
 
   return (

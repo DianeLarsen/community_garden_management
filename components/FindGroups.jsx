@@ -30,7 +30,7 @@ const FindGroups = ({ userInfo = false }) => {
       setError('Failed to fetch groups.');
     }
   };
-console.log(allGroups)
+
   const handleShowAllGroups = () => {
     setShowAllGroups((prev)=> !prev);
   };

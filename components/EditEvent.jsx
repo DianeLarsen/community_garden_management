@@ -15,9 +15,15 @@ const EditEvent = () => {
   const [groupId, setGroupId] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [plots, setPlots] = useState([]);
+  const [plotDetails, setPlotDetails] = useState(null);
   const [error, setError] = useState('');
   const router = useRouter();
-  console.log(event)
+
+  const formatDateTimeLocal = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  };
+console.log(plotId)
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
@@ -26,8 +32,8 @@ const EditEvent = () => {
         setEvent(data.event);
         setName(data.event.name);
         setDescription(data.event.description);
-        setStartDate(data.event.start_date);
-        setEndDate(data.event.end_date);
+        setStartDate(formatDateTimeLocal(data.event.start_date));
+        setEndDate(formatDateTimeLocal(data.event.end_date));
         setPlotId(data.event.plot_id || "N/A");
         setGroupId(data.event.group_id || "N/A");
         setIsPublic(data.event.is_public);
@@ -56,6 +62,22 @@ const EditEvent = () => {
 
     fetchPlots();
   }, [user.id, groupId]);
+
+  useEffect(() => {
+    const fetchPlotDetails = async () => {
+      if (plotId && plotId !== "N/A") {
+        try {
+          const response = await fetch(`/api/plot-details/${plotId}`);
+          const data = await response.json();
+          setPlotDetails(data);
+        } catch (error) {
+          console.error('Error fetching plot details:', error);
+        }
+      }
+    };
+
+    fetchPlotDetails();
+  }, [plotId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -166,10 +188,18 @@ const EditEvent = () => {
           >
             <option value="">Select Plot</option>
             {plots.length > 0 && plots.map(plot => (
-              <option key={plot.id} value={plot.id}>{plot.length}X{plot.width}</option>
+              <option key={plot.id} value={plot.id}>{plot.name} - {plot.length}X{plot.width}</option>
             ))}
           </select>
         </div>
+        {plotDetails && (
+          <div className="mt-4 p-4 bg-gray-100 rounded-md">
+            <h2 className="text-lg font-bold mb-2">Plot Reservation Information</h2>
+            <p>Reserved by: {plotDetails.reserved_by}</p>
+            <p>Reservation start: {new Date(plotDetails.reservation_start).toLocaleString()}</p>
+            <p>Reservation end: {new Date(plotDetails.reservation_end).toLocaleString()}</p>
+          </div>
+        )}
         <div>
           <button
             type="submit"

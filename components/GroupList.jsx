@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 const GroupList = ({ error, groups }) => {
   const router = useRouter();
 
-
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
   }
@@ -26,6 +25,7 @@ const GroupList = ({ error, groups }) => {
                 <th className="border px-4 py-2">Accepting Members</th>
                 <th className="border px-4 py-2">Location</th>
                 <th className="border px-4 py-2">Number of Members</th>
+                <th className="border px-4 py-2">Number of Reserved Plots</th>
               </tr>
             </thead>
             <tbody>
@@ -37,9 +37,10 @@ const GroupList = ({ error, groups }) => {
                 >
                   <td className="border px-4 py-2 text-center">{group.name}</td>
                   <td className="border px-4 py-2 text-center">{group.role}</td>
-                  <td className="border px-4 py-2 text-center">{group.accepting_members ? "Yes" : "No"}</td>
+                  <td className="border px-4 py-2 text-center">{group.accepting_members == "true" ? "Yes" : "No"}</td>
                   <td className="border px-4 py-2 text-center">{group.city || group.location}</td>
                   <td className="border px-4 py-2 text-center">{group.members_count}</td>
+                  <td className="border px-4 py-2 text-center">{group.reserved_plots}</td>
                 </tr>
               ))}
             </tbody>

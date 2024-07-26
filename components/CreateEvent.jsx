@@ -2,9 +2,11 @@
 import { useState, useEffect, useContext } from 'react';
 import { BasicContext } from '@/context/BasicContext';
 import { useRouter } from "next/navigation";
+import Link from 'next/link';
 
 const CreateEvent = ({ gardenId }) => {
   const { user, groups } = useContext(BasicContext);
+  // const [gardens, setGardens] = useState([]);
   const [plots, setPlots] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -13,8 +15,23 @@ const CreateEvent = ({ gardenId }) => {
   const [error, setError] = useState('');
   const [plotId, setPlotId] = useState('');
   const [groupId, setGroupId] = useState('');
+  const [selectedGardenId, setSelectedGardenId] = useState(gardenId || '');
   const [isPublic, setIsPublic] = useState(false);
   const router = useRouter();
+console.log(plots)
+  // useEffect(() => {
+  //   const fetchGardens = async () => {
+  //     try {
+  //       const response = await fetch('/api/gardens');
+  //       const data = await response.json();
+  //       setGardens(data);
+  //     } catch (err) {
+  //       console.error('Error fetching gardens:', err);
+  //     }
+  //   };
+
+  //   fetchGardens();
+  // }, []);
 
   useEffect(() => {
     const fetchPlots = async () => {
@@ -22,6 +39,9 @@ const CreateEvent = ({ gardenId }) => {
         let url = `/api/plots?user_id=${user.id}&userInfo=true`;
         if (groupId) {
           url += `&groupId=${groupId}`;
+        }
+        if (selectedGardenId) {
+          url += `&gardenId=${selectedGardenId}`;
         }
         const response = await fetch(url);
         const data = await response.json();
@@ -32,7 +52,7 @@ const CreateEvent = ({ gardenId }) => {
     };
 
     fetchPlots();
-  }, [user?.id, groupId]);
+  }, [user?.id, groupId, selectedGardenId]);
 
   const calculateEndDate = () => {
     const start = new Date(startDate);
@@ -51,7 +71,7 @@ const CreateEvent = ({ gardenId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const endDate = calculateEndDate();
-  
+
     try {
       const response = await fetch('/api/events', {
         method: 'POST',
@@ -63,14 +83,14 @@ const CreateEvent = ({ gardenId }) => {
           description,
           start_date: startDate,
           end_date: endDate.toISOString(),
-          garden_id: gardenId,
+          garden_id: selectedGardenId,
           plot_id: plotId,
           user_id: user.id,
           group_id: groupId,
           is_public: isPublic,
         }),
       });
-  
+
       const data = await response.json();
       if (response.ok) {
         alert('Event created successfully!');
@@ -83,7 +103,6 @@ const CreateEvent = ({ gardenId }) => {
       setError('An unexpected error occurred.');
     }
   };
-  
 
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
@@ -157,6 +176,31 @@ const CreateEvent = ({ gardenId }) => {
             </select>
           </div>
         </div>
+        {/* <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Garden
+          </label>
+          {gardenId ? (
+            <p className="mt-1">{gardens.find(g => g.id === gardenId)?.name || 'Unknown Garden'}</p>
+          ) : (
+            <select
+              value={selectedGardenId}
+              onChange={(e) => setSelectedGardenId(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+              required
+            >
+              <option value="">Select Garden</option>
+              {filteredGardens.map(garden => (
+                <option key={garden.id} value={garden.id}>{garden.name}</option>
+              ))}
+            </select>
+          )}
+          {!gardenId && (
+            <p className="text-sm text-gray-500 mt-2">
+              Note: Use the <Link href="/gardens" className="text-blue-500 underline">garden page</Link> to choose a garden.
+            </p>
+          )}
+        </div> */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Group
@@ -194,7 +238,7 @@ const CreateEvent = ({ gardenId }) => {
             ) : plots.length > 0 ? (
               plots.map((plot) => (
                 <option key={plot.id} value={plot.id}>
-                  {plot.name} - {plot.length}X{plot.width}
+                  {plot.garden_name} - {plot.length}X{plot.width}
                 </option>
               ))
             ) : (
@@ -227,3 +271,4 @@ const CreateEvent = ({ gardenId }) => {
 };
 
 export default CreateEvent;
+

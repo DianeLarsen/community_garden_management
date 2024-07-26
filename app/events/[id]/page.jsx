@@ -35,13 +35,15 @@ const EventDetails = () => {
       try {
         const response = await fetch(`/api/events/${id}`);
         const data = await response.json();
-        console.log(data.event)
         if (!data.error && !data.event.is_public && !data.event.group_admins.includes(user.id)) {
           router.push("/events");
           return;
         }
         if(data.error){
           alert(data.error)
+          if (data.status == 403){
+            router.push(data.route)
+          }
         }
         setEvent(data.event || {});
         console.log(data)

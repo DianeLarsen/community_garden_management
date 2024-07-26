@@ -7,8 +7,8 @@ export async function GET(request) {
   const token = request.cookies.get('token')?.value;
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
-  const userInfo = searchParams.get('userInfo') || false;
-// console.log(groupId, gardenId, userInfo)
+  // const userInfo = searchParams.get('userInfo') || false;
+
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -27,7 +27,9 @@ export async function GET(request) {
     let plotQuery = `
       SELECT 
         gp.id, gp.length, gp.width, gp.status, gp.garden_id, gp.user_id, gp.group_id, 
-        g.name AS garden_name, u.email AS user_email, gr.name AS group_name
+        g.name AS garden_name, u.email AS user_email, gr.name AS group_name,
+        ph.reserved_at AS start_date, 
+        ph.reserved_at + (ph.duration * interval '1 week') AS end_date
       FROM 
         garden_plots gp
       LEFT JOIN 
@@ -36,6 +38,8 @@ export async function GET(request) {
         users u ON gp.user_id = u.id
       LEFT JOIN 
         groups gr ON gp.group_id = gr.id
+      LEFT JOIN 
+        plot_history ph ON gp.id = ph.plot_id
       WHERE 
         1=1
     `;
@@ -43,7 +47,7 @@ export async function GET(request) {
     let index = 1;
 
     // Add conditions based on the presence of parameters
-    if (userInfo == "true" && userId) {
+    if (userId) {
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(userId);
       index++;

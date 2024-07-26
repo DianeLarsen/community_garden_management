@@ -11,12 +11,10 @@ import CreateEvent from "@/components/CreateEvent";
 const GardenDetails = () => {
   const { id } = useParams();
   const [garden, setGarden] = useState(null);
-
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [directionAddress, setDirectionAddress] = useState("");
-  const { user, groups } = useContext(BasicContext);
-  const [showDirections, setShowDirections] = useState(false)
+  const { user, groups, setGroups } = useContext(BasicContext);
+  const [showDirections, setShowDirections] = useState(false);
   const [newPlot, setNewPlot] = useState({
     location: "",
     length: "",
@@ -24,7 +22,8 @@ const GardenDetails = () => {
     user_id: "",
     group_id: "",
   });
-
+console.log(groups)
+  // fetch gardens
   useEffect(() => {
     const fetchGarden = async () => {
       try {
@@ -34,7 +33,6 @@ const GardenDetails = () => {
         }
         const data = await response.json();
         setGarden(data);
-
       } catch (error) {
         setError(error.message);
       }
@@ -45,7 +43,25 @@ const GardenDetails = () => {
     }
   }, [id]);
 
+  // fetch groups using this garden
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch(`/api/gardens/${id}/groups`);
+        if (!response.ok) {
+          throw new Error("Error fetching groups for this garden");
+        }
+        const data = await response.json();
+        setGroups(data);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
 
+    if (id) {
+      fetchGroups();
+    }
+  }, [id]);
 
   const handleAddressChange = (e) => {
     setDirectionAddress(e.target.value);
@@ -55,6 +71,7 @@ const GardenDetails = () => {
     e.preventDefault();
     // Logic to fetch directions using the directionAddress
   };
+
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
@@ -62,9 +79,11 @@ const GardenDetails = () => {
   if (!garden) {
     return <p>Loading...</p>;
   }
-  const handleShowDirections = ()=>{
-    setShowDirections((prev) => !prev)
-  }
+
+  const handleShowDirections = () => {
+    setShowDirections((prev) => !prev);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6 p-4 bg-white shadow-md rounded">
@@ -93,12 +112,14 @@ const GardenDetails = () => {
             ))}
           </div>
         )}
-        {garden.address && <p>Address: {garden[0].address}</p>}
+        {garden[0].address && <p>Address: {garden[0].address}</p>}
       </div>
 
       <div className="mb-6 p-4 bg-white shadow-md rounded">
-        <h2 className="text-xl font-bold mb-4">Your Groups Using This Garden</h2>
-        {groups[0]?.message ? (
+        <h2 className="text-xl font-bold mb-4">
+          Your Groups Using This Garden
+        </h2>
+        {(groups.length === 0 || (groups.reserved_plots === 0 || !groups.reserved_plots)) ? (
           <p>No groups associated with this garden.</p>
         ) : (
           <GroupList groups={groups} error={error} />
@@ -106,29 +127,38 @@ const GardenDetails = () => {
       </div>
 
       <div className="mb-6 p-6 bg-white shadow-md rounded">
-  <h2 className="text-xl font-bold mb-4">Map and Directions</h2>
-  <form className="mb-4 flex items-center gap-2" onSubmit={handleGetDirections}>
-    <input
-      type="text"
-      className={`border p-2 rounded ${directionAddress ? 'w-3/4' : 'w-full'}`}
-      placeholder="Enter your address"
-      value={directionAddress}
-      onChange={handleAddressChange}
-    />
-    {directionAddress && (
-      <button
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
-        onClick={handleShowDirections}
-      >
-        Show Trip length Info
-      </button>
-    )}
-  </form>
-  {garden && <GardenMap garden={garden} user={user} directionAddress={directionAddress} showDirections={showDirections} />}
-</div>
-
-
-
+        <h2 className="text-xl font-bold mb-4">Map and Directions</h2>
+        <form
+          className="mb-4 flex items-center gap-2"
+          onSubmit={handleGetDirections}
+        >
+          <input
+            type="text"
+            className={`border p-2 rounded ${
+              directionAddress ? "w-3/4" : "w-full"
+            }`}
+            placeholder="Enter your address"
+            value={directionAddress}
+            onChange={handleAddressChange}
+          />
+          {directionAddress && (
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+              onClick={handleShowDirections}
+            >
+              Show Trip length Info
+            </button>
+          )}
+        </form>
+        {garden && (
+          <GardenMap
+            garden={garden}
+            user={user}
+            directionAddress={directionAddress}
+            showDirections={showDirections}
+          />
+        )}
+      </div>
 
       {user?.role == "admin" && (
         <div className="mb-6 p-4 bg-white shadow-md rounded">
@@ -136,7 +166,6 @@ const GardenDetails = () => {
           <PlotCreate
             newPlot={newPlot}
             setNewPlot={setNewPlot}
-  
             gardenId={id}
             groups={groups}
             role={user?.role}
