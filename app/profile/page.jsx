@@ -11,7 +11,7 @@ const Profile = () => {
         <ProfileDetails />
         <div className="mt-8">
           <h2 className="text-2xl mb-4">Your Plots</h2>
-          <PlotsList userInfo={true} />
+          <PlotsList userInfo={true} status="reserved"/>
         </div>
         <div className="mt-8">
           <h2 className="text-2xl mb-4">Your Groups</h2>

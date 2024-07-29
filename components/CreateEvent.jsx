@@ -18,20 +18,6 @@ const CreateEvent = ({ gardenId }) => {
   const [selectedGardenId, setSelectedGardenId] = useState(gardenId || '');
   const [isPublic, setIsPublic] = useState(false);
   const router = useRouter();
-console.log(plots)
-  // useEffect(() => {
-  //   const fetchGardens = async () => {
-  //     try {
-  //       const response = await fetch('/api/gardens');
-  //       const data = await response.json();
-  //       setGardens(data);
-  //     } catch (err) {
-  //       console.error('Error fetching gardens:', err);
-  //     }
-  //   };
-
-  //   fetchGardens();
-  // }, []);
 
   useEffect(() => {
     const fetchPlots = async () => {

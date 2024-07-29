@@ -13,7 +13,7 @@ const PlotsList = ({
   message = "",
 }) => {
   const [plots, setPlots] = useState([]);
-  const [returnMessage, setReturnMessage] = useState("")
+  const [returnMessage, setReturnMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [editingPlot, setEditingPlot] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -23,7 +23,7 @@ const PlotsList = ({
   });
   const { user } = useContext(BasicContext);
   const [groupLegend, setGroupLegend] = useState({});
-console.log(plots)
+  console.log(plots);
   useEffect(() => {
     if (!user.id && !plots) {
       setLoading(true);
@@ -44,16 +44,15 @@ console.log(plots)
         url += `&userInfo=${userInfo}`;
       }
 
-
       try {
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Error fetching plots");
         }
         const data = await response.json();
-console.log(status)
-        if (data.message){
-          setReturnMessage(data.message)
+        console.log(status);
+        if (data.message) {
+          setReturnMessage(data.message);
           setLoading(false);
         }
         if (userInfo) {
@@ -264,9 +263,14 @@ console.log(status)
                   Status (total = {plots.length})
                 </th>
                 <th className="border px-2 py-2">Actions</th>
-                <th className="border px-2 py-2">Start Date</th>
-                <th className="border px-2 py-2">End Date</th>
-                <th className="border px-2 py-2">Days Left</th>
+                {status != "available" && (
+                  <>
+                    {" "}
+                    <th className="border px-2 py-2">Start Date</th>
+                    <th className="border px-2 py-2">End Date</th>
+                    <th className="border px-2 py-2">Days Left</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -320,15 +324,20 @@ console.log(status)
                       </>
                     )}
                   </td>
-                  <td className="border px-4 py-2 text-center ml-4">
-                    {formatDate(plot.start_date)}
-                  </td>
-                  <td className="border px-4 py-2 text-center ml-4">
-                    {formatDate(plot.end_date)}
-                  </td>
-                  <td className="border px-4 py-2 text-center ml-4">
-                    {calculateRemainingTime(plot.end_date)}
-                  </td>
+                  {status != "available" && (
+                    <>
+                      {" "}
+                      <td className="border px-4 py-2 text-center ml-4">
+                        {formatDate(plot.start_date)}
+                      </td>
+                      <td className="border px-4 py-2 text-center ml-4">
+                        {formatDate(plot.end_date)}
+                      </td>
+                      <td className="border px-4 py-2 text-center ml-4">
+                        {calculateRemainingTime(plot.end_date)}
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>

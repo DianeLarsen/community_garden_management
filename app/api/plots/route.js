@@ -66,7 +66,7 @@ console.log(groupId)
     }
 
     const plotResult = await client.query(plotQuery, values);
-console.log(plotResult.rows)
+// console.log(plotResult.rows)
     client.release();
 
     if (plotResult.rows.length === 0) {
