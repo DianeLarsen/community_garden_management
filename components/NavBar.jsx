@@ -65,7 +65,9 @@ const NavBar = () => {
           >
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="px-4">
+                <Link href={link.href}          onClick={() =>
+              setMenuToggle(menuToggle == "menu" ? "close" : "menu")
+            } className="px-4">
                   {link.label}
                 </Link>
               </li>
@@ -95,6 +97,11 @@ const NavBar = () => {
           } text-white text-center top-[%9%]`}
         >
           {banner.message}{" "}
+          {banner.link && (
+          <Link href={banner.link} className="text-black underline">
+            Click here to fix
+          </Link>
+        )}
           <button
             onClick={() => setBanner({ message: "", type: "" })}
             className="ml-4"

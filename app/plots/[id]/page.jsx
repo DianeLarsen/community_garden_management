@@ -10,18 +10,10 @@ const PlotDetails = () => {
   const [plot, setPlot] = useState(null);
   const [garden, setGarden] = useState(null);
   const [history, setHistory] = useState([]);
-  // const [groups, setGroups] = useState([]);
-
-  const {
-    user,
-    showBanner,
-    isAdmin,
-    userGroups
-  } = useContext(BasicContext);
-
-
+  const [events, setEvents] = useState([]);
+  const { user, showBanner, isAdmin, userGroups } = useContext(BasicContext);
   const [error, setError] = useState("");
-  const [banner, setBanner] = useState({ message: "", type: "" });
+
   useEffect(() => {
     const fetchPlotDetails = async () => {
       try {
@@ -33,9 +25,7 @@ const PlotDetails = () => {
         setPlot(data.plot);
         setGarden(data.garden);
         setHistory(data.history);
-
-
-        // setGroups(data.groups);
+        setEvents(data.events);
       } catch (error) {
         setError(error.message);
       }
@@ -44,7 +34,6 @@ const PlotDetails = () => {
     if (id) {
       fetchPlotDetails();
     }
-
   }, [id]);
 
   const handleReservePlot = async (reservationData) => {
@@ -63,6 +52,8 @@ const PlotDetails = () => {
 
       const data = await response.json();
       setPlot(data.plot);
+      setHistory(data.history);
+      setEvents(data.events);
     } catch (error) {
       setError(error.message);
     }
@@ -76,27 +67,13 @@ const PlotDetails = () => {
     return <p>Loading...</p>;
   }
 
+  const canEditReservation = isAdmin || plot.user_id === user.id || userGroups.some(group => group.id === plot.group_id && group.role === 'admin');
+
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6 p-4 bg-white shadow-md rounded">
-      {banner.message && (
-        <div
-          className={`${
-            banner.type === "error" ? "bg-red-500" : "bg-green-500"
-          } text-white text-center top-[%9%]`}
-        >
-          {banner.message}{" "}
-          <button
-            onClick={() => setBanner({ message: "", type: "" })}
-            className="ml-4"
-          >
-            ×
-          </button>
-        </div>
-      )}
         <h1 className="text-2xl font-bold mb-4">Plot Details</h1>
         <p><strong>Size:</strong> {plot.length}X{plot.width}</p>
-        <p><strong>Status:</strong> {plot.status}</p>
         {plot.reserved_by && (
           <p><strong>Reserved By:</strong> {plot.reserved_by}</p>
         )}
@@ -105,21 +82,20 @@ const PlotDetails = () => {
         </Link>
       </div>
 
-      {isAdmin && (
-        <div className="mb-6 p-4 bg-white shadow-md rounded">
-          <h2 className="text-xl font-bold mb-4">Plot History</h2>
-          <ul>
-            {history.map((event, index) => (
-              <li key={index}>
-                <p>{event.detail}</p>
-                <p><strong>Date:</strong> {new Date(event.date).toLocaleString()}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="mb-6 p-4 bg-white shadow-md rounded">
+        <h2 className="text-xl font-bold mb-4">Plot History</h2>
+        <ul>
+          {history.map((entry, index) => (
+            <li key={index} className="mb-2">
+              <p>{entry.purpose}</p>
+              <p><strong>Reserved From:</strong> {new Date(entry.reserved_at).toLocaleString()}</p>
+              <p><strong>Reserved Until:</strong> {new Date(entry.reserved_until).toLocaleString()}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      {plot.status === "available" && (
+      {canEditReservation && (
         <PlotReservation
           plot={plot}
           user={user}
@@ -128,6 +104,23 @@ const PlotDetails = () => {
           showBanner={showBanner}
         />
       )}
+
+      <div className="mb-6 p-4 bg-white shadow-md rounded">
+        <h2 className="text-xl font-bold mb-4">Associated Events</h2>
+        <ul>
+          {events.map((event, index) => (
+            <li key={index} className="mb-4">
+              <p><strong>Event Name:</strong> {event.name}</p>
+              <p><strong>Organizer:</strong> {event.organizer}</p>
+              <p><strong>Start:</strong> {new Date(event.start_date).toLocaleString()}</p>
+              <p><strong>End:</strong> {new Date(event.end_date).toLocaleString()}</p>
+              <Link href={`/events/${event.id}`} className="text-blue-500 underline">
+                View Event Details
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

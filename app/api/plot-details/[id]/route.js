@@ -3,7 +3,7 @@ import pool from "@/db";
 
 export async function GET(request, { params }) {
   const { id } = params;
-  console.log(id);
+
   try {
     const client = await pool.connect();
 
@@ -11,13 +11,13 @@ export async function GET(request, { params }) {
       `SELECT gp.*, 
               u.username AS reserved_by, 
               ph.reserved_at AS reservation_start, 
-              (ph.reserved_at + (ph.duration * interval '1 week')) AS reservation_end
+              ph.reserved_until AS reservation_end
        FROM garden_plots gp
        LEFT JOIN plot_history ph ON gp.id = ph.plot_id
        LEFT JOIN users u ON ph.user_id = u.id
        WHERE gp.id = $1
        ORDER BY ph.reserved_at DESC
-       LIMIT 1`,  // Assuming you want the most recent reservation
+       LIMIT 1`,
       [id]
     );
 

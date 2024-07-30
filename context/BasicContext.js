@@ -21,7 +21,7 @@ export const BasicProvider = ({ children }) => {
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
-  const [banner, setBanner] = useState({ message: "", type: "" });
+  const [banner, setBanner] = useState({ message: "", type: "" , link: ""});
   const [isAdmin, setIsAdmin] = useState(false);
   const [token, setToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,7 +50,7 @@ export const BasicProvider = ({ children }) => {
     phone: "",
     profile_photo: null,
   });
-console.log(groups)
+
   useEffect(() => {
     const checkToken = () => {
       const tokenCookie = parseCookies().token;
@@ -205,8 +205,8 @@ useEffect(() => {
   
 }, [])
 
-const showBanner = (message, type) => {
-  setBanner({ message, type });
+const showBanner = (message, type, link = null) => {
+  setBanner({ message, type, link });
 };
 
 
@@ -331,6 +331,8 @@ const showBanner = (message, type) => {
   };
 
   return (
-    <BasicContext.Provider value={value}>{children}</BasicContext.Provider>
+    <BasicContext.Provider value={value}>
+    {children}
+ </BasicContext.Provider>
   );
 };

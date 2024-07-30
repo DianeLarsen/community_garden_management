@@ -109,12 +109,9 @@ async function setupDatabase() {
         location VARCHAR(255) NOT NULL,
         length VARCHAR(50),
         width  VARCHAR(50),
-        status VARCHAR(50) DEFAULT 'available',
         user_id INTEGER REFERENCES users(id),
-        group_id INTEGER REFERENCES groups(id),
-        reserved_at TIMESTAMP,
-        occupied_at TIMESTAMP,
-        CHECK (status = 'available' OR (user_id IS NOT NULL OR group_id IS NOT NULL))
+        group_id INTEGER REFERENCES groups(id)
+
       )
     `);
     console.log("Garden plots table created.");
@@ -127,7 +124,7 @@ async function setupDatabase() {
         user_id INTEGER REFERENCES users(id),
         group_id INTEGER REFERENCES groups(id),
         reserved_at TIMESTAMP,
-        duration INTEGER, -- Duration in weeks
+        reserved_until TIMESTAMP,
         purpose TEXT
       )
     `);
@@ -165,11 +162,12 @@ console.log("Event invitations table created.");
 
 // Create event registrations table
 await client.query(`
-  CREATE TABLE IF NOT EXISTS event_registrations (
+   CREATE TABLE IF NOT EXISTS event_registrations (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id),
     event_id INTEGER REFERENCES events(id),
     group_id INTEGER REFERENCES groups(id),
+    role VARCHAR(50) DEFAULT 'member',
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )
 `);
@@ -255,7 +253,7 @@ console.log("Event registrations table created.");
     console.log("Sample gardens inserted.");
 
     // Insert sample garden plots
-    const plotSizes = ["4x4", "4x6", "4x8", "4x10", "4x12"];
+const plotSizes = ["4x4", "4x6", "4x8", "4x10", "4x12"];
 const plotStatuses = ["available", "reserved"];
 
 const gardensWithRentalBeds = await client.query(
@@ -267,30 +265,29 @@ for (const garden of gardensWithRentalBeds.rows) {
     const size = plotSizes[Math.floor(Math.random() * plotSizes.length)];
     const length = size.split("x")[0];
     const width = size.split("x")[1];
-    const status =
-      plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
+    const status = plotStatuses[Math.floor(Math.random() * plotStatuses.length)];
     const plotName = `${garden.name} Plot ${i}`;
     
     let user_id = null;
     let group_id = null;
     let reserved_at = null;
-    let duration = null;
+    let reserved_until = null;
     let purpose = null;
 
     if (status === 'reserved') {
       user_id = Math.floor(Math.random() * 5) + 1; // Random user_id between 1 and 5
       reserved_at = new Date();
-      duration = Math.floor(Math.random() * 12) + 1; // Random duration between 1 and 12 weeks
+      reserved_until = new Date(reserved_at.getTime() + Math.floor(Math.random() * 12 + 1) * 7 * 24 * 60 * 60 * 1000); // Random duration between 1 and 12 weeks
       purpose = 'Random purpose'; // Example purpose, replace as needed
     }
 
     const result = await client.query(
       `
-      INSERT INTO garden_plots (garden_id, name, location, length, width, status, user_id) 
+      INSERT INTO garden_plots (garden_id, name, location, length, width, user_id, group_id) 
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id
       `,
-      [garden.id, plotName, `Plot ${i}`, length, width, status, user_id]
+      [garden.id, plotName, `Plot ${i}`, length, width, user_id, group_id]
     );
 
     const plot_id = result.rows[0].id;
@@ -298,15 +295,16 @@ for (const garden of gardensWithRentalBeds.rows) {
     if (status === 'reserved') {
       await client.query(
         `
-        INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose) 
+        INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, reserved_until, purpose) 
         VALUES ($1, $2, $3, $4, $5, $6)
         `,
-        [plot_id, user_id, group_id, reserved_at, duration, purpose]
+        [plot_id, user_id, group_id, reserved_at, reserved_until, purpose]
       );
     }
   }
 }
 console.log("Sample garden plots and plot history inserted.");
+
 
 
 
@@ -321,17 +319,17 @@ console.log("Sample garden plots and plot history inserted.");
     console.log("Sample events inserted.");
     
     await client.query(`
-      INSERT INTO event_registrations (user_id, event_id, group_id) VALUES
-      (1, 1, 1),
-      (2, 2, 2),
-      (3, 3, 3),
-      (4, 4, 4),
-      (5, 5, 5),
-      (1, 2, 1),
-      (2, 3, 2),
-      (3, 4, 3),
-      (4, 5, 4),
-      (5, 1, 5)
+      INSERT INTO event_registrations (user_id, event_id, group_id, role) VALUES
+  (1, 1, 1, 'admin'),
+  (2, 2, 2, 'admin'),
+  (3, 3, 3, 'admin'),
+  (4, 4, 4, 'admin'),
+  (5, 5, 5, 'admin'),
+  (1, 2, 1, 'member'),
+  (2, 3, 2, 'member'),
+  (3, 4, 3, 'member'),
+  (4, 5, 4, 'member'),
+  (5, 1, 5, 'member')
     `);
     console.log("Sample event registration inserted.");
   } catch (error) {

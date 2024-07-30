@@ -39,13 +39,12 @@ export async function GET(request, { params }) {
     const groupAdmins = eventResult.rows.map((row) => row.group_admin_id);
 
     if (
-      (!groupAdmins.includes(userId) && role != "admin") ||
-      eventResult.rows[0]?.is_public == "false"
+      (!groupAdmins.includes(userId) && role != "admin") &&
+      eventResult.rows[0]?.is_public == "false" && event?.user_id != userId
     ) {
-      console.log("not group admin or admin");
-      if (eventResult.rows[0]?.is_public == "false") {
-        console.log("not public, and not admin, or organizer");
-      }
+      console.log("not public, not group admin or admin");
+
+
 
       return NextResponse.json(
         {
@@ -58,7 +57,7 @@ export async function GET(request, { params }) {
     }
 
     const attendeesQuery = `
-      SELECT er.user_id, u.username, u.email
+      SELECT er.user_id, u.username, u.email, er.role
       FROM event_registrations er
       LEFT JOIN users u ON er.user_id = u.id
       WHERE er.event_id = $1
@@ -93,7 +92,7 @@ export async function GET(request, { params }) {
 
 export async function PATCH(request, { params }) {
   const { id } = params;
-  const token = request.headers.get("authorization")?.split(" ")[1];
+  const token = request.cookies.get("token")?.value;
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -102,40 +101,88 @@ export async function PATCH(request, { params }) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
-    const { name, description, date, location, garden_id, group_id } =
-      await request.json();
+    const userRole = decoded.role;
 
-    const client = await pool.connect();
-    const updateQuery = `
-      UPDATE events
-      SET name = $1, description = $2, date = $3, location = $4, garden_id = $5, group_id = $6
-      WHERE id = $7 AND (organizer_id = $8 OR $9 = 'admin')
-      RETURNING *
-    `;
-    const updateResult = await client.query(updateQuery, [
+    const {
+      action,
       name,
       description,
-      date,
+      start_date,
+      end_date,
       location,
       garden_id,
       group_id,
-      id,
-      userId,
-      decoded.role,
-    ]);
-    client.release();
+      memberId,
+      role,
+    } = await request.json();
 
-    if (updateResult.rows.length === 0) {
-      return NextResponse.json(
-        { error: "Event not found or unauthorized" },
-        { status: 404 }
-      );
+    const client = await pool.connect();
+
+    if (action === "changeRole") {
+      // Check if the current user is an admin of the event or a site admin
+      const isAdminQuery = `
+        SELECT role FROM event_registrations WHERE user_id = $1 AND event_id = $2
+      `;
+      const isAdminResult = await client.query(isAdminQuery, [userId, id]);
+      const isAdmin = isAdminResult.rows[0]?.role === "admin" || userRole === "admin";
+
+      if (!isAdmin) {
+        client.release();
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      // Check if there will be at least one admin left after the role change
+      const adminCountQuery = `
+        SELECT COUNT(*) AS admin_count FROM event_registrations WHERE event_id = $1 AND role = 'admin'
+      `;
+      const adminCountResult = await client.query(adminCountQuery, [id]);
+      const adminCount = parseInt(adminCountResult.rows[0].admin_count, 10);
+
+      if (adminCount === 1 && role !== "admin") {
+        client.release();
+        return NextResponse.json({ error: "There must be at least one admin in the event" }, { status: 400 });
+      }
+
+      const changeRoleQuery = `
+        UPDATE event_registrations SET role = $1 WHERE user_id = $2 AND event_id = $3
+      `;
+      await client.query(changeRoleQuery, [role, memberId, id]);
+
+      client.release();
+      return NextResponse.json({ message: "Role changed successfully" });
+    } else {
+      const updateQuery = `
+        UPDATE events
+        SET name = $1, description = $2, start_date = $3, end_date = $4, location = $5, garden_id = $6, group_id = $7
+        WHERE id = $8 AND (user_id = $9 OR $10 = 'admin')
+        RETURNING *
+      `;
+      const updateResult = await client.query(updateQuery, [
+        name,
+        description,
+        start_date,
+        end_date,
+        location,
+        garden_id,
+        group_id,
+        id,
+        userId,
+        userRole,
+      ]);
+      client.release();
+
+      if (updateResult.rows.length === 0) {
+        return NextResponse.json(
+          { error: "Event not found or unauthorized" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        message: "Event updated successfully",
+        event: updateResult.rows[0],
+      });
     }
-
-    return NextResponse.json({
-      message: "Event updated successfully",
-      event: updateResult.rows[0],
-    });
   } catch (error) {
     console.error("Error updating event:", error);
     return NextResponse.json(
@@ -144,6 +191,8 @@ export async function PATCH(request, { params }) {
     );
   }
 }
+
+
 
 export async function DELETE(request, { params }) {
   const { id } = params;

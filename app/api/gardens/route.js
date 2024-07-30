@@ -59,8 +59,7 @@ export async function GET(request) {
              ST_Distance(gardens.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
       FROM gardens
       JOIN garden_plots ON garden_plots.garden_id = gardens.id
-      WHERE garden_plots.status = 'available'
-      AND ST_DWithin(gardens.geolocation::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3)
+       AND ST_DWithin(gardens.geolocation::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography, $3)
       GROUP BY gardens.id
       ORDER BY distance
       LIMIT $4

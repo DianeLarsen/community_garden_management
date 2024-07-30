@@ -1,6 +1,6 @@
+import Link from "next/link";
 
-
-const Banner = ({ message, type }) => {
+const Banner = ({ message, type, link }) => {
     if (!message) return null;
   
     return (
@@ -10,6 +10,11 @@ const Banner = ({ message, type }) => {
         }`}
       >
         {message}
+        {link && (
+          <Link href={link} className="text-blue-500 underline">
+            Click here to fix
+          </Link>
+        )}
       </div>
     );
   };

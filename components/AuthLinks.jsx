@@ -27,6 +27,7 @@ const AuthLinks = () => {
         localStorage.removeItem("token");
         setIsAuthenticated(false);
         showBanner("Session expired. Please log in again.", "error");
+        router.redirect("/")
       } else {
         setIsAuthenticated(true);
       }

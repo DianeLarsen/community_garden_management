@@ -1,3 +1,5 @@
+// api/plots/[id]/reserve.js
+
 import { NextResponse } from 'next/server';
 import pool from '@/db';
 import jwt from 'jsonwebtoken';
@@ -18,10 +20,10 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const { duration, purpose, group_id } = await request.json();
+    const { reserved_at, reserved_until, purpose, group_id } = await request.json();
 
-    if (!duration || !purpose) {
-      return NextResponse.json({ error: 'Duration and purpose are required' }, { status: 400 });
+    if (!reserved_at || !reserved_until || !purpose) {
+      return NextResponse.json({ error: 'Start date, end date, and purpose are required' }, { status: 400 });
     }
 
     const client = await pool.connect();
@@ -34,26 +36,24 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Plot not found' }, { status: 404 });
     }
 
-    const plot = plotResult.rows[0];
+    const overlappingReservationsQuery = `
+      SELECT * FROM plot_history
+      WHERE plot_id = $1 AND (
+        ($2::timestamp, $3::timestamp) OVERLAPS (reserved_at, reserved_until)
+      )
+    `;
+    const overlappingReservationsResult = await client.query(overlappingReservationsQuery, [id, reserved_at, reserved_until]);
 
-    if (plot.status !== 'available') {
+    if (overlappingReservationsResult.rows.length > 0) {
       client.release();
-      return NextResponse.json({ error: 'Plot is not available' }, { status: 400 });
+      return NextResponse.json({ error: 'The plot is already reserved for the selected period' }, { status: 400 });
     }
 
     const reserveQuery = `
-      UPDATE garden_plots 
-      SET status = 'reserved', user_id = $1, ${group_id ? 'group_id = $2,' : ''} reserved_at = NOW() 
-      WHERE id = $${group_id ? 3 : 2}
+      INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, reserved_until, purpose)
+      VALUES ($1, $2, $3, $4, $5, $6)
     `;
-    const reserveValues = group_id ? [userId, group_id, id] : [userId, id];
-    await client.query(reserveQuery, reserveValues);
-
-    const historyQuery = `
-      INSERT INTO plot_history (plot_id, user_id, group_id, reserved_at, duration, purpose)
-      VALUES ($1, $2, $3, NOW(), $4, $5)
-    `;
-    await client.query(historyQuery, [id, userId, group_id || null, duration, purpose]);
+    await client.query(reserveQuery, [id, userId, group_id || null, reserved_at, reserved_until, purpose]);
 
     client.release();
 

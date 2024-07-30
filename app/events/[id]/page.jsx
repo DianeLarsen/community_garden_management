@@ -2,11 +2,11 @@
 import { useState, useEffect, useContext } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
-
+import Link from "next/link";
 
 const EventDetails = () => {
   const { id } = useParams();
-  const { user, groups, token } = useContext(BasicContext);
+  const { user, groups, token, showBanner } = useContext(BasicContext);
   const [event, setEvent] = useState(null);
   const [attendees, setAttendees] = useState([]);
   const [invitations, setInvitations] = useState([]);
@@ -28,7 +28,43 @@ const EventDetails = () => {
   const isGroupAdmin = event?.group_admins?.includes(user.id);
   const isOrganizer = event?.user_id === user.id;
 
-  // get all events
+  const hasMissingInfo = () => {
+    return !event?.plot_id || !event?.user_id || !event?.group_admin_id;
+  };
+
+  const isPlotReserved = async () => {
+    try {
+      const response = await fetch(`/api/plot-reservation-check`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ plot_id: event.plot_id, start_date: event.start_date, end_date: event.end_date, user_id: event.user_id, group_id: event.group_id }),
+      });
+      const data = await response.json();
+      return data.isReserved;
+    } catch (error) {
+      console.error("Error checking plot reservation:", error);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const validateEvent = async () => {
+      if (event && hasMissingInfo()) {
+        showBanner("Missing information please update event", "error", `/plots/${event.plot_id}`);
+      } else if (event) {
+        const reserved = await isPlotReserved();
+        if (!reserved) {
+          showBanner("Plot is not reserved for the event time period", "error", `/plots/${event.plot_id}`);
+        }
+      }
+    };
+
+    validateEvent();
+  }, [event]);
+
   useEffect(() => {
     const fetchEventDetails = async () => {
       setLoading(true);
@@ -39,14 +75,13 @@ const EventDetails = () => {
           router.push("/events");
           return;
         }
-        if(data.error){
-          alert(data.error)
-          if (data.status == 403){
-            router.push(data.route)
+        if (data.error) {
+          alert(data.error);
+          if (data.status === 403) {
+            router.push(data.route);
           }
         }
         setEvent(data.event || {});
-        console.log(data)
         setAttendees(data.attendees || []);
         setInvitations(data.invitations || []);
         setLoading(false);
@@ -55,11 +90,11 @@ const EventDetails = () => {
         setLoading(false);
       }
     };
-    fetchEventDetails();
-  }, [id, showInviteModal]);
+    if (user) {
+      fetchEventDetails();
+    }
+  }, [id, showInviteModal, user]);
 
-
-  // get all users
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
@@ -227,6 +262,37 @@ const EventDetails = () => {
     }
   };
 
+  const handleChangeRole = async (memberId, newRole) => {
+    if (!isAdmin && !isGroupAdmin && !isOrganizer) {
+      alert("Must be admin to change roles");
+      return;
+    }
+    try {
+      const response = await fetch(`/api/events/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ action: "changeRole", memberId, role: newRole }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        console.log(data);
+        alert(data.error);
+        throw new Error("Error changing role", data.error);
+      }
+
+      setAttendees(
+        attendees.map((member) =>
+          member.id === memberId ? { ...member, role: newRole } : member
+        )
+      );
+      window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const handleDeleteEvent = async () => {
     const reason = prompt("Please provide a reason for deleting this event:");
     if (reason) {
@@ -264,7 +330,6 @@ const EventDetails = () => {
       if (response.ok) {
         setShowInviteModal(false);
         alert("User invited!");
-
         setInviteEmail("");
       } else {
         alert("Failed to invite user.");
@@ -289,7 +354,7 @@ const EventDetails = () => {
           <h1 className="text-2xl font-bold mb-4">{event.name}</h1>
           <p className="text-gray-700 mb-4">{event.description}</p>
           <p className="text-gray-600 mb-4">
-            {new Date(event.date).toLocaleDateString()}
+            {new Date(event.start_date).toLocaleDateString()} - {new Date(event.end_date).toLocaleDateString()}
           </p>
           <p className="text-gray-600 mb-4">Garden: {event.garden_name}</p>
           <p className="text-gray-600 mb-4">Plot: {event.plot_name}</p>
@@ -302,6 +367,7 @@ const EventDetails = () => {
               <button
                 onClick={handleRequestInvite}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                disabled={hasMissingInfo()}
               >
                 Request Invite
               </button>
@@ -323,6 +389,7 @@ const EventDetails = () => {
               <button
                 onClick={handleAcceptInvite}
                 className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+                disabled={hasMissingInfo()}
               >
                 Accept Invite
               </button>
@@ -355,12 +422,13 @@ const EventDetails = () => {
               <button
                 onClick={() => setShowInviteModal(true)}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                disabled={hasMissingInfo()}
               >
                 Invite User
               </button>
             )}
           </div>
-          {isAttending && (
+          {(isAttending || isAdmin) && (
             <>
               <h2 className="text-xl font-bold mb-2">Attendees</h2>
               <ul className="list-disc pl-5">
@@ -370,9 +438,19 @@ const EventDetails = () => {
                       key={attendee.user_id}
                       className="text-gray-700 flex items-center"
                     >
-                      {attendee.username}
+                      {attendee.username} {isAdmin && `(${attendee.email})`}
                       {(isAdmin || isGroupAdmin || isOrganizer) && (
                         <>
+                          <select
+                            value={attendee.role}
+                            onChange={(e) =>
+                              handleChangeRole(attendee.user_id, e.target.value)
+                            }
+                            className="ml-2 border"
+                          >
+                            <option value="member">Member</option>
+                            <option value="admin">Admin</option>
+                          </select>
                           <span className="ml-2 text-green-500">&#10003;</span>
                           <button
                             onClick={() => handleRemoveUser(attendee.user_id)}
@@ -411,6 +489,7 @@ const EventDetails = () => {
                             )
                           }
                           className="ml-4 bg-green-500 text-white py-1 px-2 rounded-md hover:bg-green-600"
+                          disabled={hasMissingInfo()}
                         >
                           Approve
                         </button>
@@ -475,13 +554,19 @@ const EventDetails = () => {
                     {user.username} ({user.email})
                   </option>
                 ))}
-            </select>
+                       </select>
             <div className="flex space-x-4">
               <button
                 onClick={handleInviteUser}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
                 Invite Selected User
+              </button>
+              <button
+                onClick={() => setShowInviteModal(false)}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+              >
+                Cancel
               </button>
             </div>
           </div>
@@ -492,3 +577,5 @@ const EventDetails = () => {
 };
 
 export default EventDetails;
+
+

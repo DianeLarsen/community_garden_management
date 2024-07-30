@@ -8,7 +8,9 @@ export async function GET(request) {
   const groupId = searchParams.get('groupId');
   const gardenId = searchParams.get('gardenId');
   const userInfo = searchParams.get('userInfo') || false;
-console.log(groupId)
+  const startDate = searchParams.get('start_date');
+  const endDate = searchParams.get('end_date');
+
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -23,13 +25,11 @@ console.log(groupId)
 
     const client = await pool.connect();
 
-    // Build dynamic query
     let plotQuery = `
       SELECT 
-        gp.id, gp.length, gp.width, gp.status, gp.garden_id, gp.user_id, gp.group_id, 
+        gp.id, gp.length, gp.width, gp.garden_id, gp.user_id, gp.group_id, 
         g.name AS garden_name, u.email AS user_email, gr.name AS group_name,
-        ph.reserved_at AS start_date, 
-        ph.reserved_at + (ph.duration * interval '1 week') AS end_date
+        ph.reserved_at AS start_date, ph.reserved_until AS end_date
       FROM 
         garden_plots gp
       LEFT JOIN 
@@ -46,7 +46,6 @@ console.log(groupId)
     const values = [];
     let index = 1;
 
-    // Add conditions based on the presence of parameters
     if (userInfo) {
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(userId);
@@ -57,7 +56,7 @@ console.log(groupId)
       plotQuery += ` AND gp.group_id = $${index}`;
       values.push(groupId);
       index++;
-    } 
+    }
 
     if (gardenId) {
       plotQuery += ` AND gp.garden_id = $${index}`;
@@ -65,8 +64,23 @@ console.log(groupId)
       index++;
     }
 
+    if (startDate && endDate) {
+      plotQuery += `
+        AND gp.id NOT IN (
+          SELECT plot_id FROM plot_history 
+          WHERE reserved_at < $${index + 1} 
+          AND reserved_until > $${index}
+        )
+      `;
+      values.push(endDate, startDate);
+    }
+
+    if (userInfo) {
+      plotQuery += ` AND (ph.reserved_until >= NOW() OR ph.reserved_at >= NOW())`;
+    }
+
     const plotResult = await client.query(plotQuery, values);
-// console.log(plotResult.rows)
+
     client.release();
 
     if (plotResult.rows.length === 0) {

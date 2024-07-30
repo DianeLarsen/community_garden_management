@@ -19,34 +19,51 @@ export async function GET(request, { params }) {
     }
 
     const client = await pool.connect();
-    
+
     const plotQuery = `
-      SELECT 
-        gp.*, g.name AS garden_name, g.id AS garden_id, u.email AS reserved_by
-      FROM 
-        garden_plots gp
-      LEFT JOIN 
-        gardens g ON gp.garden_id = g.id
-      LEFT JOIN 
-        users u ON gp.user_id = u.id
-      WHERE 
-        gp.id = $1
+      SELECT gp.*, 
+            u.username AS reserved_by, 
+            ph.reserved_at AS reservation_start, 
+            ph.reserved_until AS reservation_end,
+            g.name AS garden_name
+      FROM garden_plots gp
+      LEFT JOIN plot_history ph ON gp.id = ph.plot_id
+      LEFT JOIN users u ON ph.user_id = u.id
+      LEFT JOIN gardens g ON gp.garden_id = g.id
+      WHERE gp.id = $1
+      ORDER BY ph.reserved_at DESC
+      LIMIT 1
     `;
     const plotResult = await client.query(plotQuery, [id]);
-    const plot = plotResult.rows[0];
 
-    if (!plot) {
+    if (plotResult.rows.length === 0) {
       client.release();
       return NextResponse.json({ error: 'Plot not found' }, { status: 404 });
     }
+
+    const plot = plotResult.rows[0];
 
     const gardenQuery = `SELECT * FROM gardens WHERE id = $1`;
     const gardenResult = await client.query(gardenQuery, [plot.garden_id]);
     const garden = gardenResult.rows[0];
 
-    const historyQuery = `SELECT * FROM plot_history WHERE plot_id = $1 ORDER BY reserved_at DESC`;
+    const historyQuery = `
+      SELECT * 
+      FROM plot_history 
+      WHERE plot_id = $1 
+      ORDER BY reserved_at DESC
+    `;
     const historyResult = await client.query(historyQuery, [id]);
     const history = historyResult.rows;
+
+    const eventsQuery = `
+      SELECT e.*, u.username AS organizer
+      FROM events e
+      JOIN users u ON e.user_id = u.id
+      WHERE e.plot_id = $1
+      ORDER BY e.start_date
+    `;
+    const eventsResult = await client.query(eventsQuery, [id]);
 
     const groupsQuery = `
       SELECT 
@@ -73,7 +90,8 @@ export async function GET(request, { params }) {
       history,
       groups,
       user,
-      isAdmin: user.is_admin
+      isAdmin: user.is_admin,
+      events: eventsResult.rows,
     });
   } catch (error) {
     console.error('Error fetching plot details:', error);

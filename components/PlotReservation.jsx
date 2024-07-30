@@ -1,126 +1,135 @@
-"use client"
-import { useState } from 'react';
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-const PlotReservation = ({ user, groups, plotId, gardenId, showBanner }) => {
-  const { id } = useParams();
-  const router = useRouter();
-  const [reservation, setReservation] = useState({
-    group_id: "",
-    duration: 1,
-    user_id: user.id,
-    plot_id: id,
-    garden_id: gardenId,
-    purpose: '', // Add purpose field
-  });
+const PlotReservation = ({ plot, user, groups, handleReservePlot, showBanner, editMode = false }) => {
+  const [reservedAt, setReservedAt] = useState(editMode ? new Date(plot.reserved_at) : null);
+  const [duration, setDuration] = useState(editMode ? ((new Date(plot.reserved_until) - new Date(plot.reserved_at)) / (7 * 24 * 60 * 60 * 1000)) : 1);
+  const [purpose, setPurpose] = useState(editMode ? plot.purpose : "");
+  const [groupId, setGroupId] = useState(editMode ? plot.group_id : "");
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setReservation((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [reservedDates, setReservedDates] = useState([]);
 
-  const handleReservePlot = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`/api/plots/${id}/reserve`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reservation),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error reserving plot');
+  useEffect(() => {
+    const fetchReservedDates = async () => {
+      try {
+        const response = await fetch(`/api/plots/${plot.id}/reserved-dates`);
+        const data = await response.json();
+        setReservedDates(data.reservedDates);
+      } catch (error) {
+        console.error("Error fetching reserved dates:", error);
       }
+    };
 
-      showBanner("Plot Reservation successful!", "success");
- // Reload the page after successful reservation
-    } catch (error) {
-      console.error('Error:', error);
-      showBanner("Error!", "error");
-    } finally {
-      router.back();
-    }
+    fetchReservedDates();
+  }, [plot.id]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const reservedUntil = new Date(reservedAt);
+    reservedUntil.setDate(reservedUntil.getDate() + duration * 7);
+
+    const reservationData = {
+      reserved_at: reservedAt,
+      reserved_until: reservedUntil,
+      purpose,
+      group_id: groupId
+    };
+
+    await handleReservePlot(reservationData);
   };
+
+  const isWeekReserved = (start) => {
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+
+    return reservedDates.some(reservedDate => {
+      const reservedStart = new Date(reservedDate.start_date);
+      const reservedEnd = new Date(reservedDate.end_date);
+      return (
+        (start >= reservedStart && start <= reservedEnd) ||
+        (end >= reservedStart && end <= reservedEnd) ||
+        (start <= reservedStart && end >= reservedEnd)
+      );
+    });
+  };
+
+  const filterWeek = (date) => {
+    // Ensure the date is a Monday
+    const day = date.getDay();
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - day + (day === 0 ? -6 : 1));
+
+    return !isWeekReserved(monday);
+  };
+
+  const highlightWithRanges = [
+    {
+      "react-datepicker__day--highlighted-custom-1": reservedDates.map(date => ({
+        start: new Date(date.start_date),
+        end: new Date(date.end_date)
+      }))
+    }
+  ];
 
   return (
-    <div className="mb-6 p-4 bg-white shadow-md rounded">
-      <h2 className="text-xl font-bold mb-4">Reserve This Plot</h2>
-
-      <form onSubmit={handleReservePlot}>
+    <div className="p-4 bg-white shadow-md rounded">
+      <h2 className="text-xl font-bold mb-4">{editMode ? "Edit Reservation" : "Reserve Plot"}</h2>
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={user.username}
-            className="w-full px-3 py-2 border rounded"
-            readOnly
+          <label className="block text-sm font-medium text-gray-700">Start Date</label>
+          <DatePicker
+            selected={reservedAt}
+            onChange={date => setReservedAt(date)}
+            filterDate={filterWeek}
+            highlightDates={highlightWithRanges}
+            dateFormat="MMMM d, yyyy"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={user.email}
-            className="w-full px-3 py-2 border rounded"
-            readOnly
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Phone</label>
-          <input
-            type="text"
-            name="phone"
-            value={user.phone}
-            className="w-full px-3 py-2 border rounded"
-            readOnly
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Group</label>
-          <select name="group_id" value={reservation.group_id} onChange={handleInputChange} className="w-full px-3 py-2 border rounded">
-            <option value="">Select a group</option>
-            {groups && groups.map((group) => (
-              <option key={group.id} value={group.id}>
-                {group.name}
-              </option>
+          <label className="block text-sm font-medium text-gray-700">Duration</label>
+          <select
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          >
+            {[...Array(12)].map((_, i) => (
+              <option key={i + 1} value={i + 1}>{i + 1} week(s)</option>
             ))}
           </select>
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Duration</label>
-          <select name="duration" value={reservation.duration} onChange={handleInputChange} className="w-full px-3 py-2 border rounded">
-            {[...Array(12).keys()].map((i) => (
-              <option key={i + 1} value={i + 1}>
-                {i + 1} {i + 1 === 1 ? "week" : "weeks"}
-              </option>
-            ))}
-            {[...Array(12).keys()].map((i) => (
-              <option key={i + 1} value={(i + 1) * 4}>
-                {i + 1} {i + 1 === 1 ? "month" : "months"}
-              </option>
+          <label className="block text-sm font-medium text-gray-700">Purpose</label>
+          <textarea
+            value={purpose}
+            onChange={(e) => setPurpose(e.target.value)}
+            required
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Group</label>
+          <select
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          >
+            <option value="">Select Group</option>
+            {groups.map(group => (
+              <option key={group.id} value={group.id}>{group.name}</option>
             ))}
           </select>
         </div>
-        <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Purpose</label>
-          <input
-            type="text"
-            name="purpose"
-            value={reservation.purpose}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border rounded"
-          />
+        <div>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+          >
+            {editMode ? "Update Reservation" : "Reserve Plot"}
+          </button>
         </div>
-        <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded">
-          Reserve Plot
-        </button>
       </form>
     </div>
   );

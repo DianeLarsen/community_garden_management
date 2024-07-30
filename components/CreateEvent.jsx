@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link';
 
 const CreateEvent = ({ gardenId }) => {
-  const { user, groups } = useContext(BasicContext);
+  const { user, userGroups } = useContext(BasicContext);
   // const [gardens, setGardens] = useState([]);
   const [plots, setPlots] = useState([]);
   const [name, setName] = useState('');
@@ -69,7 +69,6 @@ const CreateEvent = ({ gardenId }) => {
           description,
           start_date: startDate,
           end_date: endDate.toISOString(),
-          garden_id: selectedGardenId,
           plot_id: plotId,
           user_id: user.id,
           group_id: groupId,
@@ -162,31 +161,7 @@ const CreateEvent = ({ gardenId }) => {
             </select>
           </div>
         </div>
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Garden
-          </label>
-          {gardenId ? (
-            <p className="mt-1">{gardens.find(g => g.id === gardenId)?.name || 'Unknown Garden'}</p>
-          ) : (
-            <select
-              value={selectedGardenId}
-              onChange={(e) => setSelectedGardenId(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-              required
-            >
-              <option value="">Select Garden</option>
-              {filteredGardens.map(garden => (
-                <option key={garden.id} value={garden.id}>{garden.name}</option>
-              ))}
-            </select>
-          )}
-          {!gardenId && (
-            <p className="text-sm text-gray-500 mt-2">
-              Note: Use the <Link href="/gardens" className="text-blue-500 underline">garden page</Link> to choose a garden.
-            </p>
-          )}
-        </div> */}
+
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Group
@@ -197,10 +172,10 @@ const CreateEvent = ({ gardenId }) => {
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select Group</option>
-            {groups.message ? (
+            {userGroups.message ? (
               <option value="">No groups found</option>
             ) : (
-              groups.map((group) => (
+              userGroups.map((group) => (
                 <option key={group.id} value={group.id}>
                   {group.name}
                 </option>

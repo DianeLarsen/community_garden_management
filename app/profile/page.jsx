@@ -1,5 +1,5 @@
 import ProfileDetails from "@/components/ProfileDetails";
-import PlotsList from "@/components/PlotsList";
+import UserPlotList from "@/components/UserPlotList";
 import GroupList from "@/components/GroupList";
 import EventsList from "@/components/EventsList";
 import InvitesList from "@/components/InvitesList";
@@ -11,7 +11,7 @@ const Profile = () => {
         <ProfileDetails />
         <div className="mt-8">
           <h2 className="text-2xl mb-4">Your Plots</h2>
-          <PlotsList userInfo={true} status="reserved"/>
+          <UserPlotList userInfo={true} status="reserved"/>
         </div>
         <div className="mt-8">
           <h2 className="text-2xl mb-4">Your Groups</h2>
