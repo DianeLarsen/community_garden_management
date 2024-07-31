@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
 import Login from "./Login";
 
@@ -27,7 +27,7 @@ const AuthLinks = () => {
         localStorage.removeItem("token");
         setIsAuthenticated(false);
         showBanner("Session expired. Please log in again.", "error");
-        router.redirect("/")
+        router.push("/")
       } else {
         setIsAuthenticated(true);
       }

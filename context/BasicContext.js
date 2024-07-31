@@ -1,11 +1,6 @@
 "use client";
 import { createContext, useState, useEffect } from "react";
-import {
-  addMonths,
-  isSameMonth,
-  isBefore,
-  isToday,
-} from "date-fns";
+import { addMonths, isSameMonth, isBefore, isToday } from "date-fns";
 import { parseCookies } from "nookies";
 import { useRouter } from "next/navigation";
 
@@ -21,7 +16,7 @@ export const BasicProvider = ({ children }) => {
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
-  const [banner, setBanner] = useState({ message: "", type: "" , link: ""});
+  const [banner, setBanner] = useState({ message: "", type: "", link: "" });
   const [isAdmin, setIsAdmin] = useState(false);
   const [token, setToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -71,8 +66,6 @@ export const BasicProvider = ({ children }) => {
 
     checkToken();
   }, [router]);
-
-
 
   // Fetch all users
   useEffect(() => {
@@ -134,7 +127,9 @@ export const BasicProvider = ({ children }) => {
     const limit = 1000;
     const fetchAllGardens = async () => {
       try {
-        const response = await fetch(`/api/gardens?maxDistance=${maxDistance}&limit=${limit}`);
+        const response = await fetch(
+          `/api/gardens?maxDistance=${maxDistance}&limit=${limit}`
+        );
         const data = await response.json();
         if (response.ok) {
           setGardens(data);
@@ -182,33 +177,56 @@ export const BasicProvider = ({ children }) => {
     }
   }, [isAuthenticated, token]);
 
-useEffect(() => {
-  const fetchGroups = async () => {
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        let url = `/api/groups?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
 
-    try {
-      let url = `/api/groups?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-      console.log(data)
-      if (response.ok) {
-        setGroups(data);
-
-      } else {
-        setError(data.error);
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
+        if (response.ok) {
+          setGroups(data);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch groups.");
       }
-    } catch (err) {
-      setError('Failed to fetch groups.');
+    };
+  }, []);
+
+  useEffect(() => {
+    let timer;
+    if (banner.type === "success") {
+      timer = setTimeout(() => {
+        setBanner({ message: "", type: "", link: null });
+      }, 5000); // Clear after 5 seconds
     }
+
+    return () => clearTimeout(timer);
+  }, [banner]);
+
+  // Clear error messages when the screen changes
+  useEffect(() => {
+    const handleRouteChange = () => {
+      if (banner.type === "error") {
+        setBanner({ message: "", type: "", link: null });
+      }
+    };
+    if (router && router.events) {
+      router.events.on("routeChangeStart", handleRouteChange);
+      router.events.on("routeChangeStart", handleRouteChange);
+
+      return () => {
+        router.events.off("routeChangeStart", handleRouteChange);
+      };
+    }
+  }, [banner, router]);
+
+  const showBanner = (message, type, link = null) => {
+    setBanner({ message, type, link });
   };
-
-  
-}, [])
-
-const showBanner = (message, type, link = null) => {
-  setBanner({ message, type, link });
-};
-
 
   // Event search handler
   const handleEventSearch = async (e) => {
@@ -237,14 +255,17 @@ const showBanner = (message, type, link = null) => {
         const filtered = data.filter((event) => {
           const eventDate = new Date(event.date);
           const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
-          const isPastEvent = isBefore(eventDate, new Date()) && !isToday(eventDate);
+          const isPastEvent =
+            isBefore(eventDate, new Date()) && !isToday(eventDate);
           const isWithinDistance = event.distance <= distance * 1609.34; // Convert miles to meters
 
           if (user.role === "admin") return isEventInCurrentMonth;
 
           const isEventRelevant =
-            ((selectedGroup === "" || event.group_id === parseInt(selectedGroup)) &&
-              (selectedGarden === "" || event.garden_id === parseInt(selectedGarden)) &&
+            ((selectedGroup === "" ||
+              event.group_id === parseInt(selectedGroup)) &&
+              (selectedGarden === "" ||
+                event.garden_id === parseInt(selectedGarden)) &&
               (availablePlots === "all" ||
                 (availablePlots === "yes" && event.available_plots > 0) ||
                 (availablePlots === "no" && event.available_plots === 0))) ||
@@ -327,12 +348,10 @@ const showBanner = (message, type, link = null) => {
     invites,
     setLoading,
     setGroups,
-    userGroups
+    userGroups,
   };
 
   return (
-    <BasicContext.Provider value={value}>
-    {children}
- </BasicContext.Provider>
+    <BasicContext.Provider value={value}>{children}</BasicContext.Provider>
   );
 };

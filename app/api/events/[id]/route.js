@@ -109,7 +109,6 @@ export async function PATCH(request, { params }) {
       description,
       start_date,
       end_date,
-      location,
       garden_id,
       group_id,
       memberId,
@@ -153,8 +152,8 @@ export async function PATCH(request, { params }) {
     } else {
       const updateQuery = `
         UPDATE events
-        SET name = $1, description = $2, start_date = $3, end_date = $4, location = $5, garden_id = $6, group_id = $7
-        WHERE id = $8 AND (user_id = $9 OR $10 = 'admin')
+        SET name = $1, description = $2, start_date = $3, end_date = $4, garden_id = $5, group_id = $6
+        WHERE id = $7 AND (user_id = $8 OR $9 = 'admin')
         RETURNING *
       `;
       const updateResult = await client.query(updateQuery, [
@@ -162,7 +161,6 @@ export async function PATCH(request, { params }) {
         description,
         start_date,
         end_date,
-        location,
         garden_id,
         group_id,
         id,
@@ -191,6 +189,7 @@ export async function PATCH(request, { params }) {
     );
   }
 }
+
 
 
 

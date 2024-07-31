@@ -10,6 +10,7 @@ const UserPlotsList = ({
   userInfo = false,
   groupInfo = false,
   message = "",
+  eventUserId = ""
 }) => {
   const [plots, setPlots] = useState([]);
   const [returnMessage, setReturnMessage] = useState("");
@@ -21,6 +22,7 @@ const UserPlotsList = ({
     group_id: "",
   });
   const { user } = useContext(BasicContext);
+
   const [groupLegend, setGroupLegend] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const plotsPerPage = 10;
@@ -37,8 +39,7 @@ const UserPlotsList = ({
   useEffect(() => {
     const fetchPlots = async () => {
       setLoading(true);
-      const url = `/api/plots?userInfo=true`;
-
+      let url = `/api/plots?userInfo=true`;
       try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -50,7 +51,10 @@ const UserPlotsList = ({
           setReturnMessage(data.message);
           setLoading(false);
         } else {
-          const userPlots = data.filter((plot) => plot.user_id === user.id);
+          let userPlots = data;
+          if (user.role !== "admin") {
+            userPlots = data.filter((plot) => plot.user_id === user.id);
+          }
           userPlots.sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
           setPlots(userPlots);
         }
@@ -135,16 +139,12 @@ const UserPlotsList = ({
     }
   };
 
-  const handleRenewPlot = (plot) => {
-    setRenewingPlot(plot);
-  };
-
-  const handleRenewSubmit = async (e) => {
-    e.preventDefault();
+  const handleRenewPlot = async (plotId, extensionWeeks) => {
     try {
-      const newEndDate = addWeeks(new Date(renewingPlot.end_date), renewWeeks).toISOString();
+      const plotToRenew = plots.find((plot) => plot.id === plotId);
+      const newEndDate = addWeeks(new Date(plotToRenew.end_date), extensionWeeks).toISOString();
 
-      const response = await fetch(`/api/plots/${renewingPlot.id}/extend`, {
+      const response = await fetch(`/api/plots/${plotId}/extend`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -159,11 +159,9 @@ const UserPlotsList = ({
 
       setPlots(
         plots.map((plot) =>
-          plot.id === renewingPlot.id ? { ...plot, end_date: newEndDate } : plot
+          plot.id === plotId ? { ...plot, end_date: newEndDate } : plot
         )
       );
-      setRenewingPlot(null);
-      setRenewWeeks(1);
     } catch (error) {
       console.log(error.message);
     }
@@ -212,7 +210,7 @@ const UserPlotsList = ({
   };
 
   const handleNextPage = () => {
-    if (currentPage < Math.ceil(filteredPlots().length / plotsPerPage)) {
+    if (currentPage < Math.ceil(plots.length / plotsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -223,34 +221,37 @@ const UserPlotsList = ({
     }
   };
 
-  const getRowClassName = (plot) => {
-    const now = new Date();
-    const end = new Date(plot.end_date);
-    return end >= now ? "bg-green-100" : "bg-yellow-100";
-  };
-
-  const filteredPlots = () => {
-    const now = new Date();
-    return plots.filter((plot) => {
-      const end = new Date(plot.end_date);
-      if (filter === "current") {
-        return end >= now;
-      } else if (filter === "future") {
-        return end > now;
-      }
-      return true;
-    });
-  };
-
-  const paginatedPlots = filteredPlots().slice(
+  const paginatedPlots = plots.slice(
     (currentPage - 1) * plotsPerPage,
     currentPage * plotsPerPage
   );
 
+  const getBackgroundColor = (endDate) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    if (end > now) {
+      return "bg-green-100";
+    } else if (end <= now) {
+      return "bg-red-100";
+    }
+    return "";
+  };
+
+  const filteredPlots = plots.filter((plot) => {
+    const now = new Date();
+    const end = new Date(plot.end_date);
+    if (filter === "current") {
+      return end >= now;
+    } else if (filter === "future") {
+      return end > now;
+    } else {
+      return true;
+    }
+  });
+
   if (loading) {
     return <div>Loading...</div>;
   }
-
 
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
@@ -288,7 +289,7 @@ const UserPlotsList = ({
               onChange={(e) =>
                 setEditForm({ ...editForm, length: e.target.value })
               }
-className="w-full px-3 py-2 border rounded"
+              className="w-full px-3 py-2 border rounded"
               required
             />
           </div>
@@ -330,45 +331,6 @@ className="w-full px-3 py-2 border rounded"
         </form>
       )}
 
-      {renewingPlot && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-md shadow-md">
-            <h2 className="text-xl font-bold mb-4">Extend Plot</h2>
-            <form onSubmit={handleRenewSubmit}>
-              <div className="mb-4">
-                <label className="block mb-2 text-sm font-medium text-gray-700">
-                  Extend by (weeks)
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="4"
-                  value={renewWeeks}
-                  onChange={(e) => setRenewWeeks(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border rounded"
-                  required
-                />
-              </div>
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setRenewingPlot(null)}
-                  className="px-4 py-2 bg-gray-500 text-white rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
-                >
-                  Extend
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {!plots[0]?.message && paginatedPlots.length > 0 ? (
         <>
           <table className="w-full table-auto border-collapse">
@@ -376,6 +338,7 @@ className="w-full px-3 py-2 border rounded"
               <tr>
                 <th className="border px-2 py-2">Plot Size(ft.)</th>
                 <th className="border px-2 py-2">Garden Name</th>
+                <th className="border px-2 py-2">Group</th>
                 <th className="border px-2 py-2">Start Date</th>
                 <th className="border px-2 py-2">End Date</th>
                 <th className="border px-2 py-2">Days Left</th>
@@ -384,12 +347,15 @@ className="w-full px-3 py-2 border rounded"
             </thead>
             <tbody>
               {paginatedPlots.map((plot) => (
-                <tr key={plot.id} className={getRowClassName(plot)}>
+                <tr key={plot.id} className={getBackgroundColor(plot.end_date)}>
                   <td className="border px-4 py-2 text-center">
                     {plot.length}X{plot.width}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {plot.garden_name}
+                  </td>
+                  <td className="border px-4 py-2 text-center">
+                    {plot.group_name || "N/A"}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {formatDate(plot.start_date)}
@@ -428,10 +394,10 @@ className="w-full px-3 py-2 border rounded"
                           Edit
                         </button>
                         <button
-                          onClick={() => handleRenewPlot(plot)}
+                          onClick={() => setRenewPlot(plot.id)}
                           className="text-blue-600 ml-4"
                         >
-                          Extend
+                          Renew
                         </button>
                       </div>
                     )}
@@ -449,12 +415,12 @@ className="w-full px-3 py-2 border rounded"
               Previous
             </button>
             <span>
-              Page {currentPage} of {Math.ceil(filteredPlots().length / plotsPerPage)}
+              Page {currentPage} of {Math.ceil(plots.length / plotsPerPage)}
             </span>
             <button
               onClick={handleNextPage}
               className="p-2 bg-gray-200 rounded"
-              disabled={currentPage === Math.ceil(filteredPlots().length / plotsPerPage)}
+              disabled={currentPage === Math.ceil(plots.length / plotsPerPage)}
             >
               Next
             </button>
@@ -476,8 +442,40 @@ className="w-full px-3 py-2 border rounded"
         <div>{message}</div>
       )}
       <div>{returnMessage}</div>
+
+      {renewingPlot  && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <h2 className="text-xl font-bold mb-4">Extend Plot</h2>
+            <input
+              type="number"
+              value={renewWeeks}
+              onChange={(e) => setRenewWeeks(e.target.value)}
+              placeholder="Enter weeks (max 4)"
+              min="1"
+              max="4"
+              className="w-full p-2 border border-gray-300 rounded-md mb-4"
+            />
+            <div className="flex space-x-4">
+            <button
+                onClick={() => handleRenewPlot(renewPlot, renewWeeks)}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+              >
+                Extend
+              </button>
+              <button
+                onClick={() => setRenewPlot(null)}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default UserPlotsList;
+

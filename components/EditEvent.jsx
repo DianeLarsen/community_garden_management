@@ -7,21 +7,28 @@ const EditEvent = () => {
   const { id } = useParams();
   const { user, groups, token } = useContext(BasicContext);
   const [event, setEvent] = useState(null);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [plotId, setPlotId] = useState('');
-  const [groupId, setGroupId] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [plotId, setPlotId] = useState("");
+  const [groupId, setGroupId] = useState("N/A");
+  const [message, setMessage] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [plots, setPlots] = useState([]);
   const [plotDetails, setPlotDetails] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const formatDateTimeLocal = (date) => {
     const d = new Date(date);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(d.getDate()).padStart(2, "0")}T${String(d.getHours()).padStart(
+      2,
+      "0"
+    )}:${String(d.getMinutes()).padStart(2, "0")}`;
   };
 
   useEffect(() => {
@@ -48,19 +55,23 @@ const EditEvent = () => {
   useEffect(() => {
     const fetchPlots = async () => {
       try {
-        let url = `/api/plots?user_id=${user.id}&userInfo=true`;
-        if (groupId && groupId !== "N/A") {
+        let url = `/api/plots?user_id=${user.id}&userInfo=${user.role !== 'admin'}`;
+        if (groupId !== "N/A") {
           url += `&groupId=${groupId}`;
         }
         const response = await fetch(url);
         const data = await response.json();
+        if (data.message) {
+          setMessage(data.message);
+        }
         setPlots(data);
       } catch (err) {
-        console.error('Error fetching plots:', err);
+        console.error("Error fetching plots:", err);
       }
     };
-
-    fetchPlots();
+    if (user.id) {
+      fetchPlots();
+    }
   }, [user.id, groupId]);
 
   useEffect(() => {
@@ -71,7 +82,7 @@ const EditEvent = () => {
           const data = await response.json();
           setPlotDetails(data);
         } catch (error) {
-          console.error('Error fetching plot details:', error);
+          console.error("Error fetching plot details:", error);
         }
       }
     };
@@ -83,23 +94,31 @@ const EditEvent = () => {
     e.preventDefault();
     try {
       const response = await fetch(`/api/events/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name, description, start_date: startDate, end_date: endDate, plot_id: plotId, group_id: groupId, is_public: isPublic }),
+        body: JSON.stringify({
+          name,
+          description,
+          start_date: startDate,
+          end_date: endDate,
+          plot_id: plotId,
+          group_id: groupId,
+          is_public: isPublic,
+        }),
       });
 
       if (response.ok) {
-        alert('Event updated successfully!');
+        alert("Event updated successfully!");
         router.push(`/events/${id}`);
       } else {
         const errorData = await response.json();
         alert(`Failed to update event: ${errorData.error}`);
       }
     } catch (error) {
-      console.error('Error updating event:', error);
+      console.error("Error updating event:", error);
     }
   };
 
@@ -112,7 +131,9 @@ const EditEvent = () => {
       <h1 className="text-2xl font-bold mb-6">Edit Event</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Event Name</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Event Name
+          </label>
           <input
             type="text"
             value={name}
@@ -123,7 +144,9 @@ const EditEvent = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Event Description</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Event Description
+          </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -133,7 +156,9 @@ const EditEvent = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Start Date and Time</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Start Date and Time
+          </label>
           <input
             type="datetime-local"
             value={startDate}
@@ -143,7 +168,9 @@ const EditEvent = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">End Date and Time</label>
+          <label className="block text-sm font-medium text-gray-700">
+            End Date and Time
+          </label>
           <input
             type="datetime-local"
             value={endDate}
@@ -153,22 +180,32 @@ const EditEvent = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Current Group</label>
-          <p className="mt-1">{(groupId !== "N/A" && event) ? `${event.group_name}` : "N/A"}</p>
-          <label className="block text-sm font-medium text-gray-700 mt-4">Change Group</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Current Group
+          </label>
+          <p className="mt-1">
+            {groupId !== "N/A" && event ? `${event.group_name}` : "N/A"}
+          </p>
+          <label className="block text-sm font-medium text-gray-700">
+            Change Group
+          </label>
           <select
-            value={groupId}
+            value={groupId || ""}
             onChange={(e) => setGroupId(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="">Select Group</option>
-            {groups.map(group => (
-              <option key={group.id} value={group.id}>{group.name}</option>
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.name}
+              </option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Public Event</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Public Event
+          </label>
           <input
             type="checkbox"
             checked={isPublic}
@@ -177,30 +214,49 @@ const EditEvent = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Current Plot</label>
-          <p className="mt-1">{(plotId !== "N/A" && event) ? `${event.plot_name}` : "N/A"}</p>
-          <label className="block text-sm font-medium text-gray-700 mt-4">Change Plot</label>
-          <select
-            value={plotId}
-            onChange={(e) => setPlotId(e.target.value)}
-            required
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value="">Select Plot</option>
-            {plots.length > 0 && plots.map(plot => (
-              <option key={plot.id} value={plot.id}>{plot.name} - {plot.length}X{plot.width}</option>
-            ))}
-          </select>
-        </div>
+  <label className="block text-sm font-medium text-gray-700">
+    Current Plot
+  </label>
+  <p className="mt-1">
+    {plotId !== "N/A" && event ? `${event.plot_name}` : "N/A"}
+  </p>
+  <label className="block text-sm font-medium text-gray-700 mt-4">
+    Change Plot
+  </label>
+  <select
+    value={plotId || ""}
+    onChange={(e) => setPlotId(e.target.value)}
+    required={!event?.plot_id} // Only required if there is no plot associated with the event
+    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+  >
+    <option value="">Select Plot</option>
+    {plots.length > 0 &&
+      plots.map((plot) => (
+        <option key={plot.id} value={plot.id}>
+          {plot.garden_name} - {plot.length}X{plot.width}
+        </option>
+      ))}
+  </select>
+</div>
+
         {plotDetails && (
           <div className="mt-4 p-4 bg-gray-100 rounded-md">
-            <h2 className="text-lg font-bold mb-2">Plot Reservation Information</h2>
+            <h2 className="text-lg font-bold mb-2">
+              Plot Reservation Information
+            </h2>
             <p>Reserved by: {plotDetails.reserved_by}</p>
-            <p>Reservation start: {new Date(plotDetails.reservation_start).toLocaleString()}</p>
-            <p>Reservation end: {new Date(plotDetails.reservation_end).toLocaleString()}</p>
+            <p>
+              Reservation start:{" "}
+              {new Date(plotDetails.reservation_start).toLocaleString()}
+            </p>
+            <p>
+              Reservation end:{" "}
+              {new Date(plotDetails.reservation_end).toLocaleString()}
+            </p>
           </div>
         )}
         <div>
+        {message && <p>{message}</p>}
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"

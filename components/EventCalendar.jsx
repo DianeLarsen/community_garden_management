@@ -47,7 +47,7 @@ const EventCalendar = () => {
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
   useReloadOnLoading(loading);
-  console.log(allGroups)
+
   useEffect(() => {
     if (user.id) {
       setIsUserLoaded(true);
@@ -171,7 +171,7 @@ const EventCalendar = () => {
   }
 
   return (
-    <div>
+    <div className="min-w-[85%] min-h-96">
       {error ||
         (events.error && (
           <p className="text-red-500">{error || events.error}</p>
@@ -256,46 +256,47 @@ const EventCalendar = () => {
       </div>
 
       {view === "calendar" ? (
-        <div className="calendar-grid grid grid-cols-7 gap-2">
-          {Array.from({ length: startDay }).map((_, index) => (
-            <div key={index} className="calendar-day empty"></div>
-          ))}
-          {daysInMonth.map((day) => (
-            <div
-              key={day}
-              className={`calendar-day p-2 border rounded bg-white ${
-                isBefore(day, new Date()) && !isToday(day) ? "bg-gray-200" : ""
-              }`}
-            >
-              <div className="date font-bold mb-2">{format(day, "d")}</div>
-              <div className="events">
-                {filteredEvents
-                  .filter(
-                    (event) =>
-                      isSameDay(new Date(event.start_date), day) &&
-                      (event.is_public ||
-                        groups.some((group) => group.id === event.group_id))
-                  )
-                  .map((event) => (
-                    <Link
-                      href={`/events/${event.id}`}
-                      key={event.id}
-                      className={`event block mb-2 p-1 rounded ${
-                        isBefore(new Date(event.start_date), new Date())
-                          ? "text-gray-500 line-through"
-                          : ""
-                      }`}
-                    >
-                      <h3 className="font-semibold">{event.name}</h3>
-                      <p className="text-sm">
-                        {new Date(event.start_date).toLocaleDateString()}
-                      </p>
-                    </Link>
-                  ))}
-              </div>
-            </div>
-          ))}
+    <div className="calendar-grid grid grid-cols-7 gap-2">
+    {Array.from({ length: startDay }).map((_, index) => (
+      <div key={index} className="calendar-day empty"></div>
+    ))}
+    {daysInMonth.map((day) => (
+      <div
+        key={day}
+        className={`calendar-day p-2 border rounded bg-white ${
+          isBefore(day, new Date()) && !isToday(day) ? "bg-gray-200" : ""
+        } h-24 sm:h-24 md:h-32 lg:h-40`}
+      >
+        <div className="date font-bold mb-2">{format(day, "d")}</div>
+        <div className="events">
+          {filteredEvents
+            .filter(
+              (event) =>
+                isSameDay(new Date(event.start_date), day) &&
+                (event.is_public ||
+                  groups.some((group) => group.id === event.group_id))
+            )
+            .map((event) => (
+              <Link
+                href={`/events/${event.id}`}
+                key={event.id}
+                className={`event block mb-2 p-1 rounded ${
+                  isBefore(new Date(event.start_date), new Date())
+                    ? "text-gray-500 line-through"
+                    : ""
+                }`}
+              >
+                <h3 className="font-semibold">{event.name}</h3>
+                <p className="text-sm">
+                  {new Date(event.start_date).toLocaleDateString()}
+                </p>
+              </Link>
+            ))}
         </div>
+      </div>
+    ))}
+  </div>
+  
       ) : (
         <ul className="list-disc pl-5">
           {filteredEvents.length === 0 ? (
