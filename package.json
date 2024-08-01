@@ -6,8 +6,8 @@
     "predev": "sudo /etc/init.d/postgresql start",
     "dev": "node server.js && next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "NODE_ENV=production node server.js",
+    "lint": "next lint" 
   },
   "dependencies": {
     "@react-google-maps/api": "^2.19.3",

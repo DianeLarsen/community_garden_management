@@ -1,6 +1,9 @@
 const express = require('express');
 const next = require('next');
-const setupDatabase = require('./setup');
+const dotenv = require('dotenv');
+const { Pool } = require('pg');
+
+dotenv.config();
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -8,10 +11,18 @@ const handle = app.getRequestHandler();
 
 const port = process.env.PORT || 3000;
 
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
 (async () => {
   try {
-    // Setup the database
-    await setupDatabase();
+    // Test the database connection
+    await pool.connect();
+    console.log('Connected to the database');
 
     // Prepare the Next.js app
     await app.prepare();

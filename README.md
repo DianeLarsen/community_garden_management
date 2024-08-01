@@ -1,57 +1,85 @@
-…or create a new repository on the command line
-echo "# community_garden_management" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin git@github.com:DianeLarsen/community_garden_management.git
-git push -u origin main
-…or push an existing repository from the command line
-git remote add origin git@github.com:DianeLarsen/community_garden_management.git
-git branch -M main
-git push -u origin main
+# Community Garden Management System
 
-to start postgresql
-# Check the status of PostgreSQL
-sudo /etc/init.d/postgresql status
+## Project Overview
+The Community Garden Management System is a web application designed to streamline the coordination of garden activities, manage plot reservations, and facilitate communication among garden members. By integrating weather and Google Maps APIs, the system provides timely weather updates and a visual representation of garden plots to enhance gardening efficiency and planning.
 
-# Start PostgreSQL
-sudo /etc/init.d/postgresql start
+## Features
+- **Plot Reservation System**: Easily reserve garden plots and check availability.
+- **Weather Updates**: Receive real-time weather updates and gardening tips.
+- **Visual Garden Layout**: View garden layout and plot status with Google Maps integration.
 
-# Stop PostgreSQL
-sudo /etc/init.d/postgresql stop
+## Setup and Installation
+Follow these steps to set up and run the project locally:
 
-# Restart PostgreSQL
-sudo /etc/init.d/postgresql restart
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/DianeLarsen/community_garden_management.git
+Navigate to the project directory:
 
-psql -U cgmadmin -d community_garden_management
+bash
+Copy code
+cd community_garden_management
+Install dependencies:
 
-GRANT ALL PRIVILEGES ON DATABASE community_garden_management TO cgmadmin;
+bash
+Copy code
+npm install
+Run the development server:
 
-  
-To untrack a single file that has already been added/initialized to your repository, i.e., stop tracking the file but not delete it from your system use: git rm --cached filename
+bash
+Copy code
+npm start
+Build for production (optional):
 
-To untrack every file that is now in your .gitignore:
+bash
+Copy code
+npm run build
+Usage
+Access the application in your browser at http://localhost:3000.
+Register a new account or log in if you already have an account.
+Navigate through the interface to reserve plots, check weather updates, and view the garden layout.
+Deployment on Netlify
+To deploy the project on Netlify:
 
-First commit any outstanding code changes, and then, run this command:
+Sign Up/Login: Create an account or log in to Netlify.
+New Site: Click on "New site from Git" on the Netlify dashboard.
+Connect Repository: Connect your GitHub repository to Netlify.
+Build Settings: Set the build command to npm run build and the publish directory to build.
+Deploy Site: Netlify will build and deploy your site automatically.
+Add a netlify.toml file for configuration settings:
 
-git rm -r --cached .
-This removes any changed files from the index(staging area), then just run:
 
-git add .
-Commit it:
+[build]
+  command = "npm run build"
+  publish = "build"
 
-git commit -m ".gitignore is now working"
-To undo git rm --cached filename, use git add filename.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+Contributing
+Contributions are welcome! Follow these steps to contribute:
 
-Make sure to commit all your important changes before running git add . Otherwise, you will lose any changes to other files.
+Fork the repository.
+Create a new branch for your feature or bug fix:
 
-Please be careful, when you push this to a repository and pull from somewhere else into a state where those files are still tracked, the files will be DELETED
+git checkout -b feature-name
+Make your changes and commit them:
 
-How to creat a jwt secret:
-openssl rand -base64 64
+git commit -m "Description of feature or fix"
+Push to the branch:
 
-turning off password on sudo
-sudo visudo
- add this to end:
-your-username ALL=(ALL) NOPASSWD: /etc/init.d/postgresql
+git push origin feature-name
+Submit a pull request with a detailed description of your changes.
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Acknowledgements
+Netlify for deployment services.
+Google Maps API for garden layout visualization.
+Weather API for real-time weather updates.
+Contact
+For any questions or suggestions, please feel free to contact Diane Larsen.
+
+
+
