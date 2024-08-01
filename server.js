@@ -12,7 +12,7 @@ const handle = app.getRequestHandler();
 const port = process.env.PORT || 3000;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.HEROKU_POSTGRESQL_MAUVE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
