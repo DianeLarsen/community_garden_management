@@ -8,15 +8,36 @@ const GardenList = () => {
   const [error, setError] = useState('');
   const router = useRouter();
   const {
-    user, loading, setLoading
+    user, loading, setLoading, showBanner
     } = useContext(BasicContext);
-useEffect(() => {
-if (!user.id){
-  setLoading(true)
-} else {
-  setLoading(false)
-}
-}, [router]);
+
+    const [isUserLoaded, setIsUserLoaded] = useState(false);
+
+
+  useEffect(() => {
+    if (user.id) {
+      setLoading(true)
+      setIsUserLoaded(true);
+    } else {
+      setLoading(true)
+      setIsUserLoaded(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user.zip) {
+      if (gardens.length > 0) {
+        setLoading(false);
+      }
+    } else if (isUserLoaded){
+      showBanner(
+        "Please update profile page with required information",
+        "error", "/profile"
+      );
+      router.push("/profile")
+    }
+  }, [user, gardens, isUserLoaded]);
+
   useEffect(() => {
     const fetchGardens = async () => {
       try {
@@ -47,6 +68,9 @@ if (!user.id){
 if (loading) {
   return <p>Loading...</p>
 }
+
+if (!isUserLoaded) useReloadOnLoading(loading);
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Community Gardens Near You</h1>

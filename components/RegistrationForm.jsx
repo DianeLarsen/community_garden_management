@@ -10,7 +10,7 @@ const RegistrationForm = () => {
     password: '',
     confirmPassword: '',
   });
-  const [data, setData] = useState();
+  const [data, setData] = useState(null);
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -41,11 +41,59 @@ const RegistrationForm = () => {
       if (response.ok) {
         showBanner("Registration successful! Check Email!", "success");
         router.push('/');
+      } else if (results.resendVerification) {
+        setData({ error: results.error, resendVerification: true });
+      } else if (results.resetPassword) {
+        setData({ error: results.error, resetPassword: true });
       } else {
         setData(results);
       }
     } catch (error) {
       console.error('Registration error:', error);
+      setData({ error: 'An unexpected error occurred. Please try again later.' });
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      const response = await fetch('/api/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        showBanner("Verification email resent! Check Email!", "success");
+      } else {
+        setData(result);
+      }
+    } catch (error) {
+      console.error('Resend verification error:', error);
+      setData({ error: 'An unexpected error occurred. Please try again later.' });
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await fetch('/api/community-garden/password-reset-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        showBanner("Password reset email sent! Check Email!", "success");
+      } else {
+        setData(result);
+      }
+    } catch (error) {
+      console.error('Password reset request error:', error);
       setData({ error: 'An unexpected error occurred. Please try again later.' });
     }
   };
@@ -92,7 +140,21 @@ const RegistrationForm = () => {
             Register
           </button>
         </form>
-        {data && <p className="mt-4 text-red-600">{data.error || data.message}</p>}
+        {data && data.error && (
+          <div className="mt-4 text-red-600">
+            <p>{data.error}</p>
+            {data.resendVerification && (
+              <button onClick={handleResendVerification} className="mt-2 py-2 px-4 bg-blue-600 text-white rounded">
+                Resend Verification Email
+              </button>
+            )}
+            {data.resetPassword && (
+              <button onClick={handleResetPassword} className="mt-2 py-2 px-4 bg-blue-600 text-white rounded">
+                Reset Password
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

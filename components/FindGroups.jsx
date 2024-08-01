@@ -2,16 +2,47 @@
 import { useState, useEffect, useContext } from "react";
 import { BasicContext } from "@/context/BasicContext";
 import GroupList from "./GroupList";
+import { useRouter } from "next/navigation";
 
 const FindGroups = ({ userInfo = false }) => {
-  const { user, allGroups } = useContext(BasicContext);
-  
+  const { user, allGroups, loading, setLoading, showBanner } = useContext(BasicContext);
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [limit, setLimit] = useState(10);
   const [searchedGroups, setSearchedGroups] = useState([]);
   const [showAllGroups, setShowAllGroups] = useState(false);
+
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
+
+
+  useEffect(() => {
+    if (user.id) {
+      setLoading(true)
+      setIsUserLoaded(true);
+    } else {
+      setLoading(true)
+      setIsUserLoaded(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user.zip) {
+      if (allGroups) {
+        setLoading(false);
+      }
+    } else if (isUserLoaded){
+      showBanner(
+        "Please update profile page with required information",
+        "error", "/profile"
+      );
+      router.push("/profile")
+    }
+  }, [user, allGroups, isUserLoaded]);
+
+
+
 
   const searchGroups = async (e) => {
     e.preventDefault();

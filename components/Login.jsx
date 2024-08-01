@@ -1,14 +1,16 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { BasicContext } from "@/context/BasicContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
 const Login = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const { user, isAuthenticated, setIsAuthenticated, showBanner, isDropdownVisible, setIsDropdownVisible } =
+  const { isAuthenticated, setIsAuthenticated, showBanner, setIsDropdownVisible } =
     useContext(BasicContext);
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -68,8 +70,13 @@ const Login = () => {
           Sign In
         </button>
       </form>
-      <Link className="block p-2 text-center text-blue-500" href="/register" onClick={()=> setIsDropdownVisible(false)}>
-        Not yet a member? Register here
+      <p className="text-black text-center">Not yet a member?</p>
+      <Link className="block p-2 text-center text-blue-500 underline" href="/register" onClick={() => setIsDropdownVisible(false)}>
+         Register here
+      </Link>
+      <p className="text-black text-center">Forgot your password? </p>
+      <Link className="block p-2 text-center text-blue-500 underline" href="/password-reset-request" onClick={() => setIsDropdownVisible(false)}>
+        Reset it here
       </Link>
     </>
   );

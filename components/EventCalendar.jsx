@@ -11,7 +11,6 @@ import {
   eachDayOfInterval,
   getDay,
   isSameDay,
-  isSameMonth,
   isBefore,
   isToday,
 } from "date-fns";
@@ -40,39 +39,39 @@ const EventCalendar = () => {
     groups,
     isAuthenticated,
   } = useContext(BasicContext);
+  
   const router = useRouter();
   const [allGroups, setAllGroups] = useState([]);
   const [gardens, setGardens] = useState([]);
   const [view, setView] = useState("calendar");
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
-  useReloadOnLoading(loading);
 
   useEffect(() => {
     if (user.id) {
       setIsUserLoaded(true);
     } else {
+      setLoading(true);
       setIsUserLoaded(false);
     }
   }, [user]);
 
   useEffect(() => {
     if (user.zip) {
-      if (allGroups && gardens.length > 0) {
+      if (allGroups.length > 0 && gardens.length > 0) {
         setLoading(false);
       }
-    } else if (isUserLoaded){
+    } else if (isUserLoaded) {
       showBanner(
         "Please update profile page with required information",
-        "error"
+        "error",
+        "/profile"
       );
-      setTimeout(() => {
-        router.push("/profile");
-      }, 1000); // Adjust the delay as needed
+      router.push("/profile");
     }
-  }, [user, allGroups, gardens]);
+  }, [user, allGroups, gardens, isUserLoaded]);
 
-  //fetch groups
+  // fetch groups
   useEffect(() => {
     const fetchGroups = async () => {
       try {
@@ -85,7 +84,7 @@ const EventCalendar = () => {
     };
 
     if (user.zip) fetchGroups();
-  }, []);
+  }, [user.zip]);
 
   // fetch gardens
   useEffect(() => {
@@ -103,7 +102,7 @@ const EventCalendar = () => {
     };
 
     if (user.zip) fetchGardens();
-  }, [distance]);
+  }, [distance, user.zip]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -168,6 +167,10 @@ const EventCalendar = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!isUserLoaded) {
+    useReloadOnLoading(loading);
   }
 
   return (

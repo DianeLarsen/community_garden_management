@@ -2,7 +2,7 @@
 import { createContext, useState, useEffect } from "react";
 import { addMonths, isSameMonth, isBefore, isToday } from "date-fns";
 import { parseCookies } from "nookies";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export const BasicContext = createContext();
 
@@ -33,6 +33,9 @@ export const BasicProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [invites, setInvites] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const pathname = usePathname()
+  const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];
+  const isPublicPath = publicPaths.includes(pathname);
 
   const [user, setUser] = useState({
     email: "",
@@ -58,6 +61,7 @@ export const BasicProvider = ({ children }) => {
         setIsAuthenticated(false);
         setTimeout(() => {
           if (!localToken && !tokenCookie) {
+            if (isPublicPath) return;
             router.push("/");
           }
         }, 2000); // Delay of 2000 milliseconds (2 seconds)
@@ -216,7 +220,7 @@ export const BasicProvider = ({ children }) => {
     };
     if (router && router.events) {
       router.events.on("routeChangeStart", handleRouteChange);
-      router.events.on("routeChangeStart", handleRouteChange);
+
 
       return () => {
         router.events.off("routeChangeStart", handleRouteChange);

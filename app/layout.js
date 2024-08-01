@@ -6,6 +6,7 @@ import TokenRefresher from "@/components/TokenRefresher";
 import { BasicProvider } from "@/context/BasicContext";
 import { Suspense } from "react";
 import Footer from "@/components/Footer";
+import Loading from "./loading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,7 @@ export default function RootLayout({ children }) {
           <NavBar />
         </header>
         <TokenRefresher />
-        <Suspense>
+        <Suspense fallback={<Loading />}>
         <main className="p-4 ">{children}</main>
         </Suspense>
         <Footer />

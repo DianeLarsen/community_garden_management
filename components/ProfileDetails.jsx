@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CldUploadWidget } from "next-cloudinary";
 import { useRouter } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
+import ChangePassword from "@/components/ChangePassword";
 
 const ProfileDetails = () => {
   const {
@@ -18,6 +19,7 @@ const ProfileDetails = () => {
   );
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [ changePasswordToggle, setChangePasswordToggle] = useState(false)
   const router = useRouter();
 
 // console.log(user)
@@ -94,7 +96,9 @@ const ProfileDetails = () => {
     }
     setLoading(false)
   };
-
+  const handleChangePasswordToggle = ()=>{
+    setChangePasswordToggle(prev => !prev)
+  }
   return (
     <form
       onSubmit={handleSubmit}
@@ -222,6 +226,7 @@ const ProfileDetails = () => {
           )}
         </CldUploadWidget>
       </div>
+      {changePasswordToggle ? <ChangePassword handleChangePasswordToggle={handleChangePasswordToggle}/>: <button className="w-full py-2 px-4 mb-4 bg-blue-600 text-white rounded" onClick={handleChangePasswordToggle}>Change Password</button>}
       <button
         type="submit"
         className="w-full py-2 px-4 bg-blue-600 text-white rounded"
