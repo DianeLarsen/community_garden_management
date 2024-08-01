@@ -41,6 +41,6 @@
     "tailwindcss": "^3.4.1"
   },
   "engines": {
-    "node": "21.x" // Specify the Node.js version
+    "node": "22.x" // Specify the Node.js version
   }
 }
