@@ -1,6 +1,6 @@
 {
   "name": "community_garden_management",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "predev": "sudo /etc/init.d/postgresql start",
@@ -9,6 +9,7 @@
     "start": "NODE_ENV=production node server.js",
     "lint": "next lint" 
   },
+  "author": "diane-larsen",
   "dependencies": {
     "@react-google-maps/api": "^2.19.3",
     "@vis.gl/react-google-maps": "^1.1.0",
@@ -41,6 +42,6 @@
     "tailwindcss": "^3.4.1"
   },
   "engines": {
-    "node": "22.x" // Specify the Node.js version
+    "node": "22.x"
   }
 }
