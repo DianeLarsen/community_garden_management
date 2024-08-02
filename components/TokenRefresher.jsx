@@ -22,14 +22,13 @@ const TokenRefresher = () => {
       
       if (!token) {
         if (isPublicPath) return;
-        console.log("Shouldnt be here3")
-        console.log("no token");
+
         router.push("/"); // Redirect to home if no token
         return;
       }
 
       try {
-        console.log("Should be here1")
+
         const response = await fetch("/api/refresh-token", {
           method: "POST",
           headers: {
