@@ -46,7 +46,7 @@ const EventCalendar = () => {
   const [view, setView] = useState("calendar");
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
-
+  useReloadOnLoading(loading, isUserLoaded);
   useEffect(() => {
     if (user.id) {
       setIsUserLoaded(true);
@@ -54,6 +54,7 @@ const EventCalendar = () => {
       setLoading(true);
       setIsUserLoaded(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ const EventCalendar = () => {
       );
       router.push("/profile");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, allGroups, gardens, isUserLoaded]);
 
   // fetch groups
@@ -102,6 +104,7 @@ const EventCalendar = () => {
     };
 
     if (user.zip) fetchGardens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [distance, user.zip]);
 
   useEffect(() => {
@@ -117,6 +120,32 @@ const EventCalendar = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+ // fetch events
+ useEffect(() => {
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch(`/api/events`);
+      const data = await response.json();
+      console.log(data);
+      setFilteredEvents(data);
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    }
+  };
+
+  if (isAuthenticated && user.zip) fetchEvents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [
+  currentDate,
+  selectedGroup,
+  selectedGarden,
+  distance,
+  showAllEvents,
+  isAuthenticated,
+  user,
+]);
+
 
   const handleDistanceChange = (e) => {
     setDistance(e.target.value);
@@ -141,37 +170,12 @@ const EventCalendar = () => {
   });
   const startDay = getDay(startOfMonth(currentDate));
 
-  // fetch events
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch(`/api/events`);
-        const data = await response.json();
-        console.log(data);
-        setFilteredEvents(data);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-      }
-    };
-
-    if (isAuthenticated && user.zip) fetchEvents();
-  }, [
-    currentDate,
-    selectedGroup,
-    selectedGarden,
-    distance,
-    showAllEvents,
-    isAuthenticated,
-    user,
-  ]);
-
+ 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!isUserLoaded) {
-    useReloadOnLoading(loading);
-  }
+
 
   return (
     <div className="min-w-[85%] min-h-96">

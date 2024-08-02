@@ -63,6 +63,7 @@ const EventDetails = () => {
     };
 
     validateEvent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event]);
 
   useEffect(() => {
@@ -93,6 +94,7 @@ const EventDetails = () => {
     if (user) {
       fetchEventDetails();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, showInviteModal, user]);
 
   useEffect(() => {

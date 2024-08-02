@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { parseCookies } from "nookies";
 
-const useReloadOnLoading = (loading) => {
+const useReloadOnLoading = (loading, isUserLoaded) => {
   const router = useRouter();
   const [token, setToken] = useState("");
   const pathname = usePathname();
@@ -27,7 +27,7 @@ const useReloadOnLoading = (loading) => {
     };
 
     checkToken();
-  }, [router]);
+  }, [router, isUserLoaded]);
 
   if (!token) {
     if (isPublicPath) return;
@@ -38,7 +38,7 @@ const useReloadOnLoading = (loading) => {
   }
 
   useEffect(() => {
-    if (loading) {
+    if (!isUserLoaded && loading) {
       const intervalId = setInterval(() => {
         window.location.reload();
       }, 10000);
