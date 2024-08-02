@@ -24,7 +24,7 @@ export default function Home() {
       </section>
 
       <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <Link href="/plot-reservation" legacyBehavior>
+        <Link href="/gardens" legacyBehavior>
           <a className="flex flex-col items-center cursor-pointer">
             <Image
               src="https://media.gettyimages.com/id/1336514990/photo/drone-view-looking-down-onto-an-allotment-garden.jpg?s=2048x2048&w=gi&k=20&c=DRxFAGlGwPcE_-T5F9ZYzJpyIsj0Hay-M8ObBOz29zY="
@@ -39,7 +39,7 @@ export default function Home() {
             </p>
           </a>
         </Link>
-        <Link href="/event-calendar" legacyBehavior>
+        <Link href="/events" legacyBehavior>
           <a className="flex flex-col items-center cursor-pointer">
             <Image
               src="https://media.gettyimages.com/id/185237954/photo/children-holding-community-garden-sign.jpg?s=612x612&w=gi&k=20&c=Fc2QuLFtDZHK0V3pkylQSn9nMdrV8aCdRmX4iB75m48="
@@ -57,7 +57,7 @@ export default function Home() {
       </section>
 
       <section className="w-full flex flex-col items-center mb-8">
-        <Link href="/weather-updates" legacyBehavior>
+        <Link href="/groups" legacyBehavior>
           <a className="flex flex-col items-center cursor-pointer">
             <Image
               src="https://media.gettyimages.com/id/154556360/photo/girl-smells-hortentia-flower-in-garden.jpg?s=612x612&w=gi&k=20&c=3a9sHV8frUr_WvLzWTAcb2s3NihxqkHDcxoGHJdmGNU="
