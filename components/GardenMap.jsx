@@ -127,6 +127,7 @@ function Directions() {
         map.fitBounds(bounds);
       });
     return () => directionsRenderer.setMap(null);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [directionsService, directionsRenderer, garden, directionAddress, address]);
 
   useEffect(() => {
