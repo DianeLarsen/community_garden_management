@@ -42,7 +42,7 @@ export async function POST(request) {
       from: process.env.NEXT_EMAIL_USER,
       to: email,
       subject: 'Password Reset',
-      text: `Please reset your password by clicking the following link: ${process.env.BASE_URL}/reset-password?token=${token}`,
+      text: `Please reset your password by clicking the following link: ${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${token}`,
     };
 
     // Send the password reset email

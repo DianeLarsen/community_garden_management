@@ -57,7 +57,7 @@ export async function POST(request) {
       pass: process.env.NEXT_EMAIL_PASS,
     },
   });
-
+console.log(process.env.NEXT_PUBLIC_BASE_URL)
   // Define the email options
   const mailOptions = {
     from: process.env.NEXT_EMAIL_USER,
