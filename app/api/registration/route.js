@@ -63,7 +63,7 @@ export async function POST(request) {
     from: process.env.NEXT_EMAIL_USER,
     to: email,
     subject: 'Email Verification',
-    text: `Please verify your email by clicking the following link: ${process.env.BASE_URL}/api/verify?token=${token}`,
+    text: `Please verify your email by clicking the following link: ${process.env.NEXT_PUBLIC_BASE_URL}/api/verify?token=${token}`,
   };
 
   // Send the verification email
