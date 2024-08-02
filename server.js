@@ -2,6 +2,7 @@ const express = require('express');
 const next = require('next');
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
+const setupDatabase = require('./setup');
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ const pool = new Pool({
     // Test the database connection
     await pool.connect();
     console.log('Connected to the database');
+
+    // Setup the database
+    await setupDatabase();
 
     // Prepare the Next.js app
     await app.prepare();

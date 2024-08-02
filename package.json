@@ -6,8 +6,9 @@
     "predev": "sudo /etc/init.d/postgresql start",
     "dev": "node server.js",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "node server.js",
+    "lint": "next lint",
+    "setup": "node setup.js"
   },
   "author": "diane-larsen",
   "dependencies": {
