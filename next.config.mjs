@@ -1,11 +1,6 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  env: {
-    BASE_URL: process.env.NODE_ENV === 'production'
-      ? 'https://community-garden-management-975d65cae5d8.herokuapp.com'
-      : 'http://localhost:3000',
-  },
   images: {
     remotePatterns: [
       {
