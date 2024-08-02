@@ -1,7 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
-
 import TokenRefresher from "@/components/TokenRefresher";
 import { BasicProvider } from "@/context/BasicContext";
 import { Suspense } from "react";
@@ -19,20 +18,21 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  
   return (
     <html lang="en">
-      <body className={inter.className}>
-      <BasicProvider>
+      <head>
         <link rel="icon" href="/public/favicon.ico" sizes="any" />
-        <header className="bg-gray-800 text-white ">
-          <NavBar />
-        </header>
-        <TokenRefresher />
-        <Suspense fallback={<Loading />}>
-        <main className="p-4 ">{children}</main>
-        </Suspense>
-        <Footer />
+      </head>
+      <body className={inter.className}>
+        <BasicProvider>
+          <header className="bg-gray-800 text-white">
+            <NavBar />
+          </header>
+          <TokenRefresher />
+          <Suspense fallback={<Loading />}>
+            <main className="p-4">{children}</main>
+          </Suspense>
+          <Footer />
         </BasicProvider>
       </body>
     </html>
