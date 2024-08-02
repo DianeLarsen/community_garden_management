@@ -25,6 +25,7 @@ const FindGroups = ({ userInfo = false }) => {
       setLoading(true)
       setIsUserLoaded(false);
     }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
@@ -39,6 +40,7 @@ const FindGroups = ({ userInfo = false }) => {
       );
       router.push("/profile")
     }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, allGroups, isUserLoaded]);
 
 

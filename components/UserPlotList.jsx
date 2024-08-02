@@ -77,6 +77,7 @@ const UserPlotsList = ({
     if (user.id) {
       fetchPlots();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleRemovePlot = async (plotId) => {

@@ -6,6 +6,7 @@ import {
   memo,
   createContext,
   useContext,
+  useRef,
 } from "react";
 import {
   APIProvider,
@@ -32,7 +33,6 @@ const GardenContext = createContext();
 
 export default function GardenMap({
   garden,
-  position = defaultCenter,
   directionAddress,
   user,
   showDirections
@@ -44,13 +44,15 @@ export default function GardenMap({
     showDirections
   };
   const [zoom, setZoom] = useState(defaultZoom);
+  const positionRef = useRef(defaultCenter);
+
   if (garden[0]) {
-    position = { lat: garden[0].lat, lng: garden[0].lon };
-    
+    positionRef.current = { lat: garden[0].lat, lng: garden[0].lon };
   }
+
   useEffect(() => {
     if (garden[0]) {
-      position = { lat: garden[0].lat, lng: garden[0].lon };
+      positionRef.current = { lat: garden[0].lat, lng: garden[0].lon };
     }
   }, [garden]);
 
@@ -59,7 +61,7 @@ export default function GardenMap({
       <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
         <GardenContext.Provider value={value}>
           <Map
-            center={position}
+            center={positionRef.current}
             mapId={process.env.NEXT_PUBLIC_MAP_ID}
             zoom={zoom}
             fullscreenControl={false}
@@ -93,11 +95,10 @@ function Directions() {
   const [routeIndex, setRouteIndex] = useState(0);
   const selected = routes[routeIndex];
   const leg = selected?.legs[0];
-  useEffect(() => {
-    let homeAdress =
-      user.street_address + "," + user.city + "," + user.state + "," + user.zip;
 
-    setAddress(homeAdress);
+  useEffect(() => {
+    let homeAddress = user.street_address + "," + user.city + "," + user.state + "," + user.zip;
+    setAddress(homeAddress);
   }, [user]);
 
   useEffect(() => {
@@ -125,38 +126,41 @@ function Directions() {
         bounds.extend(new google.maps.LatLng(response.routes[0].legs[0].start_location.lat(), response.routes[0].legs[0].start_location.lng()));
         map.fitBounds(bounds);
       });
-      return () => directionsRenderer.setMap(null)
-  }, [directionsService, directionsRenderer, garden, directionAddress]);
+    return () => directionsRenderer.setMap(null);
+  }, [directionsService, directionsRenderer, garden, directionAddress, address]);
 
   useEffect(() => {
     if (!directionsRenderer) return;
     directionsRenderer.setRouteIndex(routeIndex);
-  }, [routeIndex, directionsRenderer, directionAddress]);
+  }, [routeIndex, directionsRenderer]);
 
   if (!leg) return null;
 
   return (
     <>
-    {showDirections && 
-   <div className="absolute w-[275px] top-0 right-0 p-5 pt-0 m-1 text-white bg-gray-800 rounded">
-   <h2 className="py-1 text-xl">{selected.summary}</h2>
-   <p className="text-sm p-0 pb-1 m-0">
-     {leg.start_address.split(",")[0]} to {leg.end_address.split(",")[0]}
-   </p>
-   <p className="text-sm p-0 pb-1 m-0">Distance: {leg.distance?.text}</p>
-   <p className="text-sm p-0 pb-1 m-0">Duration: {leg.duration?.text}</p>
-   <h2 className="py-1 text-xl">Other Routes</h2>
-   <ul className="pl-6 p-0 m-0">
-     {routes.map((route, index) => (
-       <li key={route.summary}>
-         <button className="text-yellow-400 bg-none border-none cursor-pointer" onClick={() => setRouteIndex(index)}>
-           {route.summary}
-         </button>
-       </li>
-     ))}
-   </ul>
- </div>
- }
+      {showDirections && (
+        <div className="absolute w-[275px] top-0 right-0 p-5 pt-0 m-1 text-white bg-gray-800 rounded">
+          <h2 className="py-1 text-xl">{selected.summary}</h2>
+          <p className="text-sm p-0 pb-1 m-0">
+            {leg.start_address.split(",")[0]} to {leg.end_address.split(",")[0]}
+          </p>
+          <p className="text-sm p-0 pb-1 m-0">Distance: {leg.distance?.text}</p>
+          <p className="text-sm p-0 pb-1 m-0">Duration: {leg.duration?.text}</p>
+          <h2 className="py-1 text-xl">Other Routes</h2>
+          <ul className="pl-6 p-0 m-0">
+            {routes.map((route, index) => (
+              <li key={route.summary}>
+                <button
+                  className="text-yellow-400 bg-none border-none cursor-pointer"
+                  onClick={() => setRouteIndex(index)}
+                >
+                  {route.summary}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </>
   );
 }

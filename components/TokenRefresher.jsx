@@ -57,6 +57,7 @@ const TokenRefresher = () => {
     }, 15 * 60 * 1000); // Refresh token every 15 minutes
 
     return () => clearInterval(refreshInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   return null;
