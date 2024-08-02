@@ -13,7 +13,7 @@ export const metadata = {
   title: "Community Garden Manager",
   description: "Track Plots in your Community Garden",
   icons: {
-    icon: "/public/favicon.ico",
+    icon: "/favicon.ico",
   },
 };
 
@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/public/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className={inter.className}>
         <BasicProvider>
