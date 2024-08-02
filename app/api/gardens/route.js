@@ -7,7 +7,7 @@ import getLatLonFromAddress from '@/utils/getLatLonFromAddress';
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.nextUrl);
+    const { searchParams } = new URL(request.url);
     const searchTerm = searchParams.get('searchTerm');
     const maxDistance = searchParams.get('maxDistance') || 5; // Default to 5 miles
     const limit = searchParams.get('limit') || 10; // Default to 10
