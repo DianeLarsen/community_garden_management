@@ -1,3 +1,4 @@
+// api/gardens.js or app/api/gardens/route.js (depending on your directory structure)
 import { NextResponse } from 'next/server';
 import pool from '@/db';
 import jwt from 'jsonwebtoken';
@@ -6,7 +7,7 @@ import getLatLonFromAddress from '@/utils/getLatLonFromAddress';
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.nextUrl);
     const searchTerm = searchParams.get('searchTerm');
     const maxDistance = searchParams.get('maxDistance') || 5; // Default to 5 miles
     const limit = searchParams.get('limit') || 10; // Default to 10
@@ -29,16 +30,13 @@ export async function GET(request) {
         ({ lat, lon } = await getLatLonFromAddress(searchTerm));
       }
     } else {
-    
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       const userId = decoded.userId;
 
       const client = await pool.connect();
       const userQuery = 'SELECT zip FROM users WHERE id = $1';
       const userResult = await client.query(userQuery, [userId]);
-      
 
       if (userResult.rowCount === 0) {
         client.release();
@@ -49,8 +47,14 @@ export async function GET(request) {
 
       if (!userZip) {
         client.release();
-        return NextResponse.json({ error: 'User does not have a ZIP code' }, {redirect: "/profile"}, {bannerText: "Please update profile page with required information"}, {code: "error"},{ status: 400 });
+        return NextResponse.json({
+          error: 'User does not have a ZIP code',
+          redirect: "/profile",
+          bannerText: "Please update profile page with required information",
+          code: "error"
+        }, { status: 400 });
       }
+
       ({ lat, lon } = await getLatLonFromZipCode(userZip));
     }
 
