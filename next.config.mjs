@@ -1,18 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-const ContentSecurityPolicy = `
-  default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' res.cloudinary.com media.gettyimages.com;
-  connect-src 'self';
-  font-src 'self';
-  frame-src 'self';
-  object-src 'none';
-  base-uri 'self';
-  form-action 'self';
-`;
-
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',

@@ -2,6 +2,7 @@ const express = require('express');
 const next = require('next');
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
+const helmet = require('helmet');
 const setupDatabase = require('./setup');
 
 dotenv.config();
@@ -33,6 +34,46 @@ const pool = new Pool({
     await app.prepare();
 
     const server = express();
+
+    // Middleware to force HTTPS
+    server.use((req, res, next) => {
+      if (req.headers['x-forwarded-proto'] !== 'https' && !dev) {
+        return res.redirect(`https://${req.headers.host}${req.url}`);
+      }
+      next();
+    });
+
+    // Add Helmet for security headers
+    server.use(
+      helmet({
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+            connectSrc: ["'self'"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'self'"],
+          },
+        },
+        referrerPolicy: { policy: 'no-referrer' },
+        frameguard: { action: 'deny' },
+        hsts: {
+          maxAge: 31536000,
+          includeSubDomains: true,
+          preload: true,
+        },
+        noSniff: true,
+        xssFilter: true,
+        expectCt: {
+          enforce: true,
+          maxAge: 86400,
+        },
+      })
+    );
 
     server.all('*', (req, res) => {
       return handle(req, res);
