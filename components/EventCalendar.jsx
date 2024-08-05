@@ -4,7 +4,6 @@ import { BasicContext } from "@/context/BasicContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  addMonths,
   format,
   startOfMonth,
   endOfMonth,
@@ -30,14 +29,11 @@ const EventCalendar = () => {
     distance,
     setDistance,
     filteredEvents,
-    setFilteredEvents,
     loading,
     setLoading,
     showBanner,
     groups,
-    isAuthenticated,
     token,
-    userGroups,
     allGroups,
     userEvents,
     userGardens,
@@ -124,11 +120,11 @@ const EventCalendar = () => {
 
   return (
     <div className="min-w-[85%] min-h-96">
-      {error || (events.error && (
-        <p className="text-red-500">{error || events.error}</p>
+      {error || (userEvents.error && (
+        <p className="text-red-500">{error || userEvents.error || filteredEvents.error}</p>
       ))}
-      {message || (events.message && (
-        <p className="text-yellow-500">{message || events.message}</p>
+      {message || (userEvents.message && (
+        <p className="text-yellow-500">{message || userEvents.message || filteredEvents.message}</p>
       ))}
 
       <div className="filters flex flex-wrap gap-4 mb-4">
@@ -228,24 +224,37 @@ const EventCalendar = () => {
                       (event.is_public ||
                         groups.some((group) => group.id === event.group_id))
                   )
-                  .map((event) => (
-                    <Link
-                      href={`/events/${event.id}`}
-                      key={event.id}
-                      className={`event block mb-2 p-1 rounded ${
-                        userEvents.some((userEvent) => userEvent.id === event.id)
-                          ? "bg-blue-100"
-                          : ""
-                      } ${isBefore(new Date(event.start_date), new Date()) ? "text-gray-500 line-through" : ""}`}
-                    >
-                      <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
-                        {event.name}
-                      </h3>
-                      <p className="text-xs sm:text-xs md:text-xs lg:text-sm">
-                        {formatTime(event.start_date)} to {formatTime(event.end_date)}
-                      </p>
-                    </Link>
-                  ))}
+                  .map((event) => {
+                    const inviteStatus = userInvites.find(
+                      (invite) => invite.event_id === event.id
+                    );
+                    let statusText = "";
+                    if (inviteStatus) {
+                      if (inviteStatus.status === "requested") {
+                        statusText = " (pending)";
+                      } else if (inviteStatus.status === "invited") {
+                        statusText = " (requires attention)";
+                      }
+                    }
+                    return (
+                      <Link
+                        href={`/events/${event.id}`}
+                        key={event.id}
+                        className={`event block mb-2 p-1 rounded ${
+                          userEvents.some((userEvent) => userEvent.id === event.id)
+                            ? "bg-blue-100"
+                            : ""
+                        } ${isBefore(new Date(event.start_date), new Date()) ? "text-gray-500 line-through" : ""}`}
+                      >
+                        <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
+                          {event.name} {statusText}
+                        </h3>
+                        <p className="text-xs sm:text-xs md:text-xs lg:text-sm">
+                          {formatTime(event.start_date)} to {formatTime(event.end_date)}
+                        </p>
+                      </Link>
+                    );
+                  })}
               </div>
             </div>
           ))}
@@ -263,20 +272,33 @@ const EventCalendar = () => {
                   event.is_public ||
                   allGroups.some((group) => group.id === event.group_id)
               )
-              .map((event) => (
-                <li key={event.id} className="mb-2">
-                  <Link
-                    href={`/events/${event.id}`}
-                    className={`text-blue-500 hover:underline ${
-                      userEvents.some((userEvent) => userEvent.id === event.id)
-                        ? "font-bold"
-                        : ""
-                    }`}
-                  >
-                    {event.name} - {new Date(event.start_date).toLocaleDateString()}
-                  </Link>
-                </li>
-              ))
+              .map((event) => {
+                const inviteStatus = userInvites.find(
+                  (invite) => invite.event_id === event.id
+                );
+                let statusText = "";
+                if (inviteStatus) {
+                  if (inviteStatus.status === "requested") {
+                    statusText = " (pending)";
+                  } else if (inviteStatus.status === "invited") {
+                    statusText = " (requires attention)";
+                  }
+                }
+                return (
+                  <li key={event.id} className="mb-2">
+                    <Link
+                      href={`/events/${event.id}`}
+                      className={`text-blue-500 hover:underline ${
+                        userEvents.some((userEvent) => userEvent.id === event.id)
+                          ? "font-bold"
+                          : ""
+                      }`}
+                    >
+                      {event.name} {statusText} - {new Date(event.start_date).toLocaleDateString()}
+                    </Link>
+                  </li>
+                );
+              })
           )}
         </ul>
       )}
@@ -285,3 +307,4 @@ const EventCalendar = () => {
 };
 
 export default EventCalendar;
+
