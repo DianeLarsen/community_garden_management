@@ -8,28 +8,29 @@ import ChangePassword from "@/components/ChangePassword";
 
 const ProfileDetails = () => {
   const {
-    user,setUser,
-    groups, message, setMessage 
+    user, setUser,
+    groups, message, setMessage
   } = useContext(BasicContext);
   const [localProfileData, setLocalProfileData] = useState({});
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(
     user?.profile_photo ||
-      "https://res.cloudinary.com/dqjh46sk5/image/upload/v1677786781/zpoquv2r7p88ahgupk0d.jpg"
+    "https://res.cloudinary.com/dqjh46sk5/image/upload/v1677786781/zpoquv2r7p88ahgupk0d.jpg"
   );
   const [usernameAvailable, setUsernameAvailable] = useState(null);
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [ changePasswordToggle, setChangePasswordToggle] = useState(false)
+  const [changePasswordToggle, setChangePasswordToggle] = useState(false)
   const router = useRouter();
 
-// console.log(user)
+  // console.log(user)
   useEffect(() => {
-    if (!user?.id){
+    if (!user?.id) {
       setLoading(true)
     } else {
       setLoading(false)
     }
   }, [user?.id])
+
   useEffect(() => {
     const checkUsernameAvailability = async () => {
       if (localProfileData.username) {
@@ -45,7 +46,7 @@ const ProfileDetails = () => {
 
     checkUsernameAvailability();
   }, [localProfileData.username]);
-  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,9 +97,10 @@ const ProfileDetails = () => {
     }
     setLoading(false)
   };
-  const handleChangePasswordToggle = ()=>{
+  const handleChangePasswordToggle = () => {
     setChangePasswordToggle(prev => !prev)
   }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -125,11 +127,13 @@ const ProfileDetails = () => {
           value={localProfileData.username || ""}
           onChange={handleChange}
           className={`w-full px-3 py-2 border rounded ${
+            !user?.username ? 'bg-red-100' : ''
+          } ${
             usernameAvailable === false
               ? "border-red-500"
               : usernameAvailable === true
-              ? "border-green-500"
-              : ""
+                ? "border-green-500"
+                : ""
           }`}
           required={!user?.username}
         />
@@ -186,7 +190,9 @@ const ProfileDetails = () => {
             name="zip"
             value={localProfileData.zip || ""}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded"
+            className={`w-full px-3 py-2 border rounded ${
+              !user?.zip ? 'bg-red-100' : ''
+            }`}
             required={!user?.zip}
           />
         </div>

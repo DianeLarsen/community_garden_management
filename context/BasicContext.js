@@ -36,7 +36,8 @@ export const BasicProvider = ({ children }) => {
   const pathname = usePathname()
   const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];
   const isPublicPath = publicPaths.includes(pathname);
-
+const gardenPaths = ["/gardens", "/admin", "/events", "/groups"]
+const isGardenPaths = gardenPaths.includes(pathname);
   const [user, setUser] = useState({
     email: "",
     username: "",
@@ -147,8 +148,8 @@ export const BasicProvider = ({ children }) => {
         setError("Failed to fetch gardens.");
       }
     };
-    if (isAuthenticated) fetchAllGardens();
-  }, [isAuthenticated]);
+    if (isAuthenticated, isGardenPaths) fetchAllGardens();
+  }, [isAuthenticated, isGardenPaths]);
 
   // Fetch profile data
   useEffect(() => {
