@@ -3,7 +3,6 @@ const next = require('next');
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
 const setupDatabase = require('./setup');
-const helmet = require('helmet');
 
 dotenv.config();
 
@@ -34,17 +33,6 @@ const pool = new Pool({
     await app.prepare();
 
     const server = express();
-
-    // Middleware to force HTTPS
-    server.use((req, res, next) => {
-      if (!dev && req.headers['x-forwarded-proto'] !== 'https') {
-        return res.redirect(`https://${req.headers.host}${req.url}`);
-      }
-      next();
-    });
-
-    // Set security headers
-    server.use(helmet());
 
     server.all('*', (req, res) => {
       return handle(req, res);
