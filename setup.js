@@ -29,7 +29,7 @@ async function setupDatabase() {
     // // Drop tables if they exist for fresh setup
     // await client.query(
     //   "DROP TABLE IF EXISTS plot_history, event_registrations, events, event_invitations, garden_plots, group_memberships, groups, group_invitations, users, gardens CASCADE"
-    // );
+    // );}
 
     // Create users table
     await client.query(`

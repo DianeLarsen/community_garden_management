@@ -29,15 +29,18 @@ export const BasicProvider = ({ children }) => {
   const [selectedGarden, setSelectedGarden] = useState("");
   const [availablePlots, setAvailablePlots] = useState("all");
   const [distance, setDistance] = useState(5);
+  const [userEvents, setUserEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [users, setUsers] = useState([]);
   const [invites, setInvites] = useState([]);
+  const [userInvites, setUserInvites] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const pathname = usePathname()
+  const pathname = usePathname();
   const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];
   const isPublicPath = publicPaths.includes(pathname);
-const gardenPaths = ["/gardens", "/admin", "/events", "/groups"]
-const isGardenPaths = gardenPaths.includes(pathname);
+  const gardenPaths = ["/gardens", "/admin", "/events", "/groups"];
+  const isGardenPaths = gardenPaths.includes(pathname);
+
   const [user, setUser] = useState({
     email: "",
     username: "",
@@ -65,93 +68,13 @@ const isGardenPaths = gardenPaths.includes(pathname);
             if (isPublicPath) return;
             router.push("/");
           }
-        }, 2000); // Delay of 2000 milliseconds (2 seconds)
+        }, 2000);
       }
     };
 
     checkToken();
   }, [router]);
 
-  // Fetch all users
-  useEffect(() => {
-    const fetchAllUsers = async () => {
-      try {
-        const response = await fetch("/api/users");
-        const data = await response.json();
-        if (response.ok) {
-          setUsers(data.users);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch users.");
-      }
-    };
-    if (isAuthenticated) fetchAllUsers();
-  }, [isAuthenticated]);
-
-  // Fetch all groups
-  useEffect(() => {
-    const fetchAllGroups = async () => {
-      try {
-        const response = await fetch("/api/groups");
-        const data = await response.json();
-        if (response.ok) {
-          setAllGroups(data);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch groups.");
-      }
-    };
-    if (isAuthenticated && user.zip) fetchAllGroups();
-  }, [isAuthenticated, user.zip]);
-
-  // Fetch all events
-  useEffect(() => {
-    const handleEventSearch = async () => {
-      try {
-        const response = await fetch("/api/events");
-        const data = await response.json();
-        if (response.ok) {
-          setEvents(data);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch events.");
-      }
-    };
-    if (isAuthenticated && user.zip) handleEventSearch();
-  }, [isAuthenticated, user.zip]);
-
-  // Fetch all gardens
-  useEffect(() => {
-    const maxDistance = 1000;
-    const limit = 1000;
-    const fetchAllGardens = async () => {
-      try {
-        const response = await fetch(
-          `/api/gardens?maxDistance=${maxDistance}&limit=${limit}`
-        );
-        const data = await response.json();
-        if (data.error){
-          showBanner(data.bannerText, data.code, data.redirect)
-        }
-        if (response.ok) {
-          setGardens(data);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch gardens.");
-      }
-    };
-    if (isAuthenticated && isGardenPaths) fetchAllGardens();
-  }, [isAuthenticated, isGardenPaths]);
-
-  // Fetch profile data
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -172,7 +95,9 @@ const isGardenPaths = gardenPaths.includes(pathname);
             setIsAdmin(false);
           }
           setUserGroups(data.groups);
-          setInvites(data.invites);
+          setUserEvents(data.events);
+          setUserGardens(data.gardens);
+          setUserInvites(data.invites);
         } else {
           setMessage(data.error);
         }
@@ -190,13 +115,12 @@ const isGardenPaths = gardenPaths.includes(pathname);
     if (banner.type === "success") {
       timer = setTimeout(() => {
         setBanner({ message: "", type: "", link: null });
-      }, 5000); // Clear after 5 seconds
+      }, 5000);
     }
 
     return () => clearTimeout(timer);
   }, [banner]);
 
-  // Clear error messages when the screen changes
   useEffect(() => {
     const handleRouteChange = () => {
       if (banner.type === "error") {
@@ -205,7 +129,6 @@ const isGardenPaths = gardenPaths.includes(pathname);
     };
     if (router && router.events) {
       router.events.on("routeChangeStart", handleRouteChange);
-
 
       return () => {
         router.events.off("routeChangeStart", handleRouteChange);
@@ -217,7 +140,6 @@ const isGardenPaths = gardenPaths.includes(pathname);
     setBanner({ message, type, link });
   };
 
-  // Event search handler
   const handleEventSearch = async (e) => {
     e.preventDefault();
     try {
@@ -234,46 +156,46 @@ const isGardenPaths = gardenPaths.includes(pathname);
     }
   };
 
-  // Fetch events and filter them
+  const fetchFilteredEvents = async () => {
+    try {
+      const response = await fetch(`/api/events?distance=${distance}`);
+      const data = await response.json();
+
+      const filtered = data.filter((event) => {
+        const eventDate = new Date(event.date);
+        const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
+        const isPastEvent =
+          isBefore(eventDate, new Date()) && !isToday(eventDate);
+        const isWithinDistance = event.distance <= distance * 1609.34; 
+
+        if (user.role === "admin") return isEventInCurrentMonth;
+
+        const isEventRelevant =
+          ((selectedGroup === "" ||
+            event.group_id === parseInt(selectedGroup)) &&
+            (selectedGarden === "" ||
+              event.garden_id === parseInt(selectedGarden)) &&
+            (availablePlots === "all" ||
+              (availablePlots === "yes" && event.available_plots > 0) ||
+              (availablePlots === "no" && event.available_plots === 0))) ||
+          event.user_id === user.id;
+
+        const isUserAuthorized =
+          event.is_public || event.group_id === user.group_id;
+
+        return isEventInCurrentMonth && isEventRelevant && isUserAuthorized;
+      });
+
+      setFilteredEvents(filtered);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    }
+  };
+
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch("/api/events");
-        const data = await response.json();
-
-        const filtered = data.filter((event) => {
-          const eventDate = new Date(event.date);
-          const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
-          const isPastEvent =
-            isBefore(eventDate, new Date()) && !isToday(eventDate);
-          const isWithinDistance = event.distance <= distance * 1609.34; // Convert miles to meters
-
-          if (user.role === "admin") return isEventInCurrentMonth;
-
-          const isEventRelevant =
-            ((selectedGroup === "" ||
-              event.group_id === parseInt(selectedGroup)) &&
-              (selectedGarden === "" ||
-                event.garden_id === parseInt(selectedGarden)) &&
-              (availablePlots === "all" ||
-                (availablePlots === "yes" && event.available_plots > 0) ||
-                (availablePlots === "no" && event.available_plots === 0))) ||
-            event.user_id === user.id;
-
-          const isUserAuthorized =
-            event.is_public || event.group_id === user.group_id;
-
-          return isEventInCurrentMonth && isEventRelevant && isUserAuthorized;
-        });
-
-        setFilteredEvents(filtered);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-      }
-    };
     if (isAuthenticated && user.zip) {
-      fetchEvents();
+      fetchFilteredEvents();
     }
   }, [
     currentDate,
@@ -282,7 +204,7 @@ const isGardenPaths = gardenPaths.includes(pathname);
     availablePlots,
     distance,
     user,
-    isAuthenticated
+    isAuthenticated,
   ]);
 
   const handlePrevMonth = () => {
@@ -338,6 +260,9 @@ const isGardenPaths = gardenPaths.includes(pathname);
     setLoading,
     setGroups,
     userGroups,
+    userEvents,
+    userGardens,
+    userInvites,
   };
 
   return (

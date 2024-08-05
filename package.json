@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "predev": "sudo /etc/init.d/postgresql start",
     "dev": "node server.js",
     "build": "next build",
     "start": "node server.js",
@@ -32,6 +31,7 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "next": "^14.2.5",

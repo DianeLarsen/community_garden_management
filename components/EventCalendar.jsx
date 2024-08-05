@@ -38,15 +38,19 @@ const EventCalendar = () => {
     showBanner,
     groups,
     isAuthenticated,
-    token
+    token,
+    userGroups,
+    allGroups,
+    userEvents
   } = useContext(BasicContext);
   
   const router = useRouter();
-  const [allGroups, setAllGroups] = useState([]);
+  // const [allGroups, setAllGroups] = useState([]);
   const [gardens, setGardens] = useState([]);
   const [view, setView] = useState("calendar");
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
+ 
   
   // useReloadOnLoading(loading, isUserLoaded);
   
@@ -78,24 +82,24 @@ const EventCalendar = () => {
     }
   }, [user, allGroups, gardens, isUserLoaded, showBanner, router, setLoading]);
 
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch(`/api/groups`);
-        const data = await response.json();
-        setAllGroups(data);
-      } catch (err) {
-        console.error("Error fetching groups:", err);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchGroups = async () => {
+  //     try {
+  //       const response = await fetch(`/api/user-groups`);
+  //       const data = await response.json();
+  //       setAllGroups(data);
+  //     } catch (err) {
+  //       console.error("Error fetching groups:", err);
+  //     }
+  //   };
 
-    if (user.zip) fetchGroups();
-  }, [user.zip]);
+  //   if (user.zip) fetchGroups();
+  // }, [user.zip]);
 
   useEffect(() => {
     const fetchGardens = async () => {
       try {
-        const response = await fetch(`/api/gardens?distance=${distance}`);
+        const response = await fetch(`/api/user-gardens?userId=${user.id}`);
         const data = await response.json();
         if (data.error) {
           showBanner(data.error, "error");
@@ -106,8 +110,8 @@ const EventCalendar = () => {
       }
     };
 
-    if (user.zip) fetchGardens();
-  }, [distance, user.zip, showBanner]);
+    if (user.id) fetchGardens();
+  }, [user.id, showBanner]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -122,7 +126,29 @@ const EventCalendar = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  // useEffect(() => {
+  //   const fetchEvents = async () => {
+  //     try {
+  //       const response = await fetch(`/api/user-events`);
+  //       const data = await response.json();
+  //       // console.log(data);
+  //       setUserEvents(data);
+  //     } catch (err) {
+  //       console.error("Error fetching events:", err);
+  //     }
+  //   };
 
+  //   if (isAuthenticated && user.zip) fetchEvents();
+  // }, [
+  //   currentDate,
+  //   selectedGroup,
+  //   selectedGarden,
+  //   distance,
+  //   showAllEvents,
+  //   isAuthenticated,
+  //   user,
+  //   setFilteredEvents,
+  // ]);
   useEffect(() => {
     const fetchEvents = async () => {
       try {

@@ -15,7 +15,7 @@ console.log('Database URL:', process.env.DATABASE_URL);
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
+  ssl: dev ? false : {
     rejectUnauthorized: false,
   },
 });
@@ -44,7 +44,6 @@ const pool = new Pool({
       res.setHeader('strict-transport-security', 'max-age=31536000; includeSubDomains; preload');
       next();
     });
-
 
     server.all('*', (req, res) => {
       return handle(req, res);
