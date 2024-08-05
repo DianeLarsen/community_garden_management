@@ -270,7 +270,7 @@ const EventCalendar = () => {
                 isToday(day) ? 'bg-green-100' : isBefore(day, new Date()) ? 'bg-gray-200' : 'bg-white'
               } h-24 sm:h-24 md:h-32 lg:h-40`}
             >
-              <div className="date font-bold mb-2 text-xs sm:text-sm md:text-base lg:text-lg">
+              <div className="date font-bold mb-1 text-xs sm:text-sm md:text-base lg:text-lg">
                 {format(day, "d")}
               </div>
               <div className="events text-xs sm:text-sm md:text-base lg:text-lg">
@@ -291,7 +291,7 @@ const EventCalendar = () => {
                           : ""
                       }`}
                     >
-                      <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg">
+                      <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
                         {event.name}
                       </h3>
                       <p className="text-xs sm:text-sm md:text-base lg:text-lg">
