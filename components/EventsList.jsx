@@ -19,7 +19,7 @@ const EventsList = () => {
           },
         });
         const data = await response.json();
-        console.log(data)
+        // console.log(data)
         setEvents(data);
         setLoading(false);
       } catch (error) {

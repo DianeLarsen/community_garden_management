@@ -17,7 +17,7 @@ const FindPlot = () => {
   const [groups, setGroups] = useState([]);
   const [user, setUser] = useState({});
   const [userInfo, setUserInfo] = useState(false)
-console.log(user)
+// console.log(user)
   const fetchGardens = async () => {
     try {
       const response = await fetch(

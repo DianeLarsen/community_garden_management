@@ -5,10 +5,10 @@ import { BasicContext } from "@/context/BasicContext";
 import { useState, useEffect, useContext } from "react";
 
 const GroupList = ({groups, error}) => {
-  console.log(groups)
+  // console.log(groups)
   const router = useRouter();
   const { userGroups } = useContext(BasicContext);
-console.log(userGroups)
+// console.log(userGroups)
 
   
 

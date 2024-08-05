@@ -135,6 +135,9 @@ export const BasicProvider = ({ children }) => {
           `/api/gardens?maxDistance=${maxDistance}&limit=${limit}`
         );
         const data = await response.json();
+        if (data.error){
+          showBanner(data.bannerText, data.code, data.redirect)
+        }
         if (response.ok) {
           setGardens(data);
         } else {
@@ -188,7 +191,7 @@ export const BasicProvider = ({ children }) => {
 
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         if (response.ok) {
           setGroups(data);
         } else {

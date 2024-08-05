@@ -105,7 +105,7 @@ const GroupDetails = () => {
   };
 
   const handleRemoveMember = async (memberId) => {
-    console.log(memberId);
+    // console.log(memberId);
     try {
       const response = await fetch(`/api/groups/${id}/remove-user`, {
         method: "DELETE",

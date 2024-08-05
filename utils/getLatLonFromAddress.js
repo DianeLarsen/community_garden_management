@@ -14,7 +14,7 @@ async function getLatLonFromAddress(address) {
 // console.log(data)
     if (data.status === 'OK' && data.results.length > 0) {
       const { lat, lng } = data.results[0].geometry.location;
-      console.log(lat, lng)
+      // console.log(lat, lng)
       return { lat, lon: lng };
 
     } else {

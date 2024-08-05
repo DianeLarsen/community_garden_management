@@ -123,7 +123,7 @@ const EventCalendar = () => {
       try {
         const response = await fetch(`/api/events`);
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         setFilteredEvents(data);
       } catch (err) {
         console.error("Error fetching events:", err);

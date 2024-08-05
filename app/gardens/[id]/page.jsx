@@ -23,7 +23,7 @@ const GardenDetails = () => {
     user_id: "",
     group_id: "",
   });
-console.log(groups)
+// console.log(groups)
   // fetch gardens
   useEffect(() => {
     const fetchGarden = async () => {

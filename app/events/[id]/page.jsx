@@ -279,7 +279,7 @@ const EventDetails = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        console.log(data);
+        // console.log(data);
         alert(data.error);
         throw new Error("Error changing role", data.error);
       }
