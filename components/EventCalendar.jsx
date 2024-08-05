@@ -38,6 +38,7 @@ const EventCalendar = () => {
     showBanner,
     groups,
     isAuthenticated,
+    token
   } = useContext(BasicContext);
   
   const router = useRouter();
@@ -50,13 +51,16 @@ const EventCalendar = () => {
   // useReloadOnLoading(loading, isUserLoaded);
   
   useEffect(() => {
+    if (!token){
+      router.push("/")
+    }
     if (user.id) {
       setIsUserLoaded(true);
     } else {
       setLoading(true);
       setIsUserLoaded(false);
     }
-  }, [user, setLoading]);
+  }, [user, setLoading, token]);
 
   useEffect(() => {
     if (user.zip) {
@@ -180,13 +184,13 @@ const EventCalendar = () => {
           <p className="text-yellow-500">{message || events.message}</p>
         ))}
 
-      <div className="filters flex flex-wrap gap-4 mb-4">
+<div className="filters flex flex-wrap gap-4 mb-4">
         <label>
           Distance:
           <select
             value={distance}
             onChange={handleDistanceChange}
-            className="ml-2 p-1 border rounded"
+            className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="5">5 miles</option>
             <option value="10">10 miles</option>
@@ -201,7 +205,7 @@ const EventCalendar = () => {
           <select
             value={selectedGroup}
             onChange={handleGroupChange}
-            className="ml-2 p-1 border rounded"
+            className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="">All</option>
             {groups.map((group) => (
@@ -217,7 +221,7 @@ const EventCalendar = () => {
           <select
             value={selectedGarden}
             onChange={handleGardenChange}
-            className="ml-2 p-1 border rounded"
+            className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="">All</option>
             {gardens.map((garden) => (
@@ -230,26 +234,26 @@ const EventCalendar = () => {
 
         <button
           onClick={() => setView(view === "calendar" ? "list" : "calendar")}
-          className="ml-auto p-2 bg-gray-200 rounded"
+          className="ml-auto p-2 bg-gray-200 rounded border border-gray-300"
         >
           Toggle View
         </button>
         <button
           onClick={handleToggleShowAllEvents}
-          className="ml-auto p-2 bg-gray-200 rounded"
+          className="ml-auto p-2 bg-gray-200 rounded border border-gray-300"
         >
           {showAllEvents ? "Show Filtered Events" : "Show All Events"}
         </button>
       </div>
 
       <div className="calendar-nav flex justify-between items-center mb-4">
-        <button onClick={handlePrevMonth} className="p-2 bg-gray-200 rounded">
+        <button onClick={handlePrevMonth} className="p-2 bg-gray-200 rounded border border-gray-300">
           Previous Month
         </button>
         <h2 className="text-xl font-bold">
           {format(currentDate, "MMMM yyyy")}
         </h2>
-        <button onClick={handleNextMonth} className="p-2 bg-gray-200 rounded">
+        <button onClick={handleNextMonth} className="p-2 bg-gray-200 rounded border border-gray-300">
           Next Month
         </button>
       </div>
@@ -261,43 +265,42 @@ const EventCalendar = () => {
           ))}
           {daysInMonth.map((day) => (
             <div
-            key={day}
-            className={`calendar-day p-2 border rounded ${
-              isToday(day) ? 'bg-green-100' : isBefore(day, new Date()) ? 'bg-gray-200' : 'bg-white'
-            } h-24 sm:h-24 md:h-32 lg:h-40`}
-          >
-            <div className="date font-bold mb-2 text-xs sm:text-sm md:text-base lg:text-lg">
-              {format(day, "d")}
+              key={day}
+              className={`calendar-day p-2 border rounded border-gray-300 ${
+                isToday(day) ? 'bg-green-100' : isBefore(day, new Date()) ? 'bg-gray-200' : 'bg-white'
+              } h-24 sm:h-24 md:h-32 lg:h-40`}
+            >
+              <div className="date font-bold mb-2 text-xs sm:text-sm md:text-base lg:text-lg">
+                {format(day, "d")}
+              </div>
+              <div className="events text-xs sm:text-sm md:text-base lg:text-lg">
+                {filteredEvents
+                  .filter(
+                    (event) =>
+                      isSameDay(new Date(event.start_date), day) &&
+                      (event.is_public ||
+                        groups.some((group) => group.id === event.group_id))
+                  )
+                  .map((event) => (
+                    <Link
+                      href={`/events/${event.id}`}
+                      key={event.id}
+                      className={`event block mb-2 p-1 rounded ${
+                        isBefore(new Date(event.start_date), new Date())
+                          ? "text-gray-500 line-through"
+                          : ""
+                      }`}
+                    >
+                      <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg">
+                        {event.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm md:text-base lg:text-lg">
+                        {new Date(event.start_date).toLocaleDateString()}
+                      </p>
+                    </Link>
+                  ))}
+              </div>
             </div>
-            <div className="events text-xs sm:text-sm md:text-base lg:text-lg">
-              {filteredEvents
-                .filter(
-                  (event) =>
-                    isSameDay(new Date(event.start_date), day) &&
-                    (event.is_public ||
-                      groups.some((group) => group.id === event.group_id))
-                )
-                .map((event) => (
-                  <Link
-                    href={`/events/${event.id}`}
-                    key={event.id}
-                    className={`event block mb-2 p-1 rounded ${
-                      isBefore(new Date(event.start_date), new Date())
-                        ? "text-gray-500 line-through"
-                        : ""
-                    }`}
-                  >
-                    <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg">
-                      {event.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm md:text-base lg:text-lg">
-                      {new Date(event.start_date).toLocaleDateString()}
-                    </p>
-                  </Link>
-                ))}
-            </div>
-          </div>
-          
           ))}
         </div>
   
