@@ -35,16 +35,19 @@ export async function GET(request) {
     }
 
     // Update the user to set verified to true
-    const updateResult = await client.query(
-      'UPDATE users SET verified = $1, verification_token = $2 WHERE email = $3 RETURNING *',
-      [true, null, email]
+    await client.query(
+      'UPDATE users SET verification_token = $1 WHERE email = $2',
+      [null, email]
     );
 
     client.release();
 
-    return NextResponse.redirect(new URL(`/verify?status=success&email=${updateResult.rows[0].email}`, baseUrl));
+    return NextResponse.redirect(new URL(`/verify?status=success&email=${email}`, baseUrl));
   } catch (error) {
     console.error('Error verifying email:', error);
+    if (error.name === 'TokenExpiredError') {
+      return NextResponse.redirect(new URL(`/verify?status=expired`, baseUrl));
+    }
     return NextResponse.json({ error: 'Error verifying email' }, { status: 500 });
   }
 }

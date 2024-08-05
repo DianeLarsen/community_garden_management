@@ -11,10 +11,25 @@ async function setupDatabase() {
     await client.query("CREATE EXTENSION IF NOT EXISTS postgis");
     console.log("PostGIS extension created or already exists.");
 
-    // Drop tables if they exist for fresh setup
-    await client.query(
-      "DROP TABLE IF EXISTS plot_history, event_registrations, events, event_invitations, garden_plots, group_memberships, groups, group_invitations, users, gardens CASCADE"
-    );
+
+     // Check if the users table already exists
+     const tableExists = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'users'
+      );
+    `);
+
+    if (tableExists.rows[0].exists) {
+      console.log("Tables already exist. Skipping setup.");
+      return;
+    }
+
+    // // Drop tables if they exist for fresh setup
+    // await client.query(
+    //   "DROP TABLE IF EXISTS plot_history, event_registrations, events, event_invitations, garden_plots, group_memberships, groups, group_invitations, users, gardens CASCADE"
+    // );
 
     // Create users table
     await client.query(`
