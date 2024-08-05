@@ -5,20 +5,13 @@ import { BasicContext } from "@/context/BasicContext";
 import { useState, useEffect, useContext } from "react";
 
 const GroupList = ({groups, error}) => {
-  // console.log(groups)
   const router = useRouter();
   const { userGroups } = useContext(BasicContext);
-// console.log(userGroups)
 
-  
-
-  // console.log(pathname == "/groups")
-
-  // console.log(userGroups)
   if (error) {
     return <div className="text-red-500 font-bold mt-4">{error}</div>;
   }
-// console.log(groups)
+
   const handleRowClick = (id) => {
     router.push(`/groups/${id}`);
   };

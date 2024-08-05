@@ -55,11 +55,7 @@ const EventCalendar = () => {
     } else if (!user.id) {
       setLoading(true);
       setIsUserLoaded(false);
-    } else {
-      if (!token) {
-        router.push("/");
-      }
-    }
+    } 
   }, [user, setLoading, token, router]);
 
   useEffect(() => {
