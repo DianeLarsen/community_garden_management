@@ -34,7 +34,7 @@ const pool = new Pool({
 
     const server = express();
     server.use((req, res, next) => {
-      const hostname = req.hostname === 'www.app.domain.com' ? 'app.domain.com' : req.hostname;
+      const hostname = req.hostname === 'www.communitygardenmanagement.com' ? 'communitygardenmanagement.com' : req.hostname;
 
       if (req.headers['x-forwarded-proto'] === 'http' || req.hostname === 'www.app.domain.com') {
         res.redirect(301, `https://${hostname}${req.url}`);
