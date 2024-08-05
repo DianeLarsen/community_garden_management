@@ -16,23 +16,31 @@ const ContentSecurityPolicy = `
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
-    value: ContentSecurityPolicy.replace(/\n/g, ''),
+    value: "default-src 'self'; img-src 'self' https://res.cloudinary.com; script-src 'self'; style-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self';",
   },
   {
-    key: 'X-Frame-Options',
-    value: 'DENY',
+    key: 'Strict-Transport-Security',
+    value: 'max-age=31536000; includeSubDomains; preload',
   },
   {
     key: 'X-Content-Type-Options',
     value: 'nosniff',
   },
   {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
+  },
+  {
     key: 'Referrer-Policy',
-    value: 'origin-when-cross-origin',
+    value: 'no-referrer',
   },
   {
     key: 'Permissions-Policy',
-    value: 'geolocation=(), microphone=(), camera=()',
+    value: 'geolocation=(), microphone=()',
   },
 ];
 
@@ -40,7 +48,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Apply these headers to all routes in your application.
+        // Apply these headers to all routes
         source: '/(.*)',
         headers: securityHeaders,
       },
