@@ -24,7 +24,7 @@ export async function GET(request) {
 
     if (result.rowCount === 0) {
       client.release();
-      return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
+      return NextResponse.redirect(new URL(`/verify?status=expired`, baseUrl));
     }
 
     const user = result.rows[0];
