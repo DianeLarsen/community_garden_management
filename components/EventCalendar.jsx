@@ -120,10 +120,10 @@ const EventCalendar = () => {
 
   return (
     <div className="min-w-[85%] min-h-96">
-      {error || (userEvents.error && (
+      {error || ((userEvents.error || filteredEvents.error) && (
         <p className="text-red-500">{error || userEvents.error || filteredEvents.error}</p>
       ))}
-      {message || (userEvents.message && (
+      {message || ((userEvents.message || filteredEvents.message) && (
         <p className="text-yellow-500">{message || userEvents.message || filteredEvents.message}</p>
       ))}
 
