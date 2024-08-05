@@ -163,6 +163,16 @@ const EventCalendar = () => {
     setShowAllEvents(!showAllEvents);
   };
 
+  const formatTime = (date) => {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const period = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes === 0 ? "" : `:${minutes.toString().padStart(2, "0")}`;
+    return `${formattedHours}${formattedMinutes} ${period}`;
+  };
+
+
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentDate),
     end: endOfMonth(currentDate),
@@ -294,8 +304,8 @@ const EventCalendar = () => {
                       <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
                         {event.name}
                       </h3>
-                      <p className="text-xs sm:text-xs md:text-sm lg:text-base">
-                        {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to {new Date(event.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <p className="text-xs sm:text-xs md:text-xs lg:text-sm">
+                        {formatTime(event.start_date)} to {formatTime(event.end_date)}
                       </p>
                     </Link>
                   ))}
