@@ -17,6 +17,7 @@ import {
 const EventCalendar = () => {
   const {
     error,
+    setError,
     message,
     user,
     handleNextMonth,
@@ -63,6 +64,7 @@ const EventCalendar = () => {
         "error",
         "/profile"
       );
+
       router.push("/profile");
     }
   }, [user, isUserLoaded, showBanner, router, setLoading]);
@@ -120,12 +122,12 @@ const EventCalendar = () => {
 
   return (
     <div className="min-w-[85%] min-h-96">
-      {(error || userEvents.error || filteredEvents.error) && (
+      {/* {(error || userEvents.error || filteredEvents.error) && (
         <p className="text-red-500">{error || userEvents.error || filteredEvents.error}</p>
       )}
       {(message || userEvents.message || filteredEvents.message) && (
         <p className="text-yellow-500">{message || userEvents.message || filteredEvents.message}</p>
-      )}
+      )} */}
 
       <div className="filters flex flex-wrap gap-4 mb-4">
         <label>
