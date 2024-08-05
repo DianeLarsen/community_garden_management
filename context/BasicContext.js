@@ -105,8 +105,8 @@ const isGardenPaths = gardenPaths.includes(pathname);
         setError("Failed to fetch groups.");
       }
     };
-    if (isAuthenticated) fetchAllGroups();
-  }, [isAuthenticated]);
+    if (isAuthenticated && user.zip) fetchAllGroups();
+  }, [isAuthenticated, user.zip]);
 
   // Fetch all events
   useEffect(() => {
@@ -148,7 +148,7 @@ const isGardenPaths = gardenPaths.includes(pathname);
         setError("Failed to fetch gardens.");
       }
     };
-    if (isAuthenticated, isGardenPaths) fetchAllGardens();
+    if (isAuthenticated && isGardenPaths) fetchAllGardens();
   }, [isAuthenticated, isGardenPaths]);
 
   // Fetch profile data
@@ -184,25 +184,6 @@ const isGardenPaths = gardenPaths.includes(pathname);
       fetchProfileData();
     }
   }, [isAuthenticated, token]);
-
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        let url = `/api/groups?searchTerm=${searchTerm}&userInfo=${userInfo}&limit=${limit}`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-        // console.log(data);
-        if (response.ok) {
-          setGroups(data);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch groups.");
-      }
-    };
-  }, []);
 
   useEffect(() => {
     let timer;
@@ -301,7 +282,7 @@ const isGardenPaths = gardenPaths.includes(pathname);
     availablePlots,
     distance,
     user,
-    isAuthenticated,
+    isAuthenticated
   ]);
 
   const handlePrevMonth = () => {

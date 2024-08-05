@@ -13,7 +13,7 @@ const GardenList = () => {
   const [isUserLoaded, setIsUserLoaded] = useState(false);
 
   // Call the custom hook unconditionally
-  useReloadOnLoading(loading, isUserLoaded);
+  // useReloadOnLoading(loading, isUserLoaded);
 
   useEffect(() => {
     if (user.id) {
