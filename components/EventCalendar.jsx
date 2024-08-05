@@ -294,8 +294,8 @@ const EventCalendar = () => {
                       <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
                         {event.name}
                       </h3>
-                      <p className="text-xs sm:text-sm md:text-base lg:text-lg">
-                        {new Date(event.start_date).toLocaleDateString()}
+                      <p className="text-xs sm:text-xs md:text-sm lg:text-base">
+                        {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to {new Date(event.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </Link>
                   ))}
