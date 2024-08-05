@@ -51,15 +51,16 @@ const EventCalendar = () => {
   // useReloadOnLoading(loading, isUserLoaded);
   
   useEffect(() => {
-    if (!token){
-      router.push("/")
-    }
+
     if (user.id) {
       setIsUserLoaded(true);
-    } else {
+    } else if (!user.id) {
       setLoading(true);
       setIsUserLoaded(false);
-    }
+    }else {
+    if (!token){
+      router.push("/")
+    }}
   }, [user, setLoading, token]);
 
   useEffect(() => {
@@ -164,6 +165,7 @@ const EventCalendar = () => {
   };
 
   const formatTime = (date) => {
+    date = new Date(date);
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const period = hours >= 12 ? "PM" : "AM";
