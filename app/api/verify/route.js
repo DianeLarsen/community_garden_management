@@ -5,6 +5,9 @@ import pool from '@/db';
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+  console.log('Base URL:', baseUrl); // Add this line to log the base URL
 
   try {
     // Verify the token
@@ -28,7 +31,7 @@ export async function GET(request) {
 
     if (user.verified) {
       client.release();
-      return NextResponse.redirect(new URL(`/verify?status=already_verified`, request.url));
+      return NextResponse.redirect(new URL(`/verify?status=already_verified`, baseUrl));
     }
 
     // Update the user to set verified to true
@@ -39,7 +42,7 @@ export async function GET(request) {
 
     client.release();
 
-    return NextResponse.redirect(new URL(`/verify?status=success&email=${updateResult.rows[0].email}`, request.url));
+    return NextResponse.redirect(new URL(`/verify?status=success&email=${updateResult.rows[0].email}`, baseUrl));
   } catch (error) {
     console.error('Error verifying email:', error);
     return NextResponse.json({ error: 'Error verifying email' }, { status: 500 });
