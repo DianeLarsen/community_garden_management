@@ -16,6 +16,9 @@ export const BasicProvider = ({ children }) => {
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
+  const [userInvites, setUserInvites] = useState([]);
+  const [userEvents, setUserEvents] = useState([]);
+  const [userGardens, setUserGardens] = useState([]);
   const [banner, setBanner] = useState({ message: "", type: "", link: "" });
   const [isAdmin, setIsAdmin] = useState(false);
   const [token, setToken] = useState("");
@@ -29,11 +32,11 @@ export const BasicProvider = ({ children }) => {
   const [selectedGarden, setSelectedGarden] = useState("");
   const [availablePlots, setAvailablePlots] = useState("all");
   const [distance, setDistance] = useState(5);
-  const [userEvents, setUserEvents] = useState([]);
+
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [users, setUsers] = useState([]);
   const [invites, setInvites] = useState([]);
-  const [userInvites, setUserInvites] = useState([]);
+ 
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const pathname = usePathname();
   const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];

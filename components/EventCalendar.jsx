@@ -14,11 +14,9 @@ import {
   isBefore,
   isToday,
 } from "date-fns";
-// import useReloadOnLoading from "@/hooks/useReloadOnLoading";
 
 const EventCalendar = () => {
   const {
-    events,
     error,
     message,
     user,
@@ -41,37 +39,32 @@ const EventCalendar = () => {
     token,
     userGroups,
     allGroups,
-    userEvents
+    userEvents,
+    userGardens,
+    userInvites
   } = useContext(BasicContext);
-  
+
   const router = useRouter();
-  // const [allGroups, setAllGroups] = useState([]);
-  const [gardens, setGardens] = useState([]);
   const [view, setView] = useState("calendar");
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [isUserLoaded, setIsUserLoaded] = useState(false);
- 
-  
-  // useReloadOnLoading(loading, isUserLoaded);
-  
-  useEffect(() => {
 
+  useEffect(() => {
     if (user.id) {
       setIsUserLoaded(true);
     } else if (!user.id) {
       setLoading(true);
       setIsUserLoaded(false);
-    }else {
-    if (!token){
-      router.push("/")
-    }}
-  }, [user, setLoading, token]);
+    } else {
+      if (!token) {
+        router.push("/");
+      }
+    }
+  }, [user, setLoading, token, router]);
 
   useEffect(() => {
-    if (user.zip) {
-      if (allGroups.length > 0 && gardens.length > 0) {
-        setLoading(false);
-      }
+    if (user.zip && isUserLoaded) {
+      setLoading(false);
     } else if (isUserLoaded) {
       showBanner(
         "Please update profile page with required information",
@@ -80,38 +73,7 @@ const EventCalendar = () => {
       );
       router.push("/profile");
     }
-  }, [user, allGroups, gardens, isUserLoaded, showBanner, router, setLoading]);
-
-  // useEffect(() => {
-  //   const fetchGroups = async () => {
-  //     try {
-  //       const response = await fetch(`/api/user-groups`);
-  //       const data = await response.json();
-  //       setAllGroups(data);
-  //     } catch (err) {
-  //       console.error("Error fetching groups:", err);
-  //     }
-  //   };
-
-  //   if (user.zip) fetchGroups();
-  // }, [user.zip]);
-
-  useEffect(() => {
-    const fetchGardens = async () => {
-      try {
-        const response = await fetch(`/api/user-gardens?userId=${user.id}`);
-        const data = await response.json();
-        if (data.error) {
-          showBanner(data.error, "error");
-        }
-        setGardens(data);
-      } catch (err) {
-        console.error("Error fetching gardens:", err);
-      }
-    };
-
-    if (user.id) fetchGardens();
-  }, [user.id, showBanner]);
+  }, [user, isUserLoaded, showBanner, router, setLoading]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -126,52 +88,6 @@ const EventCalendar = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  // useEffect(() => {
-  //   const fetchEvents = async () => {
-  //     try {
-  //       const response = await fetch(`/api/user-events`);
-  //       const data = await response.json();
-  //       // console.log(data);
-  //       setUserEvents(data);
-  //     } catch (err) {
-  //       console.error("Error fetching events:", err);
-  //     }
-  //   };
-
-  //   if (isAuthenticated && user.zip) fetchEvents();
-  // }, [
-  //   currentDate,
-  //   selectedGroup,
-  //   selectedGarden,
-  //   distance,
-  //   showAllEvents,
-  //   isAuthenticated,
-  //   user,
-  //   setFilteredEvents,
-  // ]);
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await fetch(`/api/events`);
-        const data = await response.json();
-        // console.log(data);
-        setFilteredEvents(data);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-      }
-    };
-
-    if (isAuthenticated && user.zip) fetchEvents();
-  }, [
-    currentDate,
-    selectedGroup,
-    selectedGarden,
-    distance,
-    showAllEvents,
-    isAuthenticated,
-    user,
-    setFilteredEvents,
-  ]);
 
   const handleDistanceChange = (e) => {
     setDistance(e.target.value);
@@ -200,7 +116,6 @@ const EventCalendar = () => {
     return `${formattedHours}${formattedMinutes} ${period}`;
   };
 
-
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentDate),
     end: endOfMonth(currentDate),
@@ -213,16 +128,14 @@ const EventCalendar = () => {
 
   return (
     <div className="min-w-[85%] min-h-96">
-      {error ||
-        (events.error && (
-          <p className="text-red-500">{error || events.error}</p>
-        ))}
-      {message ||
-        (events.message && (
-          <p className="text-yellow-500">{message || events.message}</p>
-        ))}
+      {error || (events.error && (
+        <p className="text-red-500">{error || events.error}</p>
+      ))}
+      {message || (events.message && (
+        <p className="text-yellow-500">{message || events.message}</p>
+      ))}
 
-<div className="filters flex flex-wrap gap-4 mb-4">
+      <div className="filters flex flex-wrap gap-4 mb-4">
         <label>
           Distance:
           <select
@@ -262,7 +175,7 @@ const EventCalendar = () => {
             className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="">All</option>
-            {gardens.map((garden) => (
+            {userGardens.map((garden) => (
               <option key={garden.id} value={garden.id}>
                 {garden.name}
               </option>
@@ -324,10 +237,10 @@ const EventCalendar = () => {
                       href={`/events/${event.id}`}
                       key={event.id}
                       className={`event block mb-2 p-1 rounded ${
-                        isBefore(new Date(event.start_date), new Date())
-                          ? "text-gray-500 line-through"
+                        userEvents.some((userEvent) => userEvent.id === event.id)
+                          ? "bg-blue-100"
                           : ""
-                      }`}
+                      } ${isBefore(new Date(event.start_date), new Date()) ? "text-gray-500 line-through" : ""}`}
                     >
                       <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
                         {event.name}
@@ -341,7 +254,6 @@ const EventCalendar = () => {
             </div>
           ))}
         </div>
-  
       ) : (
         <ul className="list-disc pl-5">
           {filteredEvents.length === 0 ? (
@@ -359,10 +271,13 @@ const EventCalendar = () => {
                 <li key={event.id} className="mb-2">
                   <Link
                     href={`/events/${event.id}`}
-                    className="text-blue-500 hover:underline"
+                    className={`text-blue-500 hover:underline ${
+                      userEvents.some((userEvent) => userEvent.id === event.id)
+                        ? "font-bold"
+                        : ""
+                    }`}
                   >
-                    {event.name} -{" "}
-                    {new Date(event.start_date).toLocaleDateString()}
+                    {event.name} - {new Date(event.start_date).toLocaleDateString()}
                   </Link>
                 </li>
               ))
