@@ -311,7 +311,7 @@ const EventCalendar = () => {
                     statusText = " (requires attention)";
                   }
                 }
-                const distanceText = `${event.distance} miles`;
+                const distanceText = `${Math.round(event.distance)} miles`;
                 const adminText =
                   event.user_id === user.id ? " (admin)" : "";
                 return (

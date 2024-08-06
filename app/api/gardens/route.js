@@ -77,7 +77,7 @@ export async function GET(request) {
     if (result.rows.length === 0) {
       return NextResponse.json({ message: 'No gardens found within the specified distance' });
     }
-
+    
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error('Error searching gardens:', error);

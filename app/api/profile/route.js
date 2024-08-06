@@ -88,7 +88,7 @@ console.log(userCoordinates.longitude, userCoordinates.latitude)
 
     const userEventsQuery = `
       SELECT e.*, g.geolocation,
-      ST_Distance(g.geolocation, ST_SetSRID(ST_MakePoint($2, $3), 4326)::geography) AS distance
+      ST_Distance(g.geolocation, ST_SetSRID(ST_MakePoint($2, $3), 4326)::geography) * 0.000621371 AS distance
       FROM events e
       LEFT JOIN gardens g ON e.garden_id = g.id
       WHERE e.id IN (
