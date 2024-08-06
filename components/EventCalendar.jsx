@@ -202,7 +202,7 @@ const EventCalendar = () => {
           onClick={() => setView(view === "calendar" ? "list" : "calendar")}
           className="ml-auto p-2 bg-gray-200 rounded border border-gray-300"
         >
-          Toggle View
+         { view === "calendar" ? "List View" : "Calendar View"}
         </button>
       </div>
 
@@ -250,7 +250,7 @@ const EventCalendar = () => {
                       (event) =>
                         isSameDay(new Date(event.start_date), day) &&
                         (event.is_public ||
-                          groups.some((group) => group.id === event.group_id))
+                          userGroups.some((group) => group.id === event.group_id))
                     )
                     .map((event) => {
                       const inviteStatus = userInvites.find(
@@ -269,7 +269,7 @@ const EventCalendar = () => {
                           href={`/events/${event.id}`}
                           key={event.id}
                           className={`event block mb-2 p-1 rounded ${
-                            userEvents.some(
+                            userEvents && userEvents.some(
                               (userEvent) => userEvent.id === event.id
                             )
                               ? "bg-blue-100"
@@ -305,7 +305,7 @@ const EventCalendar = () => {
               .filter(
                 (event) =>
                   event.is_public ||
-                  allGroups.some((group) => group.id === event.group_id)
+                allGroups && allGroups.some((group) => group.id === event.group_id)
               )
               .map((event) => {
                 const inviteStatus = userInvites.find(
