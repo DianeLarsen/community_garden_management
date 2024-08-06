@@ -16,7 +16,7 @@ export const BasicProvider = ({ children }) => {
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
-  const [userPlots, setPlots] = useState([]);
+  const [userPlots, setUserPlots] = useState([]);
   const [userInvites, setUserInvites] = useState([]);
   const [userEvents, setUserEvents] = useState([]);
   const [userGardens, setUserGardens] = useState([]);
@@ -27,6 +27,7 @@ export const BasicProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [group, setGroup] = useState("");
   const [events, setEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]); // Added state for all events
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -37,10 +38,16 @@ export const BasicProvider = ({ children }) => {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [users, setUsers] = useState([]);
   const [invites, setInvites] = useState([]);
- 
+
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const pathname = usePathname();
-  const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];
+  const publicPaths = [
+    "/",
+    "/about",
+    "/register",
+    "/verify",
+    "/password-reset-request",
+  ];
   const isPublicPath = publicPaths.includes(pathname);
   const gardenPaths = ["/gardens", "/admin", "/events", "/groups"];
   const isGardenPaths = gardenPaths.includes(pathname);
@@ -116,6 +123,24 @@ export const BasicProvider = ({ children }) => {
   }, [isAuthenticated, token]);
 
   useEffect(() => {
+    const fetchAllEvents = async () => {
+      try {
+        const response = await fetch("/api/events");
+        const data = await response.json();
+        if (response.ok) {
+          setAllEvents(data);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch all events.");
+      }
+    };
+
+    if (isAuthenticated) fetchAllEvents();
+  }, [isAuthenticated]);
+
+  useEffect(() => {
     let timer;
     if (banner.type === "success") {
       timer = setTimeout(() => {
@@ -171,7 +196,7 @@ export const BasicProvider = ({ children }) => {
         const isEventInCurrentMonth = isSameMonth(eventDate, currentDate);
         const isPastEvent =
           isBefore(eventDate, new Date()) && !isToday(eventDate);
-        const isWithinDistance = event.distance <= distance * 1609.34; 
+        const isWithinDistance = event.distance <= distance * 1609.34;
 
         if (user.role === "admin") return isEventInCurrentMonth;
 
@@ -241,6 +266,7 @@ export const BasicProvider = ({ children }) => {
     group,
     setGroup,
     events,
+    allEvents,
     handlePrevMonth,
     handleNextMonth,
     currentDate,
@@ -268,7 +294,7 @@ export const BasicProvider = ({ children }) => {
     userEvents,
     userGardens,
     userInvites,
-    userPlots
+    userPlots,
   };
 
   return (
