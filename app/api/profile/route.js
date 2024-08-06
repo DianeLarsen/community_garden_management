@@ -89,6 +89,13 @@ export async function GET(request) {
     `;
     const invitesResult = await client.query(invitesQuery, [userId]);
 
+    const plotsQuery = `
+      SELECT gp.id, gp.name, gp.location, gp.length, gp.width, gp.user_id, gp.group_id, gp.garden_id
+      FROM garden_plots gp
+      WHERE gp.user_id = $1
+    `;
+    const plotsResult = await client.query(plotsQuery, [userId]);
+
     for (let group of groupsResult.rows) {
       group.city = await getCityFromZip(group.location);
     }
@@ -99,12 +106,13 @@ export async function GET(request) {
 
     client.release();
 
-    return NextResponse.json({ profile: user, groups: groupsResult.rows, invites: invitesResult.rows });
+    return NextResponse.json({ profile: user, groups: groupsResult.rows, invites: invitesResult.rows, plots: plotsResult.rows });
   } catch (error) {
     console.error('Error fetching profile:', error);
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });
   }
 }
+
 
 
 export async function POST(request) {

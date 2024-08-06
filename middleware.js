@@ -5,7 +5,7 @@ export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
   const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
-
+console.log("ispublicpath:", isPublicPath)
   if (!token) {
     if (isPublicPath) {
       return NextResponse.next();

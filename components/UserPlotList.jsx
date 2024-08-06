@@ -10,7 +10,7 @@ const UserPlotsList = ({
   userInfo = false,
   groupInfo = false,
   message = "",
-  eventUserId = ""
+  eventUserId = "",
 }) => {
   const [plots, setPlots] = useState([]);
   const [returnMessage, setReturnMessage] = useState("");
@@ -21,7 +21,7 @@ const UserPlotsList = ({
     width: "",
     group_id: "",
   });
-  const { user } = useContext(BasicContext);
+  const { user, userPlots } = useContext(BasicContext);
 
   const [groupLegend, setGroupLegend] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,46 +37,34 @@ const UserPlotsList = ({
   }, [user?.id, plots]);
 
   useEffect(() => {
-    const fetchPlots = async () => {
-      setLoading(true);
-      let url = `/api/plots?userInfo=true`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Error fetching plots");
-        }
-        const data = await response.json();
-
-        if (data.message) {
-          setReturnMessage(data.message);
-          setLoading(false);
-        } else {
-          let userPlots = data;
-          if (user.role !== "admin") {
-            userPlots = data.filter((plot) => plot.user_id === user.id);
-          }
-          userPlots.sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
-          setPlots(userPlots);
-        }
-
-        // Build group legend
-        const legend = {};
-        data.forEach((plot) => {
-          if (plot.group_id && !legend[plot.group_id]) {
-            legend[plot.group_id] = plot.group_name;
-          }
-        });
-        setGroupLegend(legend);
-
-        setLoading(false);
-      } catch (error) {
-        console.log(error.message);
+    setLoading(true);
+    if (userPlots.message) {
+      setReturnMessage(data.message);
+      setLoading(false);
+    } else {
+      let filteredUserPlots;
+      if (user.role !== "admin") {
+        filteredUserPlots = userPlots.filter(
+          (plot) => plot.user_id === user.id
+        );
       }
-    };
-
-    if (user.id) {
-      fetchPlots();
+      filteredUserPlots.sort(
+        (a, b) => new Date(a.end_date) - new Date(b.end_date)
+      );
+      setPlots(filteredUserPlots);
     }
+
+    // Build group legend
+    const legend = {};
+    userPlots.forEach((plot) => {
+      if (plot.group_id && !legend[plot.group_id]) {
+        legend[plot.group_id] = plot.group_name;
+      }
+    });
+    setGroupLegend(legend);
+
+    setLoading(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
@@ -143,7 +131,10 @@ const UserPlotsList = ({
   const handleRenewPlot = async (plotId, extensionWeeks) => {
     try {
       const plotToRenew = plots.find((plot) => plot.id === plotId);
-      const newEndDate = addWeeks(new Date(plotToRenew.end_date), extensionWeeks).toISOString();
+      const newEndDate = addWeeks(
+        new Date(plotToRenew.end_date),
+        extensionWeeks
+      ).toISOString();
 
       const response = await fetch(`/api/plots/${plotId}/extend`, {
         method: "POST",
@@ -238,17 +229,6 @@ const UserPlotsList = ({
     return "";
   };
 
-  const filteredPlots = plots.filter((plot) => {
-    const now = new Date();
-    const end = new Date(plot.end_date);
-    if (filter === "current") {
-      return end >= now;
-    } else if (filter === "future") {
-      return end > now;
-    } else {
-      return true;
-    }
-  });
 
   if (loading) {
     return <div>Loading...</div>;
@@ -444,7 +424,7 @@ const UserPlotsList = ({
       )}
       <div>{returnMessage}</div>
 
-      {renewingPlot  && (
+      {renewingPlot && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-md shadow-md">
             <h2 className="text-xl font-bold mb-4">Extend Plot</h2>
@@ -458,7 +438,7 @@ const UserPlotsList = ({
               className="w-full p-2 border border-gray-300 rounded-md mb-4"
             />
             <div className="flex space-x-4">
-            <button
+              <button
                 onClick={() => handleRenewPlot(renewPlot, renewWeeks)}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
@@ -479,4 +459,3 @@ const UserPlotsList = ({
 };
 
 export default UserPlotsList;
-

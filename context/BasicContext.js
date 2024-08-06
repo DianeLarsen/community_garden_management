@@ -16,6 +16,7 @@ export const BasicProvider = ({ children }) => {
   const [allGroups, setAllGroups] = useState([]);
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
+  const [userPlots, setPlots] = useState([]);
   const [userInvites, setUserInvites] = useState([]);
   const [userEvents, setUserEvents] = useState([]);
   const [userGardens, setUserGardens] = useState([]);
@@ -101,6 +102,7 @@ export const BasicProvider = ({ children }) => {
           setUserEvents(data.events);
           setUserGardens(data.gardens);
           setUserInvites(data.invites);
+          setUserPlots(data.plots);
         } else {
           setMessage(data.error);
         }
@@ -266,6 +268,7 @@ export const BasicProvider = ({ children }) => {
     userEvents,
     userGardens,
     userInvites,
+    userPlots
   };
 
   return (
