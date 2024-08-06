@@ -34,26 +34,26 @@ async function getCoordinatesFromZip(zip) {
   }
 }
 
-function haversineDistance(coords1, coords2) {
-  const toRad = angle => (angle * Math.PI) / 180;
+// function haversineDistance(coords1, coords2) {
+//   const toRad = angle => (angle * Math.PI) / 180;
 
-  const lat1 = coords1.latitude;
-  const lon1 = coords1.longitude;
-  const lat2 = coords2.latitude;
-  const lon2 = coords2.longitude;
+//   const lat1 = coords1.latitude;
+//   const lon1 = coords1.longitude;
+//   const lat2 = coords2.latitude;
+//   const lon2 = coords2.longitude;
 
-  const R = 6371; // Radius of the Earth in kilometers
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const d = R * c; // Distance in kilometers
+//   const R = 6371; // Radius of the Earth in kilometers
+//   const dLat = toRad(lat2 - lat1);
+//   const dLon = toRad(lon2 - lon1);
+//   const a =
+//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+//     Math.sin(dLon / 2) * Math.sin(dLon / 2);
+//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//   const d = R * c; // Distance in kilometers
 
-  return d * 0.621371; // Convert to miles
-}
+//   return d * 0.621371; // Convert to miles
+// }
 
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;
@@ -120,20 +120,20 @@ export async function GET(request) {
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId, userCoordinates.longitude, userCoordinates.latitude]);
 
-    // Calculate distance for each event
-    for (let event of userEventsResult.rows) {
-      if (event.geolocation) {
-        console.log("geolocation", event.geolocation)
-        const gardenCoordinates = {
-          latitude: parseFloat(event.geolocation.y),
-          longitude: parseFloat(event.geolocation.x)
-        };
-        console.log(gardenCoordinates, userCoordinates)
-        event.distance = haversineDistance(userCoordinates, gardenCoordinates);
-      } else {
-        event.distance = null;
-      }
-    }
+    // // Calculate distance for each event
+    // for (let event of userEventsResult.rows) {
+    //   if (event.geolocation) {
+    //     console.log("geolocation", event.geolocation)
+    //     const gardenCoordinates = {
+    //       latitude: parseFloat(event.geolocation.y),
+    //       longitude: parseFloat(event.geolocation.x)
+    //     };
+    //     console.log(gardenCoordinates, userCoordinates)
+    //     event.distance = haversineDistance(userCoordinates, gardenCoordinates);
+    //   } else {
+    //     event.distance = null;
+    //   }
+    // }
 
     const groupsQuery =
       user.role === "admin"
