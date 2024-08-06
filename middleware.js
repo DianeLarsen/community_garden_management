@@ -7,6 +7,7 @@ export async function middleware(request) {
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
 console.log("ispublicpath:", isPublicPath)
   if (!token) {
+    console.log("token:", token)
     if (isPublicPath) {
       return NextResponse.next();
     } else {
