@@ -18,7 +18,7 @@ async function getCityFromZip(zip) {
 
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;
-  console.log("token", token)
+
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -54,6 +54,7 @@ export async function GET(request) {
     }
 
     ({ lat, lon } = await getLatLonFromZipCode(userZip));
+    console.log("made it here 1")
     const client = await pool.connect();
 
     const userQuery = `
@@ -66,7 +67,7 @@ export async function GET(request) {
     if (userResult.rows.length === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
+    console.log("made it here 2")
     const user = userResult.rows[0];
 
     const userEventsQuery = `
@@ -80,7 +81,7 @@ export async function GET(request) {
       )
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId]);
-
+    console.log("made it here 3")
     const groupsQuery =
       user.role === "admin"
         ? `
@@ -115,7 +116,7 @@ export async function GET(request) {
         GROUP BY g.id, gm.role
       `;
     const groupsResult = await client.query(groupsQuery, [userId]);
-
+    console.log("made it here 4")
     const invitesQuery = `
       SELECT g.id, g.name, g.description, g.location, gi.status
       FROM groups g
@@ -130,7 +131,7 @@ export async function GET(request) {
       WHERE gp.user_id = $1
     `;
     const plotsResult = await client.query(plotsQuery, [userId]);
-
+    console.log("made it here 5")
     for (let group of groupsResult.rows) {
       group.city = await getCityFromZip(group.location);
     }
@@ -138,7 +139,7 @@ export async function GET(request) {
     for (let invite of invitesResult.rows) {
       invite.city = await getCityFromZip(invite.location);
     }
-
+    console.log("made it here 6")
     client.release();
 
     return NextResponse.json({
