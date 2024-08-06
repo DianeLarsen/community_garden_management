@@ -26,7 +26,7 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
-
+    console.log("made it here ")
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
     const userZIPResult = await client.query(userZipQuery, [userId]);
 
@@ -39,7 +39,7 @@ export async function GET(request) {
     }
 
     const userZip = userZIPResult.rows[0].zip;
-
+    console.log("made it here 0")
     if (!userZip) {
       client.release();
       return NextResponse.json(
