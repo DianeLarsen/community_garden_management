@@ -43,10 +43,11 @@ export async function GET(request) {
 
     const userEventsQuery = `
       SELECT e.*, 
-      gp.longitude, gp.latitude, 
+      gp.location AS plot_location, 
+      ST_X(gp.geolocation::geometry) AS longitude, ST_Y(gp.geolocation::geometry) AS latitude, 
       (SELECT ST_DistanceSphere(
-        point(gp.longitude, gp.latitude),
-        point(u.longitude, u.latitude)
+        ST_MakePoint(gp.longitude, gp.latitude),
+        ST_MakePoint(u.longitude, u.latitude)
       ) / 1609.34 FROM users u WHERE u.id = $1) as distance
       FROM events e
       LEFT JOIN garden_plots gp ON e.plot_id = gp.id
@@ -123,9 +124,6 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });
   }
 }
-
-
-
 
 export async function POST(request) {
   const token = request.headers.get('authorization')?.split(' ')[1];
@@ -273,4 +271,4 @@ export async function PATCH(request) {
     console.error('Error updating profile:', error);
     return NextResponse.json({ error: 'Error updating profile' }, { status: 500 });
   }
-  }
+}
