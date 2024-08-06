@@ -43,7 +43,7 @@ export async function GET(request) {
     }
 
     const userZip = userZIPResult.rows[0].zip;
-    console.log("made it here 0")
+    
     if (!userZip) {
       client.release();
       return NextResponse.json(
@@ -57,8 +57,9 @@ export async function GET(request) {
       );
     }
 
+    console.log("made it here 0", userZip)
     ({ lat, lon } = await getLatLonFromZipCode(userZip));
-    console.log("made it here 1")
+    console.log("made it here 1", lat, lon)
     
 
     const userQuery = `
