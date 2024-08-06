@@ -4,11 +4,14 @@ import jwt from "jsonwebtoken";
 export async function POST(request) {
   const token = request.headers.get("Authorization")?.split(" ")[1];
 
-  if (!token) {
+  const clearTokenResponse = () => {
     const response = NextResponse.redirect("/api/logout");
     response.cookies.set("token", "", { maxAge: -1, path: "/" });
     return response;
-    // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  };
+
+  if (!token) {
+    return clearTokenResponse();
   }
 
   try {
@@ -20,9 +23,7 @@ export async function POST(request) {
     const now = Math.floor(Date.now() / 1000); // current time in seconds
     if (decoded.exp < now) {
       // Token has expired, log out the user
-      const response = NextResponse.redirect("/api/logout");
-      response.cookies.set("token", "", { maxAge: -1, path: "/" });
-      return response;
+      return clearTokenResponse();
     }
 
     // If token is valid, refresh it
@@ -32,8 +33,10 @@ export async function POST(request) {
       { expiresIn: "1h" }
     );
 
-    return NextResponse.json({ token: newToken });
+    const response = NextResponse.json({ token: newToken });
+    response.cookies.set("token", newToken, { maxAge: 3600, path: "/" });
+    return response;
   } catch (error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return clearTokenResponse();
   }
 }
