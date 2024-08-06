@@ -34,26 +34,6 @@ async function getCoordinatesFromZip(zip) {
   }
 }
 
-// function haversineDistance(coords1, coords2) {
-//   const toRad = angle => (angle * Math.PI) / 180;
-
-//   const lat1 = coords1.latitude;
-//   const lon1 = coords1.longitude;
-//   const lat2 = coords2.latitude;
-//   const lon2 = coords2.longitude;
-
-//   const R = 6371; // Radius of the Earth in kilometers
-//   const dLat = toRad(lat2 - lat1);
-//   const dLon = toRad(lon2 - lon1);
-//   const a =
-//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-//     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-//     Math.sin(dLon / 2) * Math.sin(dLon / 2);
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//   const d = R * c; // Distance in kilometers
-
-//   return d * 0.621371; // Convert to miles
-// }
 
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;
@@ -92,7 +72,7 @@ export async function GET(request) {
     }
 
     const userCoordinates = await getCoordinatesFromZip(userZip);
-
+console.log(userCoordinates.longitude, userCoordinates.latitude)
     const userQuery = `
       SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
       FROM users
@@ -108,14 +88,14 @@ export async function GET(request) {
 
     const userEventsQuery = `
       SELECT e.*, g.geolocation,
-      ST_Distance(g.geolocation, ST_SetSRID(ST_MakePoint(-122.2006, 47.9884), 4326)::geography) AS distance
+      ST_Distance(g.geolocation, ST_SetSRID(ST_MakePoint($2, $3), 4326)::geography) AS distance
       FROM events e
       LEFT JOIN gardens g ON e.garden_id = g.id
       WHERE e.id IN (
-          SELECT event_id FROM event_invitations WHERE user_id = 1
+          SELECT event_id FROM event_invitations WHERE user_id = $1
       )
       OR e.id IN (
-          SELECT event_id FROM event_registrations WHERE user_id = 1
+          SELECT event_id FROM event_registrations WHERE user_id = $1
       );
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId, userCoordinates.longitude, userCoordinates.latitude]);
