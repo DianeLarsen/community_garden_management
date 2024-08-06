@@ -39,7 +39,7 @@ export async function GET(request) {
         e.*, 
         g.available_plots, 
         gd.name AS garden_name,
-        ST_Distance(gd.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance,
+        ST_Distance(gd.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) * 0.000621371 AS distance,
         COUNT(inv.id) AS pending_invitations
       FROM 
         events e
