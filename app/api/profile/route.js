@@ -107,17 +107,18 @@ export async function GET(request) {
     const user = userResult.rows[0];
 
     const userEventsQuery = `
-      SELECT e.*, g.geolocation
+      SELECT e.*, g.geolocation,
+      ST_Distance(g.geolocation, ST_SetSRID(ST_MakePoint(-122.2006, 47.9884), 4326)::geography) AS distance
       FROM events e
       LEFT JOIN gardens g ON e.garden_id = g.id
       WHERE e.id IN (
-          SELECT event_id FROM event_invitations WHERE user_id = $1
+          SELECT event_id FROM event_invitations WHERE user_id = 1
       )
       OR e.id IN (
-          SELECT event_id FROM event_registrations WHERE user_id = $1
-      )
+          SELECT event_id FROM event_registrations WHERE user_id = 1
+      );
     `;
-    const userEventsResult = await client.query(userEventsQuery, [userId]);
+    const userEventsResult = await client.query(userEventsQuery, [userId, userCoordinates.longitude, userCoordinates.latitude]);
 
     // Calculate distance for each event
     for (let event of userEventsResult.rows) {
