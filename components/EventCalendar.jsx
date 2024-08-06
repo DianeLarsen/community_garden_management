@@ -12,6 +12,7 @@ import {
   isSameDay,
   isBefore,
   isToday,
+  isWithinInterval,
 } from "date-fns";
 
 const EventCalendar = () => {
@@ -107,7 +108,11 @@ const EventCalendar = () => {
         !distance || event.distance <= parseInt(distance, 10);
       const withinGroup =
         !selectedGroup || event.group_id === parseInt(selectedGroup, 10);
-      return withinDistance && withinGroup;
+      const withinMonth = isWithinInterval(new Date(event.start_date), {
+        start: startOfMonth(currentDate),
+        end: endOfMonth(currentDate),
+      });
+      return withinDistance && withinGroup && withinMonth;
     });
     setFilteredEvents(filtered);
   };
@@ -116,7 +121,7 @@ const EventCalendar = () => {
     if (eventView === "filtered") {
       filterEvents();
     }
-  }, [eventView, distance, selectedGroup, allEvents]);
+  }, [eventView, distance, selectedGroup, allEvents, currentDate]);
 
   const formatTime = (date) => {
     date = new Date(date);
