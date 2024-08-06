@@ -153,7 +153,7 @@ const EventCalendar = () => {
             className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="">All</option>
-            {groups.map((group) => (
+            {groups && groups.map((group) => (
               <option key={group.id} value={group.id}>
                 {group.name}
               </option>
@@ -169,7 +169,7 @@ const EventCalendar = () => {
             className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="">All</option>
-            {userGardens.map((garden) => (
+            {userGardens && userGardens.map((garden) => (
               <option key={garden.id} value={garden.id}>
                 {garden.name}
               </option>
@@ -219,7 +219,7 @@ const EventCalendar = () => {
                 {format(day, "d")}
               </div>
               <div className="events text-xs sm:text-sm md:text-base lg:text-lg">
-                {filteredEvents
+                {filteredEvents && filteredEvents
                   .filter(
                     (event) =>
                       isSameDay(new Date(event.start_date), day) &&
