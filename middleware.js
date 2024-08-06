@@ -19,9 +19,10 @@ console.log("ispublicpath:", isPublicPath)
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     await jwtVerify(token, secret);
+    console.log("No problems here")
     return NextResponse.next();
   } catch (err) {
-
+    console.log(err)
     const response = NextResponse.redirect(new URL("/", request.url));
     response.cookies.delete("token");
     return response;
