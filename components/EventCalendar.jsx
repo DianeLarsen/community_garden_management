@@ -297,7 +297,7 @@ const EventCalendar = () => {
         </div>
       ) : (
         <ul className="list-disc pl-5">
-          {eventsToDisplay.length === 0 ? (
+          {(!eventsToDisplay || eventsToDisplay.length === 0) ? (
             <p>
               No events listed within {distance} miles, {selectedGroup}
             </p>
