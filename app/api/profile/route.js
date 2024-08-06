@@ -122,7 +122,7 @@ export async function GET(request) {
     // Calculate distance for each event
     for (let event of userEventsResult.rows) {
       if (event.geolocation) {
-        console.log("geolocation", event.geolocation.x, event.geolocation.y)
+        console.log("geolocation", event.geolocation)
         const gardenCoordinates = {
           latitude: parseFloat(event.geolocation.y),
           longitude: parseFloat(event.geolocation.x)
