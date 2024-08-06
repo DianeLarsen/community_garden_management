@@ -86,7 +86,7 @@ export const BasicProvider = ({ children }) => {
     checkToken();
   }, [router]);
 
-
+  // profile data
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -113,7 +113,7 @@ export const BasicProvider = ({ children }) => {
           setUserInvites(data.invites);
           setUserPlots(data.plots);
         } else {
-          showBanner(data.error, "error");
+          showBanner(data.error || data.banner.text, data.code || "error", data.redirect || "");
           setMessage(data.error);
         }
       } catch (error) {
