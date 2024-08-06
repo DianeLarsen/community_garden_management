@@ -138,11 +138,21 @@ const EventCalendar = () => {
   const getEventsToDisplay = () => {
     switch (eventView) {
       case "myEvents":
-        return userEvents;
+        return userEvents.filter((event) =>
+          isWithinInterval(new Date(event.start_date), {
+            start: startOfMonth(currentDate),
+            end: endOfMonth(currentDate),
+          })
+        );
       case "filtered":
         return filteredEvents;
       case "all":
-        return allEvents;
+        return allEvents.filter((event) =>
+          isWithinInterval(new Date(event.start_date), {
+            start: startOfMonth(currentDate),
+            end: endOfMonth(currentDate),
+          })
+        );
       default:
         return filteredEvents;
     }
