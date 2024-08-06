@@ -57,11 +57,6 @@ export async function GET(request) {
       );
     }
 
-    console.log("made it here 0", userZip)
-    ({ lat, lon } = await getLatLonFromZipCode(userZip));
-    console.log("made it here 1", lat, lon)
-    
-
     const userQuery = `
       SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
       FROM users
