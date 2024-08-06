@@ -36,6 +36,7 @@ const EventCalendar = () => {
     groups,
     token,
     allGroups,
+    userGroups,
     userGardens,
   } = useContext(BasicContext);
 
