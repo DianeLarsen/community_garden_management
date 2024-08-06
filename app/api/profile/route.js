@@ -16,6 +16,45 @@ async function getCityFromZip(zip) {
   }
 }
 
+async function getCoordinatesFromZip(zip) {
+  try {
+    const response = await fetch(`http://api.zippopotam.us/us/${zip}`);
+    if (!response.ok) {
+      throw new Error("Error fetching coordinates from zip code");
+    }
+    const data = await response.json();
+    const place = data.places[0];
+    return {
+      latitude: parseFloat(place.latitude),
+      longitude: parseFloat(place.longitude)
+    };
+  } catch (error) {
+    console.error("Error fetching coordinates from zip code:", error);
+    return null;
+  }
+}
+
+function haversineDistance(coords1, coords2) {
+  const toRad = angle => (angle * Math.PI) / 180;
+
+  const lat1 = coords1.latitude;
+  const lon1 = coords1.longitude;
+  const lat2 = coords2.latitude;
+  const lon2 = coords2.longitude;
+
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in kilometers
+
+  return d * 0.621371; // Convert to miles
+}
+
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;
 
@@ -27,23 +66,18 @@ export async function GET(request) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
 
-
-
     const client = await pool.connect();
-    console.log("made it here ")
+
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
     const userZIPResult = await client.query(userZipQuery, [userId]);
 
     if (userZIPResult.rowCount === 0) {
       client.release();
-      return NextResponse.json({ error: "User not found" ,
-        redirect: "/",
-        bannerText: "Please sign in",
-        code: "error"}, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const userZip = userZIPResult.rows[0].zip;
-    
+
     if (!userZip) {
       client.release();
       return NextResponse.json(
@@ -57,6 +91,8 @@ export async function GET(request) {
       );
     }
 
+    const userCoordinates = await getCoordinatesFromZip(userZip);
+
     const userQuery = `
       SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
       FROM users
@@ -67,12 +103,13 @@ export async function GET(request) {
     if (userResult.rows.length === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    console.log("made it here 2")
+
     const user = userResult.rows[0];
 
     const userEventsQuery = `
-      SELECT e.*
+      SELECT e.*, g.geolocation
       FROM events e
+      LEFT JOIN gardens g ON e.garden_id = g.id
       WHERE e.id IN (
           SELECT event_id FROM event_invitations WHERE user_id = $1
       )
@@ -81,7 +118,20 @@ export async function GET(request) {
       )
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId]);
-    console.log("made it here 3")
+
+    // Calculate distance for each event
+    for (let event of userEventsResult.rows) {
+      if (event.geolocation) {
+        const gardenCoordinates = {
+          latitude: parseFloat(event.geolocation.y),
+          longitude: parseFloat(event.geolocation.x)
+        };
+        event.distance = haversineDistance(userCoordinates, gardenCoordinates);
+      } else {
+        event.distance = null;
+      }
+    }
+
     const groupsQuery =
       user.role === "admin"
         ? `
@@ -116,7 +166,7 @@ export async function GET(request) {
         GROUP BY g.id, gm.role
       `;
     const groupsResult = await client.query(groupsQuery, [userId]);
-    console.log("made it here 4")
+
     const invitesQuery = `
       SELECT g.id, g.name, g.description, g.location, gi.status
       FROM groups g
@@ -131,7 +181,7 @@ export async function GET(request) {
       WHERE gp.user_id = $1
     `;
     const plotsResult = await client.query(plotsQuery, [userId]);
-    console.log("made it here 5")
+
     for (let group of groupsResult.rows) {
       group.city = await getCityFromZip(group.location);
     }
@@ -139,7 +189,7 @@ export async function GET(request) {
     for (let invite of invitesResult.rows) {
       invite.city = await getCityFromZip(invite.location);
     }
-    console.log("made it here 6")
+
     client.release();
 
     return NextResponse.json({
