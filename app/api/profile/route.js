@@ -42,15 +42,18 @@ export async function GET(request) {
     const user = userResult.rows[0];
 
     const userEventsQuery = `
-      SELECT e.*, ST_DistanceSphere(
+      SELECT e.*, 
+      gp.longitude, gp.latitude, 
+      (SELECT ST_DistanceSphere(
         point(gp.longitude, gp.latitude),
         point(u.longitude, u.latitude)
-      ) / 1609.34 as distance
+      ) / 1609.34 FROM users u WHERE u.id = $1) as distance
       FROM events e
       LEFT JOIN garden_plots gp ON e.plot_id = gp.id
-      LEFT JOIN users u ON e.user_id = u.id
       WHERE e.user_id = $1 OR e.id IN (
         SELECT event_id FROM event_invitations WHERE user_id = $1
+      ) OR e.id IN (
+        SELECT event_id FROM event_registrations WHERE user_id = $1
       )
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId]);

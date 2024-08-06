@@ -118,7 +118,7 @@ export const BasicProvider = ({ children }) => {
         setMessage("Error fetching profile data");
       }
     };
-    if (isAuthenticated) {
+    if (isAuthenticated && token) {
       fetchProfileData();
     }
   }, [isAuthenticated, token]);
