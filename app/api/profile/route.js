@@ -100,20 +100,6 @@ console.log(userCoordinates.longitude, userCoordinates.latitude)
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId, userCoordinates.longitude, userCoordinates.latitude]);
 
-    // // Calculate distance for each event
-    // for (let event of userEventsResult.rows) {
-    //   if (event.geolocation) {
-    //     console.log("geolocation", event.geolocation)
-    //     const gardenCoordinates = {
-    //       latitude: parseFloat(event.geolocation.y),
-    //       longitude: parseFloat(event.geolocation.x)
-    //     };
-    //     console.log(gardenCoordinates, userCoordinates)
-    //     event.distance = haversineDistance(userCoordinates, gardenCoordinates);
-    //   } else {
-    //     event.distance = null;
-    //   }
-    // }
 
     const groupsQuery =
       user.role === "admin"
