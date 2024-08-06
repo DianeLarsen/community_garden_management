@@ -41,11 +41,22 @@ export async function GET(request) {
 
     const user = userResult.rows[0];
 
-    let groupsQuery;
-    let groupsResult;
+    const userEventsQuery = `
+      SELECT e.*, ST_DistanceSphere(
+        point(gp.longitude, gp.latitude),
+        point(u.longitude, u.latitude)
+      ) / 1609.34 as distance
+      FROM events e
+      LEFT JOIN garden_plots gp ON e.plot_id = gp.id
+      LEFT JOIN users u ON e.user_id = u.id
+      WHERE e.user_id = $1 OR e.id IN (
+        SELECT event_id FROM event_invitations WHERE user_id = $1
+      )
+    `;
+    const userEventsResult = await client.query(userEventsQuery, [userId]);
 
-    if (user.role === 'admin') {
-      groupsQuery = `
+    const groupsQuery = user.role === 'admin'
+      ? `
         SELECT 
           g.id, g.name, g.description, g.location, g.accepting_members,
           (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count,
@@ -59,10 +70,8 @@ export async function GET(request) {
         LEFT JOIN users iu ON gi.user_id = iu.id
         LEFT JOIN garden_plots gp ON g.id = gp.group_id
         GROUP BY g.id
-      `;
-      groupsResult = await client.query(groupsQuery);
-    } else {
-      groupsQuery = `
+      `
+      : `
         SELECT 
           g.id, g.name, g.description, g.location, gm.role, g.accepting_members,
           (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count,
@@ -78,8 +87,7 @@ export async function GET(request) {
         WHERE gm.user_id = $1
         GROUP BY g.id, gm.role
       `;
-      groupsResult = await client.query(groupsQuery, [userId]);
-    }
+    const groupsResult = await client.query(groupsQuery, [userId]);
 
     const invitesQuery = `
       SELECT g.id, g.name, g.description, g.location, gi.status
@@ -106,12 +114,13 @@ export async function GET(request) {
 
     client.release();
 
-    return NextResponse.json({ profile: user, groups: groupsResult.rows, invites: invitesResult.rows, plots: plotsResult.rows });
+    return NextResponse.json({ profile: user, groups: groupsResult.rows, invites: invitesResult.rows, plots: plotsResult.rows, events: userEventsResult.rows });
   } catch (error) {
     console.error('Error fetching profile:', error);
     return NextResponse.json({ error: 'Error fetching profile' }, { status: 500 });
   }
 }
+
 
 
 
