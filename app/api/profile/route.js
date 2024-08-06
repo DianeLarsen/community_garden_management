@@ -18,6 +18,7 @@ async function getCityFromZip(zip) {
 
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;
+  console.log("token", token)
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -31,7 +32,10 @@ export async function GET(request) {
 
     if (userZIPResult.rowCount === 0) {
       client.release();
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "User not found" ,
+        redirect: "/",
+        bannerText: "Please sign in",
+        code: "error"}, { status: 404 });
     }
 
     const userZip = userZIPResult.rows[0].zip;
