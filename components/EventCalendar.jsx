@@ -20,8 +20,6 @@ const EventCalendar = () => {
     handleNextMonth,
     handlePrevMonth,
     currentDate,
-    selectedGarden,
-    setSelectedGarden,
     selectedGroup,
     setSelectedGroup,
     distance,
@@ -33,11 +31,9 @@ const EventCalendar = () => {
     loading,
     setLoading,
     showBanner,
-    groups,
     token,
     allGroups,
     userGroups,
-    userGardens,
   } = useContext(BasicContext);
 
   const router = useRouter();
@@ -92,9 +88,7 @@ const EventCalendar = () => {
     setSelectedGroup(e.target.value);
   };
 
-  const handleGardenChange = (e) => {
-    setSelectedGarden(e.target.value);
-  };
+
 
   const handleEventViewChange = (e) => {
     setEventView(e.target.value);

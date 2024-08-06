@@ -86,6 +86,7 @@ export const BasicProvider = ({ children }) => {
     checkToken();
   }, [router]);
 
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -96,7 +97,7 @@ export const BasicProvider = ({ children }) => {
           },
         });
         const data = await response.json();
-
+        console.log(data)
         if (response.ok) {
           setUser(data.profile);
 
