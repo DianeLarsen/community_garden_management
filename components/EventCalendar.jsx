@@ -160,8 +160,8 @@ const EventCalendar = () => {
             className="ml-2 p-1 border rounded border-gray-300"
           >
             <option value="">All</option>
-            {groups &&
-              groups.map((group) => (
+            {userGroups &&
+              userGroups.map((group) => (
                 <option key={group.id} value={group.id}>
                   {group.name}
                 </option>
@@ -169,7 +169,7 @@ const EventCalendar = () => {
           </select>
         </label>
 
-        <label>
+        {/* <label>
           Garden:
           <select
             value={selectedGarden}
@@ -184,7 +184,7 @@ const EventCalendar = () => {
                 </option>
               ))}
           </select>
-        </label>
+        </label> */}
 
         <label>
           Show Events:
