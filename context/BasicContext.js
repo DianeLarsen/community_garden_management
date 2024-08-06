@@ -98,6 +98,7 @@ export const BasicProvider = ({ children }) => {
         });
         const data = await response.json();
         console.log(data)
+        
         if (response.ok) {
           setUser(data.profile);
 
@@ -112,6 +113,7 @@ export const BasicProvider = ({ children }) => {
           setUserInvites(data.invites);
           setUserPlots(data.plots);
         } else {
+          showBanner(data.error, "error");
           setMessage(data.error);
         }
       } catch (error) {
