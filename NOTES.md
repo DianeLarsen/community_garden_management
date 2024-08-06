@@ -65,13 +65,11 @@ git commit -m "Prepare for deployment"
 git push heroku main
 
 
-SELECT e.*, 
-      g.location AS plot_location, 
-      ST_Distance(g.geolocation, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) AS distance
-      FROM events e
-      LEFT JOIN gardens g ON e.garden_id = g.id
-      WHERE e.user_id = 1 OR e.id IN (
-        SELECT event_id FROM event_invitations WHERE user_id = 1
-      ) OR e.id IN (
-        SELECT event_id FROM event_registrations WHERE user_id = 1
-      );
+SELECT e.*
+FROM events e
+WHERE e.id IN (
+    SELECT event_id FROM event_invitations WHERE user_id = 1
+)
+OR e.id IN (
+    SELECT event_id FROM event_registrations WHERE user_id = 1
+);

@@ -29,12 +29,12 @@ export async function GET(request) {
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
     const userZIPResult = await client.query(userZipQuery, [userId]);
 
-    if (userResult.rowCount === 0) {
+    if (userZIPResult.rowCount === 0) {
       client.release();
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const userZip = userResult.rows[0].zip;
+    const userZip = userZIPResult.rows[0].zip;
 
     if (!userZip) {
       client.release();
@@ -66,14 +66,14 @@ export async function GET(request) {
     const user = userResult.rows[0];
 
     const userEventsQuery = `
-SELECT e.*
-FROM events e
-WHERE e.id IN (
-    SELECT event_id FROM event_invitations WHERE user_id = $1
-)
-OR e.id IN (
-    SELECT event_id FROM event_registrations WHERE user_id = $1
-)
+      SELECT e.*
+      FROM events e
+      WHERE e.id IN (
+          SELECT event_id FROM event_invitations WHERE user_id = $1
+      )
+      OR e.id IN (
+          SELECT event_id FROM event_registrations WHERE user_id = $1
+      )
     `;
     const userEventsResult = await client.query(userEventsQuery, [userId]);
 
