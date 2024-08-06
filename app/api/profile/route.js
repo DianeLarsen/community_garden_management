@@ -26,6 +26,10 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
+
+
+
+    const client = await pool.connect();
     console.log("made it here ")
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
     const userZIPResult = await client.query(userZipQuery, [userId]);
@@ -55,7 +59,7 @@ export async function GET(request) {
 
     ({ lat, lon } = await getLatLonFromZipCode(userZip));
     console.log("made it here 1")
-    const client = await pool.connect();
+    
 
     const userQuery = `
       SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
