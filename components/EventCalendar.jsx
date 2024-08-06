@@ -83,7 +83,9 @@ const EventCalendar = () => {
 
   const handleDistanceChange = (e) => {
     setDistance(e.target.value);
-    router.refresh();
+    if (eventView !== "myEvents" && eventView !== "all") {
+      router.refresh();
+    }
   };
 
   const handleGroupChange = (e) => {
@@ -96,6 +98,9 @@ const EventCalendar = () => {
 
   const handleEventViewChange = (e) => {
     setEventView(e.target.value);
+    if (e.target.value === "myEvents" || e.target.value === "all") {
+      setDistance("100"); // Reset distance for myEvents and allEvents
+    }
   };
 
   const formatTime = (date) => {
@@ -143,6 +148,7 @@ const EventCalendar = () => {
             value={distance}
             onChange={handleDistanceChange}
             className="ml-2 p-1 border rounded border-gray-300"
+            disabled={eventView === "myEvents" || eventView === "all"}
           >
             <option value="5">5 miles</option>
             <option value="10">10 miles</option>
@@ -168,23 +174,6 @@ const EventCalendar = () => {
               ))}
           </select>
         </label>
-
-        {/* <label>
-          Garden:
-          <select
-            value={selectedGarden}
-            onChange={handleGardenChange}
-            className="ml-2 p-1 border rounded border-gray-300"
-          >
-            <option value="">All</option>
-            {userGardens &&
-              userGardens.map((garden) => (
-                <option key={garden.id} value={garden.id}>
-                  {garden.name}
-                </option>
-              ))}
-          </select>
-        </label> */}
 
         <label>
           Show Events:
@@ -267,6 +256,9 @@ const EventCalendar = () => {
                           statusText = " (requires attention)";
                         }
                       }
+                      const distanceText = `${event.distance} miles`;
+                      const adminText =
+                        event.user_id === user.id ? " (admin)" : "";
                       return (
                         <Link
                           href={`/events/${event.id}`}
@@ -285,12 +277,13 @@ const EventCalendar = () => {
                           }`}
                         >
                           <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
-                            {event.name} {statusText}
+                            {event.name} {statusText} - {distanceText}
+                            {adminText}
                           </h3>
                           <p className="text-xs sm:text-xs md:text-xs lg:text-sm">
                             {formatTime(event.start_date)} to{" "}
                             {formatTime(event.end_date)}
-                          </p>
+                            </p>
                         </Link>
                       );
                     })}
@@ -324,6 +317,9 @@ const EventCalendar = () => {
                     statusText = " (requires attention)";
                   }
                 }
+                const distanceText = `${event.distance} miles`;
+                const adminText =
+                  event.user_id === user.id ? " (admin)" : "";
                 return (
                   <li key={event.id} className="mb-2">
                     <Link
@@ -337,7 +333,7 @@ const EventCalendar = () => {
                           : ""
                       }`}
                     >
-                      {event.name} {statusText} -{" "}
+                      {event.name} {statusText} - {distanceText} {adminText} -{" "}
                       {new Date(event.start_date).toLocaleDateString()}
                     </Link>
                   </li>
@@ -351,3 +347,4 @@ const EventCalendar = () => {
 };
 
 export default EventCalendar;
+
