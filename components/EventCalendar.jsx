@@ -300,7 +300,7 @@ const EventCalendar = () => {
         </div>
       ) : (
         <ul className="list-disc pl-5">
-          {(!eventsToDisplay || eventsToDisplay.length === 0) ? (
+          {!eventsToDisplay || eventsToDisplay.length === 0 ? (
             <p>
               No events listed within {distance} miles, {selectedGroup}
             </p>
@@ -308,8 +308,9 @@ const EventCalendar = () => {
             eventsToDisplay
               .filter(
                 (event) =>
-                  (event.is_public ||
-                allGroups) && allGroups.some((group) => group.id === event.group_id)
+                  event.is_public ||
+                  (allGroups &&
+                    allGroups.some((group) => group.id === event.group_id))
               )
               .map((event) => {
                 const inviteStatus = userInvites.find(
@@ -328,7 +329,8 @@ const EventCalendar = () => {
                     <Link
                       href={`/events/${event.id}`}
                       className={`text-blue-500 hover:underline ${
-                        userEvents && userEvents.some(
+                        userEvents &&
+                        userEvents.some(
                           (userEvent) => userEvent.id === event.id
                         )
                           ? "font-bold"
