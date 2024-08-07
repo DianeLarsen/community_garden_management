@@ -124,13 +124,13 @@ console.log(filteredPlots)
                     {plot.length}X{plot.width}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {plot.garden_name}
+                    {plot.name}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {plot.end_date ? calculateRemainingTime(plot.end_date) : "Available"}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {!plot.end_date && (
+                    {plot.user_id == null && (
                       <Link
                         href={`/plots/${plot.id}`}
                         className="text-blue-600 ml-4"
@@ -145,7 +145,7 @@ console.log(filteredPlots)
                         onClick={() => handleRemovePlot(plot.id)}
                         className="text-red-600 ml-4"
                       >
-                        Remove
+                        Cancel 
                       </button>
                     )}
                   </td>
