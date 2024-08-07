@@ -12,7 +12,7 @@ const securityHeaders = [
       font-src 'self';
       object-src 'none';
       frame-ancestors 'none';
-    `,
+    `.replace(/\n/g, ''),
   },
   {
     key: 'Strict-Transport-Security',
