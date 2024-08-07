@@ -113,7 +113,7 @@ export const BasicProvider = ({ children }) => {
           setGardenGroups(data.groups);
           setGardenEvents(data.events);
           setGardenPlotReservations(data.reservations);
-          setGardenPlots(data.invites);
+          setGardenPlots(data.plots);
         } else {
           showBanner(
             data.error || data.banner.text,
