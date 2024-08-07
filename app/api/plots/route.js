@@ -11,7 +11,7 @@ export async function GET(request) {
   const startDate = searchParams.get("start_date");
   const endDate = searchParams.get("end_date");
   const user_id = searchParams.get("user_id") || null;
-// console.log(user_id)
+console.log("Made it here plots")
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

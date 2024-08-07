@@ -46,6 +46,7 @@ export default function GardenMap({
   };
   const [zoom, setZoom] = useState(defaultZoom);
   const positionRef = useRef(defaultCenter);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   if (garden[0]) {
     positionRef.current = { lat: garden[0].lat, lng: garden[0].lon };
@@ -57,8 +58,13 @@ export default function GardenMap({
     }
   }, [garden]);
 
+  const handleMapLoad = () => {
+    setLoading(false); // Set loading to false when the map loads
+  };
+
   return (
     <div style={containerStyle}>
+      {loading && <p>Loading Maps...</p>}
       <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
         <GardenContext.Provider value={value}>
           <Map
@@ -67,6 +73,7 @@ export default function GardenMap({
             zoom={zoom}
             fullscreenControl={false}
             gestureHandling={"greedy"}
+            onLoad={handleMapLoad} // Add onLoad handler
             onZoomChanged={ev => setZoom(ev.detail.zoom)}
           >
             <AdvancedMarker
