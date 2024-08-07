@@ -96,7 +96,7 @@ export const BasicProvider = ({ children }) => {
   useEffect(() => {
     const fetchGardenData = async () => {
       try {
-        const response = await fetch("/api/garden", {
+        const response = await fetch(`/api/gardens/${gardenId}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
