@@ -51,7 +51,12 @@ export async function GET(request) {
     console.log("Made it here plots 1")
     if (userInfo && userRole !== "admin") {
       plotQuery += ` AND gp.user_id = $${index}`;
-      values.push(user_id || userId);
+      if (user_id){
+        values.push(user_id)
+      } else {
+        values.push(userId);
+      }
+      
       index++;
     } else if (userRole === "admin") {
       plotQuery += ` AND u.role = 'event_admin'`;
@@ -79,7 +84,8 @@ export async function GET(request) {
       `;
       values.push(endDate, startDate);
     }
-    console.log("Made it here plots 2 ")
+    console.log(values)
+    console.log(plotQuery)
     const plotResult = await client.query(plotQuery, values);
 
     client.release();
