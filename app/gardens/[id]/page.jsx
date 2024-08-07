@@ -54,32 +54,32 @@ const GardenDetails = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="mb-6 p-4 bg-white shadow-md rounded">
-        <h1 className="text-2xl font-bold mb-4">{garden[0].name}</h1>
-        <p>{garden[0].description}</p>
-        {garden[0].links && (
+        <h1 className="text-2xl font-bold mb-4">{garden.name}</h1>
+        <p>{garden.description}</p>
+        {garden.links && (
           <p>
             Website:{" "}
             <a
-              href={garden[0].links[0]}
+              href={garden.links[0]}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 underline"
             >
-              {garden[0].links[0]}
+              {garden.links[0]}
             </a>
           </p>
         )}
-        {garden[0].contacts && garden[0].contacts.length > 0 && (
+        {garden.contacts && garden.contacts.length > 0 && (
           <div className="mt-4">
             <h2 className="text-xl font-bold mb-2">Contacts</h2>
-            {garden[0].contacts.map((contact, index) => (
+            {garden.contacts.map((contact, index) => (
               <p key={index}>
                 {contact.name}: {contact.email}
               </p>
             ))}
           </div>
         )}
-        {garden[0].address && <p>Address: {garden[0].address}</p>}
+        {garden.address && <p>Address: {garden.address}</p>}
       </div>
 
       <div className="mb-6 p-4 bg-white shadow-md rounded">
