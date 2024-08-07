@@ -48,13 +48,13 @@ export default function GardenMap({
   const positionRef = useRef(defaultCenter);
   const [loading, setLoading] = useState(true); // Add loading state
 
-  if (garden[0]) {
-    positionRef.current = { lat: garden[0].lat, lng: garden[0].lon };
+  if (garden) {
+    positionRef.current = { lat: garden.lat, lng: garden.lon };
   }
 
   useEffect(() => {
-    if (garden[0]) {
-      positionRef.current = { lat: garden[0].lat, lng: garden[0].lon };
+    if (garden) {
+      positionRef.current = { lat: garden.lat, lng: garden.lon };
     }
   }, [garden]);
 
@@ -77,11 +77,11 @@ export default function GardenMap({
             onZoomChanged={ev => setZoom(ev.detail.zoom)}
           >
             <AdvancedMarker
-              position={{ lat: garden[0].lat, lng: garden[0].lon }}
-              title={garden[0].name}
+              position={{ lat: garden.lat, lng: garden.lon }}
+              title={garden.name}
               icon="https://res.cloudinary.com/dqjh46sk5/image/upload/c_pad,w_40,h_40,ar_1:1/v1719377237/garden_fegyyk.png"
             >
-              {garden[0].name}
+              {garden.name}
             </AdvancedMarker>
             <Directions />
           </Map>
@@ -119,8 +119,8 @@ function Directions() {
   }, [routesLibrary, map]);
 
   useEffect(() => {
-    if (!directionsService || !directionsRenderer || !garden[0] || !directionAddress) return;
-    const destinationLatLon = { lat: garden[0].lat, lng: garden[0].lon }; // Use garden data for destination
+    if (!directionsService || !directionsRenderer || !garden || !directionAddress) return;
+    const destinationLatLon = { lat: garden.lat, lng: garden.lon }; // Use garden data for destination
 
     directionsService
       .route({
@@ -133,7 +133,7 @@ function Directions() {
         directionsRenderer.setDirections(response);
         setRoutes(response.routes);
         const bounds = new google.maps.LatLngBounds();
-        bounds.extend(new google.maps.LatLng(garden[0].lat, garden[0].lon));
+        bounds.extend(new google.maps.LatLng(garden.lat, garden.lon));
         bounds.extend(new google.maps.LatLng(response.routes[0].legs[0].start_location.lat(), response.routes[0].legs[0].start_location.lng()));
         map.fitBounds(bounds);
       });
