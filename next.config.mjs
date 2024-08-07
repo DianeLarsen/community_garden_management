@@ -4,17 +4,14 @@ const securityHeaders = [
   {
     key: 'Content-Security-Policy',
     value: `
-      default-src 'self'; 
-      img-src 'self' https://res.cloudinary.com https://*.googleapis.com https://*.gstatic.com *.google.com *.googleusercontent.com data:; 
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://upload-widget.cloudinary.com https://*.googleapis.com https://*.gstatic.com *.google.com https://*.ggpht.com *.googleusercontent.com blob:;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      connect-src 'self' https://*.googleapis.com *.google.com https://*.gstatic.com data: blob:;
-      object-src 'none'; 
-      frame-ancestors 'none'; 
-      font-src https://fonts.gstatic.com;
-      base-uri 'self'; 
-      frame-src 'self' https://upload-widget.cloudinary.com *.google.com;
-      worker-src blob:;
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://upload-widget.cloudinary.com https://maps.googleapis.com;
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https://res.cloudinary.com;
+      connect-src 'self';
+      font-src 'self';
+      object-src 'none';
+      frame-ancestors 'none';
     `,
   },
   {
