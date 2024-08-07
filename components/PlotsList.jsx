@@ -23,12 +23,12 @@ const PlotsList = ({
 console.log(filteredPlots)
   useEffect(() => {
     setLoading(true);
-    const result = filterPlots(plots, { groupId, gardenId, userInfo, startDate, endDate });
-    setFilteredPlots(result);
+    // const result = filterPlots(plots, { groupId, gardenId, userInfo, startDate, endDate });
+    // setFilteredPlots(result);
     setLoading(false);
 
     const legend = {};
-    result.forEach((plot) => {
+    plots.forEach((plot) => {
       if (plot.group_id && !legend[plot.group_id]) {
         legend[plot.group_id] = plot.group_name;
       }
@@ -56,7 +56,7 @@ console.log(filteredPlots)
     return plots.filter((plot) => {
       if (groupId && plot.group_id !== groupId) return false;
       if (gardenId && plot.garden_id !== gardenId) return false;
-      if (userInfo && plot.user_info !== userInfo) return false;
+      if (userInfo && plot.user_id !== userInfo) return false;
       if (startDate && new Date(plot.start_date) < new Date(startDate)) return false;
       if (endDate && new Date(plot.end_date) > new Date(endDate)) return false;
       return true;
@@ -106,7 +106,7 @@ console.log(filteredPlots)
       </div>
       {loading ? (
         <div>Loading...</div>
-      ) : filteredPlots.length > 0 ? (
+      ) : plots.length > 0 ? (
         <>
           <table className="w-full table-auto border-collapse">
             <thead>
@@ -118,7 +118,7 @@ console.log(filteredPlots)
               </tr>
             </thead>
             <tbody>
-              {filteredPlots.map((plot) => (
+              {plots.map((plot) => (
                 <tr key={plot.id}>
                   <td className="border px-4 py-2 text-center">
                     {plot.length}X{plot.width}
