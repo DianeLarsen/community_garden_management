@@ -31,10 +31,10 @@ const UserPlotsList = ({
   const [filter, setFilter] = useState("current");
 
   useEffect(() => {
-    if (!user.id && !plots) {
+    if (!user.id) {
       setLoading(true);
     }
-  }, [user?.id, plots]);
+  }, [user]);
 
   useEffect(() => {
     setLoading(true);
@@ -52,6 +52,7 @@ const UserPlotsList = ({
         (a, b) => new Date(a.end_date) - new Date(b.end_date)
       );
       setPlots(filteredUserPlots);
+      
     }
 
     // Build group legend
@@ -66,7 +67,7 @@ const UserPlotsList = ({
     setLoading(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, userPlots]);
 
   const handleRemovePlot = async (plotId) => {
     try {

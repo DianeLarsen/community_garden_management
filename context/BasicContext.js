@@ -113,6 +113,7 @@ export const BasicProvider = ({ children }) => {
           } else {
             setIsAdmin(false);
           }
+          setGarden(data.garden)
           setGardenGroups(data.groups);
           setGardenEvents(data.events);
           setGardenPlotReservations(data.reservations);
