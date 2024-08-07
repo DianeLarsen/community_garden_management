@@ -9,7 +9,7 @@ const securityHeaders = [
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' https://res.cloudinary.com https://*.googleapis.com https://*.gstatic.com data:;
     connect-src 'self' https://maps.googleapis.com https://*.googleapis.com https://*.gstatic.com;
-    font-src  https://fonts.gstatic.com data:;
+    font-src 'self' https://fonts.gstatic.com data:;
     frame-src https://*.google.com;
     worker-src blob:;
   `.replace(/\n/g, ' '),
