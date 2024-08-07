@@ -105,8 +105,11 @@ function Directions() {
   const leg = selected?.legs[0];
 
   useEffect(() => {
-    let homeAddress = user.street_address + "," + user.city + "," + user.state + "," + user.zip;
-    setAddress(homeAddress);
+    if (user.id){
+      let homeAddress = user.street_address + "," + user.city + "," + user.state + "," + user.zip;
+
+      setAddress(homeAddress);
+    }
   }, [user]);
 
   useEffect(() => {

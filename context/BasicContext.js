@@ -299,7 +299,7 @@ export const BasicProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (isAuthenticated && user.zip) {
+    if (isAuthenticated && user?.zip) {
       fetchFilteredEvents();
     }
   }, [
