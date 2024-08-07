@@ -52,7 +52,16 @@ const PlotsList = ({
       return `${days} day${days !== 1 ? "s" : ""}`;
     }
   };
-
+  const filterPlots = (plots, { groupId, gardenId, userInfo, startDate, endDate }) => {
+    return plots.filter((plot) => {
+      if (groupId && plot.group_id !== groupId) return false;
+      if (gardenId && plot.garden_id !== gardenId) return false;
+      if (userInfo && plot.user_info !== userInfo) return false;
+      if (startDate && new Date(plot.start_date) < new Date(startDate)) return false;
+      if (endDate && new Date(plot.end_date) > new Date(endDate)) return false;
+      return true;
+    });
+  };
   const formatDate = (date) => {
     const options = { month: "short", day: "numeric" };
     const formattedDate = new Date(date).toLocaleDateString("en-US", options);
