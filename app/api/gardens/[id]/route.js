@@ -37,7 +37,7 @@ export async function GET(request, { params }) {
     );
 
     const plotResult = await client.query(
-      `SELECT * FROM plots
+      `SELECT * FROM garden_plots
        WHERE garden_id = $1`,
       [id]
     );
