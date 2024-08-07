@@ -10,10 +10,10 @@ import CreateEvent from "@/components/CreateEvent";
 
 const GardenDetails = () => {
   const { id } = useParams();
-  const [garden, setGarden] = useState(null);
+
   const [error, setError] = useState("");
   const [directionAddress, setDirectionAddress] = useState("");
-  const { user, groups, setGardenId, gardenGroups, gardenEvents, gardenPlotReservations, gardenPlots } = useContext(BasicContext);
+  const { user, groups, setGardenId, gardenGroups, gardenEvents, gardenPlotReservations, gardenPlots, garden } = useContext(BasicContext);
   const [showDirections, setShowDirections] = useState(false);
   const [newPlot, setNewPlot] = useState({
     location: "",
