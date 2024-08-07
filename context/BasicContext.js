@@ -106,13 +106,9 @@ export const BasicProvider = ({ children }) => {
         // console.log(data)
 
         if (response.ok) {
-          setUser(data.profile);
 
-          if (data.profile.role === "admin") {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
+
+          console.log(data)
           setGarden(data.garden)
           setGardenGroups(data.groups);
           setGardenEvents(data.events);

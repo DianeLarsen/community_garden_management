@@ -14,6 +14,7 @@ const GardenDetails = () => {
   const [error, setError] = useState("");
   const [directionAddress, setDirectionAddress] = useState("");
   const { user, groups, setGardenId, gardenGroups, gardenEvents, gardenPlotReservations, gardenPlots, garden } = useContext(BasicContext);
+  console.log(garden)
   const [showDirections, setShowDirections] = useState(false);
   const [newPlot, setNewPlot] = useState({
     location: "",
