@@ -62,6 +62,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       garden,
+      plots: plotResult.rows,
       groups: groupResult.rows,
       events: eventResult.rows,
       reservations: reservationResult.rows,
