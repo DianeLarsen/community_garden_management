@@ -5,9 +5,9 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: `
       default-src 'self'; 
-      img-src 'self' https://res.cloudinary.com  https://maps.gstatic.com; 
+      img-src 'self' https://res.cloudinary.com; 
       script-src 'self' 'unsafe-inline' https://upload-widget.cloudinary.com https://maps.googleapis.com;
-      style-src 'self' 'unsafe-inline'; 
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
       object-src 'none'; 
       frame-ancestors 'none'; 
       base-uri 'self'; 
