@@ -5,7 +5,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: `
     default-src 'self';
-    script-src 'self' https://upload-widget.cloudinary.com https://maps.googleapis.com https://*.googleapis.com;
+    script-src 'nonce-{script value}' 'strict-dynamic' https: 'unsafe-eval' blob: https://upload-widget.cloudinary.com https://maps.googleapis.com https://*.googleapis.com;
     style-src 'self' https://fonts.googleapis.com;
     img-src 'self' https://res.cloudinary.com https://*.googleapis.com https://*.gstatic.com data:;
     connect-src 'self' https://maps.googleapis.com https://*.googleapis.com https://*.gstatic.com;
