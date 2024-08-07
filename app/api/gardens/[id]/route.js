@@ -36,6 +36,12 @@ export async function GET(request, { params }) {
       [id]
     );
 
+    const plotResult = await client.query(
+      `SELECT * FROM plots
+       WHERE garden_id = $1`,
+      [id]
+    );
+
     const reservationResult = await client.query(
       `SELECT ph.id, ph.plot_id, ph.user_id, ph.group_id, ph.reserved_at, ph.reserved_until, ph.purpose
        FROM plot_history ph
