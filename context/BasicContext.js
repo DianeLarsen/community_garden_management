@@ -11,10 +11,15 @@ export const BasicProvider = ({ children }) => {
   const [plot, setPlot] = useState(null);
   const [error, setError] = useState("");
   const [garden, setGarden] = useState(null);
+  const [gardenId, setGardenId] = useState(null);
   const [gardenPlots, setGardenPlots] = useState([]);
   const [gardens, setGardens] = useState([]);
   const [history, setHistory] = useState([]);
+  const [gardenGroups, setGardenGroups] = useState([]);
+  const [gardenEvents, setGardenEvents] = useState([]);
+  const [gardenPlotReservations, setGardenPlotReservations] = useState([]);
   const [allGroups, setAllGroups] = useState([]);
+  const [allPlots, setAllPlots] = useState([]);
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
   const [userPlots, setUserPlots] = useState([]);
@@ -28,7 +33,7 @@ export const BasicProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [group, setGroup] = useState("");
   const [events, setEvents] = useState([]);
-  const [allEvents, setAllEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]); // Added state for all events
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState("");
@@ -87,7 +92,49 @@ export const BasicProvider = ({ children }) => {
     checkToken();
   }, [router]);
 
-  // Profile data
+  // fetch garden details and info
+  useEffect(() => {
+    const fetchGardenData = async () => {
+      try {
+        const response = await fetch("/api/garden", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        // console.log(data)
+
+        if (response.ok) {
+          setUser(data.profile);
+
+          if (data.profile.role === "admin") {
+            setIsAdmin(true);
+          } else {
+            setIsAdmin(false);
+          }
+          setGardenGroups(data.groups);
+          setGardenEvents(data.events);
+          setGardenPlotReservations(data.reservations);
+          setGardenPlots(data.invites);
+        } else {
+          showBanner(
+            data.error || data.banner.text,
+            data.code || "error",
+            data.redirect || ""
+          );
+          setMessage(data.error);
+        }
+      } catch (error) {
+        setMessage("Error fetching profile data");
+      }
+    };
+    if (isAuthenticated && token && gardenId) {
+      fetchGardenData();
+    }
+  }, [isAuthenticated, token, gardenId]);
+
+  // profile data
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -98,6 +145,7 @@ export const BasicProvider = ({ children }) => {
           },
         });
         const data = await response.json();
+        // console.log(data)
 
         if (response.ok) {
           setUser(data.profile);
@@ -113,7 +161,11 @@ export const BasicProvider = ({ children }) => {
           setUserInvites(data.invites);
           setUserPlots(data.plots);
         } else {
-          showBanner(data.error || data.banner.text, data.code || "error", data.redirect || "");
+          showBanner(
+            data.error || data.banner.text,
+            data.code || "error",
+            data.redirect || ""
+          );
           setMessage(data.error);
         }
       } catch (error) {
@@ -125,7 +177,6 @@ export const BasicProvider = ({ children }) => {
     }
   }, [isAuthenticated, token]);
 
-  // Fetch all events
   useEffect(() => {
     const fetchAllEvents = async () => {
       try {
@@ -144,80 +195,50 @@ export const BasicProvider = ({ children }) => {
     if (isAuthenticated) fetchAllEvents();
   }, [isAuthenticated]);
 
-  // Fetch all groups
-  useEffect(() => {
-    const fetchAllGroups = async () => {
-      try {
-        const response = await fetch("/api/groups", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setAllGroups(data);
-        } else {
-          setError(data.error);
-        }
-      } catch (error) {
-        setError("Error fetching groups");
-      }
-    };
-    if (isAuthenticated && token) {
-      fetchAllGroups();
-    }
-  }, [isAuthenticated, token]);
 
-  // Fetch all gardens
   useEffect(() => {
-    const fetchAllGardens = async () => {
+    const fetchAllPlots = async () => {
       try {
-        const response = await fetch(`/api/gardens?maxDistance=${maxDistance}&limit=${limit}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch("/api/plots");
         const data = await response.json();
         if (response.ok) {
-          setGardens(data);
+          setAllPlots(data);
         } else {
           setError(data.error);
         }
-      } catch (error) {
-        setError("Error fetching gardens");
+      } catch (err) {
+        setError("Failed to fetch all events.");
       }
     };
-    if (isAuthenticated && token) {
-      fetchAllGardens();
-    }
-  }, [isAuthenticated, token]);
 
-  // Fetch reserved plots
+    if (isAuthenticated) fetchAllPlots();
+  }, [isAuthenticated]); 
+
   useEffect(() => {
-    const fetchReservedPlots = async () => {
-      try {
-        const response = await fetch(`/api/reserved-plots?groupId=${selectedGroup}&userId=${selectedUser}&days=${selectedDays}&gardenId=${selectedGarden}`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setUserPlots(data.plots);
-        } else {
-          setError(data.error);
-        }
-      } catch (error) {
-        setError("Error fetching reserved plots");
+    let timer;
+    if (banner.type === "success") {
+      timer = setTimeout(() => {
+        setBanner({ message: "", type: "", link: null });
+      }, 5000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [banner]);
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      if (banner.type === "error") {
+        setBanner({ message: "", type: "", link: null });
       }
     };
-    if (isAuthenticated && token) {
-      fetchReservedPlots();
+    if (router && router.events) {
+      router.events.on("routeChangeStart", handleRouteChange);
+
+      return () => {
+        router.events.off("routeChangeStart", handleRouteChange);
+      };
     }
-  }, [isAuthenticated, token, selectedGroup, selectedUser, selectedDays, selectedGarden]);
+  }, [banner, router]);
 
   const showBanner = (message, type, link = null) => {
     setBanner({ message, type, link });
@@ -266,93 +287,96 @@ export const BasicProvider = ({ children }) => {
         const isUserAuthorized =
           event.is_public || event.group_id === user.group_id;
 
-          return isEventInCurrentMonth && isEventRelevant && isUserAuthorized;
-        });
-  
-        setFilteredEvents(filtered);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-      }
-    };
-  
-    useEffect(() => {
-      if (isAuthenticated && user.zip) {
-        fetchFilteredEvents();
-      }
-    }, [
-      currentDate,
-      selectedGroup,
-      selectedGarden,
-      availablePlots,
-      distance,
-      user,
-      isAuthenticated,
-    ]);
-  
-    const handlePrevMonth = () => {
-      setCurrentDate(addMonths(currentDate, -1));
-    };
-  
-    const handleNextMonth = () => {
-      setCurrentDate(addMonths(currentDate, 1));
-    };
-  
-    const value = {
-      plot,
-      garden,
-      token,
-      history,
-      groups,
-      user,
-      setUser,
-      showBanner,
-      isAuthenticated,
-      setBanner,
-      setIsAuthenticated,
-      banner,
-      isAdmin,
-      groups,
-      message,
-      setMessage,
-      handleEventSearch,
-      group,
-      setGroup,
-      events,
-      allEvents,
-      handlePrevMonth,
-      handleNextMonth,
-      currentDate,
-      loading,
-      availablePlots,
-      setAvailablePlots,
-      selectedGarden,
-      setSelectedGarden,
-      selectedGroup,
-      setSelectedGroup,
-      distance,
-      setDistance,
-      filteredEvents,
-      setFilteredEvents,
-      isDropdownVisible,
-      setIsDropdownVisible,
-      groups,
-      users,
-      gardens,
-      allGroups,
-      invites,
-      setLoading,
-      setGroups,
-      userGroups,
-      userEvents,
-      userGardens,
-      userInvites,
-      userPlots,
-    };
-  
-    return (
-      <BasicContext.Provider value={value}>{children}</BasicContext.Provider>
-    );
+        return isEventInCurrentMonth && isEventRelevant && isUserAuthorized;
+      });
+
+      setFilteredEvents(filtered);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    }
   };
-  
-     
+
+  useEffect(() => {
+    if (isAuthenticated && user.zip) {
+      fetchFilteredEvents();
+    }
+  }, [
+    currentDate,
+    selectedGroup,
+    selectedGarden,
+    availablePlots,
+    distance,
+    user,
+    isAuthenticated,
+  ]);
+
+  const handlePrevMonth = () => {
+    setCurrentDate(addMonths(currentDate, -1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(addMonths(currentDate, 1));
+  };
+
+  const value = {
+    plot,
+    garden,
+    token,
+    history,
+    groups,
+    user,
+    setUser,
+    showBanner,
+    isAuthenticated,
+    setBanner,
+    setIsAuthenticated,
+    banner,
+    isAdmin,
+    groups,
+    message,
+    setMessage,
+    handleEventSearch,
+    group,
+    setGroup,
+    events,
+    allEvents,
+    handlePrevMonth,
+    handleNextMonth,
+    currentDate,
+    loading,
+    availablePlots,
+    setAvailablePlots,
+    selectedGarden,
+    setSelectedGarden,
+    selectedGroup,
+    setSelectedGroup,
+    distance,
+    setDistance,
+    filteredEvents,
+    setFilteredEvents,
+    isDropdownVisible,
+    setIsDropdownVisible,
+    groups,
+    users,
+    gardens,
+    allGroups,
+    invites,
+    setLoading,
+    setGroups,
+    userGroups,
+    userEvents,
+    userGardens,
+    userInvites,
+    userPlots,
+    setGardenId,
+    gardenGroups,
+    gardenEvents,
+    gardenPlotReservations,
+    gardenPlots,
+  };
+
+  return (
+    <BasicContext.Provider value={value}>{children}</BasicContext.Provider>
+  );
+};

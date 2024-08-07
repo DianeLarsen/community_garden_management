@@ -12,9 +12,8 @@ const GardenDetails = () => {
   const { id } = useParams();
   const [garden, setGarden] = useState(null);
   const [error, setError] = useState("");
-  const [gardenGroups, setGardenGroups] = useState([]);
   const [directionAddress, setDirectionAddress] = useState("");
-  const { user, groups, setGroups } = useContext(BasicContext);
+  const { user, groups, setGardenId, gardenGroups, gardenEvents, gardenPlotReservations, gardenPlots } = useContext(BasicContext);
   const [showDirections, setShowDirections] = useState(false);
   const [newPlot, setNewPlot] = useState({
     location: "",
@@ -23,46 +22,12 @@ const GardenDetails = () => {
     user_id: "",
     group_id: "",
   });
-// console.log(groups)
-  // fetch gardens
-  useEffect(() => {
-    const fetchGarden = async () => {
-      try {
-        const response = await fetch(`/api/gardens/${id}`);
-        if (!response.ok) {
-          throw new Error("Error fetching garden details");
-        }
-        const data = await response.json();
-        setGarden(data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
 
-    if (id) {
-      fetchGarden();
-    }
+  useEffect(() => {
+    setGardenId(id)
   }, [id]);
 
-  // fetch groups using this garden
-  useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch(`/api/gardens/${id}/groups`);
-        if (!response.ok) {
-          throw new Error("Error fetching groups for this garden");
-        }
-        const data = await response.json();
-        setGardenGroups(data);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
 
-    if (id) {
-      fetchGroups();
-    }
-  }, [id]);
 
   const handleAddressChange = (e) => {
     setDirectionAddress(e.target.value);
@@ -178,6 +143,7 @@ const GardenDetails = () => {
         <h3 className="text-lg font-bold mb-4">Existing Plots</h3>
         <PlotsList
           setError={setError}
+          plots={gardenPlots}
           gardenId={id}
           message={"No Plots associated with this garden."}
         />
