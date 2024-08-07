@@ -5,11 +5,11 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://upload-widget.cloudinary.com https://maps.googleapis.com https://*.googleapis.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    script-src 'self' https://upload-widget.cloudinary.com https://maps.googleapis.com https://*.googleapis.com;
+    style-src 'self' https://fonts.googleapis.com;
     img-src 'self' https://res.cloudinary.com https://*.googleapis.com https://*.gstatic.com data:;
     connect-src 'self' https://maps.googleapis.com https://*.googleapis.com https://*.gstatic.com;
-    font-src https://fonts.gstatic.com https://community-garden-management-975d65cae5d8.herokuapp.com/_next/static/media/*;
+    font-src data: https://fonts.gstatic.com;
     frame-src https://*.google.com;
   `.replace(/\n/g, ' '),
   },
