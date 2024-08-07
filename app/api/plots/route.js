@@ -11,7 +11,7 @@ export async function GET(request) {
   const startDate = searchParams.get("start_date");
   const endDate = searchParams.get("end_date");
   const user_id = searchParams.get("user_id") || null;
-console.log("Made it here plots")
+
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -26,7 +26,7 @@ console.log("Made it here plots")
     }
 
     const client = await pool.connect();
-
+    console.log("Made it here plots")
     let plotQuery = `
       SELECT 
         gp.id, gp.length, gp.width, gp.garden_id, gp.user_id, gp.group_id, 
@@ -48,7 +48,7 @@ console.log("Made it here plots")
     `;
     const values = [];
     let index = 1;
-
+    console.log("Made it here plots 1")
     if (userInfo && userRole !== "admin") {
       plotQuery += ` AND gp.user_id = $${index}`;
       values.push(user_id || userId);
@@ -79,7 +79,7 @@ console.log("Made it here plots")
       `;
       values.push(endDate, startDate);
     }
-
+    console.log("Made it here plots 2 ")
     const plotResult = await client.query(plotQuery, values);
 
     client.release();
@@ -89,7 +89,7 @@ console.log("Made it here plots")
         message: "No plots found for the given criteria",
       });
     }
-
+    console.log("Made it here plots 3")
     return NextResponse.json(plotResult.rows);
   } catch (error) {
     console.error("Error fetching plots:", error);
