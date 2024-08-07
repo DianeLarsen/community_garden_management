@@ -9,7 +9,7 @@ const securityHeaders = [
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' https://res.cloudinary.com https://*.googleapis.com https://*.gstatic.com data:;
     connect-src 'self' https://maps.googleapis.com https://*.googleapis.com https://*.gstatic.com;
-    font-src https://fonts.gstatic.com;
+    font-src https://fonts.gstatic.com https://community-garden-management-975d65cae5d8.herokuapp.com/_next/static/media;
     frame-src https://*.google.com;
   `.replace(/\n/g, ' '),
   },
