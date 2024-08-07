@@ -20,7 +20,7 @@ const PlotsList = ({
   const [groupLegend, setGroupLegend] = useState({});
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
+console.log(plots)
   useEffect(() => {
     setLoading(true);
     const result = filterPlots(plots, { groupId, gardenId, userInfo, startDate, endDate });
