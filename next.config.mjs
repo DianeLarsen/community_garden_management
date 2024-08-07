@@ -3,16 +3,20 @@
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
-    value: `
-      default-src 'self';
-      script-src 'self' 'unsafe-inline' https://upload-widget.cloudinary.com;
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data: https://res.cloudinary.com;
-      connect-src 'self';
-      font-src 'self';
-      object-src 'none';
-      frame-ancestors 'none';
-    `.replace(/\n/g, ''),
+    value: (req, res) => {
+      const scriptNonce = crypto.randomBytes(16).toString('base64');
+      const styleNonce = crypto.randomBytes(16).toString('base64');
+      res.setHeader('script-nonce', scriptNonce);
+      res.setHeader('style-nonce', styleNonce);
+      return `
+        script-src 'nonce-${scriptNonce}' 'strict-dynamic' https: 'unsafe-eval' blob:;
+        img-src 'self' https://*.googleapis.com https://*.gstatic.com *.google.com *.googleusercontent.com data:;
+        frame-src *.google.com;
+        connect-src 'self' https://*.googleapis.com *.google.com https://*.gstatic.com data: blob:;
+        font-src https://fonts.gstatic.com;
+        style-src 'nonce-${styleNonce}' https://fonts.googleapis.com;
+        worker-src blob:;
+      `.replace(/\n/g, '');}
   },
   {
     key: 'Strict-Transport-Security',
