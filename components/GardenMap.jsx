@@ -14,6 +14,7 @@ import {
   useMapsLibrary,
   useMap,
   Marker,
+  AdvancedMarker
 } from "@vis.gl/react-google-maps";
 
 const containerStyle = {
@@ -68,13 +69,13 @@ export default function GardenMap({
             gestureHandling={"greedy"}
             onZoomChanged={ev => setZoom(ev.detail.zoom)}
           >
-            <Marker
+            <AdvancedMarker
               position={{ lat: garden[0].lat, lng: garden[0].lon }}
               title={garden[0].name}
               icon="https://res.cloudinary.com/dqjh46sk5/image/upload/c_pad,w_40,h_40,ar_1:1/v1719377237/garden_fegyyk.png"
             >
               {garden[0].name}
-            </Marker>
+            </AdvancedMarker>
             <Directions />
           </Map>
         </GardenContext.Provider>
