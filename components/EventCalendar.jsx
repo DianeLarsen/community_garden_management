@@ -170,7 +170,7 @@ const EventCalendar = () => {
   }
 
   return (
-    <div className="min-w-[85%] min-h-96">
+    <div className="w-[85%] min-h-96">
       <div className="filters flex flex-wrap gap-4 mb-4">
         <label>
           Distance:
