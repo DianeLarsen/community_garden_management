@@ -288,7 +288,6 @@ console.log(plots)
               <tr>
                 <th className="border px-2 py-2">Plot Size(ft.)</th>
                 <th className="border px-2 py-2">Garden Name</th>
-                <th className="border px-2 py-2">Group</th>
                 <th className="border px-2 py-2">End Date</th>
                 <th className="border px-2 py-2">Days Left</th>
                 <th className="border px-2 py-2">Actions</th>
@@ -303,9 +302,7 @@ console.log(plots)
                   <td className="border px-4 py-2 text-center">
                     {plot.garden_name}
                   </td>
-                  <td className="border px-4 py-2 text-center">
-                    {plot.group_name || "N/A"}
-                  </td>
+
                   <td className="border px-4 py-2 text-center">
                     {formatDate(plot.reserved_until)}
                   </td>
