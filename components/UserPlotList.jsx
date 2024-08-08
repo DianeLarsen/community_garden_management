@@ -28,7 +28,7 @@ const UserPlotsList = ({
   const plotsPerPage = 10;
   const [renewingPlot, setRenewingPlot] = useState(null);
   const [renewWeeks, setRenewWeeks] = useState(1);
-  const [filter, setFilter] = useState("current");
+
 console.log(plots)
   useEffect(() => {
     if (!user.id) {
@@ -237,23 +237,6 @@ console.log(plots)
 
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
-      <div className="mb-4 flex justify-between items-center">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Filter
-          </label>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          >
-            <option value="current">Current</option>
-            <option value="future">Future</option>
-            <option value="all">All</option>
-          </select>
-        </div>
-      </div>
-
       {editingPlot && (
         <form
           onSubmit={handleEditSubmit}
@@ -306,7 +289,6 @@ console.log(plots)
                 <th className="border px-2 py-2">Plot Size(ft.)</th>
                 <th className="border px-2 py-2">Garden Name</th>
                 <th className="border px-2 py-2">Group</th>
-                <th className="border px-2 py-2">Start Date</th>
                 <th className="border px-2 py-2">End Date</th>
                 <th className="border px-2 py-2">Days Left</th>
                 <th className="border px-2 py-2">Actions</th>
@@ -323,9 +305,6 @@ console.log(plots)
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {plot.group_name || "N/A"}
-                  </td>
-                  <td className="border px-4 py-2 text-center">
-                    {formatDate(plot.start_date)}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {formatDate(plot.reserved_until)}
