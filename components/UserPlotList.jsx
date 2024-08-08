@@ -41,7 +41,7 @@ const UserPlotsList = ({
   useEffect(() => {
     setLoading(true);
     if (userPlots.message) {
-      setReturnMessage(data.message);
+      setReturnMessage(userPlots.message);
       setLoading(false);
     } else {
       let filteredUserPlots;
@@ -54,7 +54,6 @@ const UserPlotsList = ({
         (a, b) => new Date(a.end_date) - new Date(b.end_date)
       );
       setPlots(filteredUserPlots);
-      
     }
 
     // Build group legend
@@ -232,7 +231,6 @@ const UserPlotsList = ({
     return "";
   };
 
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -272,21 +270,6 @@ const UserPlotsList = ({
               value={editForm.length}
               onChange={(e) =>
                 setEditForm({ ...editForm, length: e.target.value })
-              }
-              className="w-full px-3 py-2 border rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Width
-            </label>
-            <input
-              type="text"
-              name="width"
-              value={editForm.width}
-              onChange={(e) =>
-                setEditForm({ ...editForm, width: e.target.value })
               }
               className="w-full px-3 py-2 border rounded"
               required
@@ -378,7 +361,7 @@ const UserPlotsList = ({
                           Edit
                         </button>
                         <button
-                          onClick={() => setRenewPlot(plot.id)}
+                          onClick={() => setRenewingPlot(plot.id)}
                           className="text-blue-600 ml-4"
                         >
                           Renew
@@ -442,13 +425,13 @@ const UserPlotsList = ({
             />
             <div className="flex space-x-4">
               <button
-                onClick={() => handleRenewPlot(renewPlot, renewWeeks)}
+                onClick={() => handleRenewPlot(renewingPlot, renewWeeks)}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
               >
                 Extend
               </button>
               <button
-                onClick={() => setRenewPlot(null)}
+                onClick={() => setRenewingPlot(null)}
                 className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
               >
                 Cancel
@@ -462,3 +445,4 @@ const UserPlotsList = ({
 };
 
 export default UserPlotsList;
+

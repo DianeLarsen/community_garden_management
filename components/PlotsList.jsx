@@ -20,11 +20,11 @@ const PlotsList = ({
   const [groupLegend, setGroupLegend] = useState({});
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-console.log(filteredPlots)
+
   useEffect(() => {
     setLoading(true);
-    // const result = filterPlots(plots, { groupId, gardenId, userInfo, startDate, endDate });
-    // setFilteredPlots(result);
+    const result = filterPlots(plots, { groupId, gardenId, userInfo, startDate, endDate });
+    setFilteredPlots(result);
     setLoading(false);
 
     const legend = {};
@@ -52,6 +52,7 @@ console.log(filteredPlots)
       return `${days} day${days !== 1 ? "s" : ""}`;
     }
   };
+
   const filterPlots = (plots, { groupId, gardenId, userInfo, startDate, endDate }) => {
     return plots.filter((plot) => {
       if (groupId && plot.group_id !== groupId) return false;
@@ -62,6 +63,7 @@ console.log(filteredPlots)
       return true;
     });
   };
+
   const formatDate = (date) => {
     const options = { month: "short", day: "numeric" };
     const formattedDate = new Date(date).toLocaleDateString("en-US", options);
@@ -106,7 +108,7 @@ console.log(filteredPlots)
       </div>
       {loading ? (
         <div>Loading...</div>
-      ) : plots.length > 0 ? (
+      ) : filteredPlots.length > 0 ? (
         <>
           <table className="w-full table-auto border-collapse">
             <thead>
@@ -118,7 +120,7 @@ console.log(filteredPlots)
               </tr>
             </thead>
             <tbody>
-              {plots.map((plot) => (
+              {filteredPlots.map((plot) => (
                 <tr key={plot.id}>
                   <td className="border px-4 py-2 text-center">
                     {plot.length}X{plot.width}
@@ -127,10 +129,10 @@ console.log(filteredPlots)
                     {plot.name}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {!(plot.user_id == null) ? calculateRemainingTime(plot.end_date) : "Available"}
+                    {plot.reserved_until ? calculateRemainingTime(plot.reserved_until) : "Available"}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {plot.user_id == null && (
+                    {!plot.reserved_until && (
                       <Link
                         href={`/plots/${plot.id}`}
                         className="text-blue-600 ml-4"

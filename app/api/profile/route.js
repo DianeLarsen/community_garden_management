@@ -145,11 +145,19 @@ console.log(userCoordinates.longitude, userCoordinates.latitude)
     const invitesResult = await client.query(invitesQuery, [userId]);
 
     const plotsQuery = `
-      SELECT gp.id, gp.name, gp.location, gp.length, gp.width, gp.user_id, gp.group_id, gp.garden_id
-      FROM garden_plots gp
-      WHERE gp.user_id = $1
-    `;
-    const plotsResult = await client.query(plotsQuery, [userId]);
+    SELECT gp.id, gp.name, gp.location, gp.length, gp.width, gp.user_id, gp.group_id, gp.garden_id, 
+           ph.reserved_until
+    FROM garden_plots gp
+    LEFT JOIN (
+      SELECT plot_id, MAX(reserved_until) AS reserved_until
+      FROM plot_history
+      WHERE reserved_until > NOW()
+      GROUP BY plot_id
+    ) ph ON gp.id = ph.plot_id
+    WHERE gp.user_id = $1
+  `;
+  const plotsResult = await client.query(plotsQuery, [userId]);
+  
 
     for (let group of groupsResult.rows) {
       group.city = await getCityFromZip(group.location);

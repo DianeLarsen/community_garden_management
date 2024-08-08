@@ -28,64 +28,67 @@ export async function GET(request) {
     const client = await pool.connect();
     console.log("Made it here plots")
     let plotQuery = `
-      SELECT 
-        gp.id, gp.length, gp.width, gp.garden_id, gp.user_id, gp.group_id, 
-        g.name AS garden_name, u.email AS user_email, gr.name AS group_name,
-        ph.reserved_at AS start_date, 
-        ph.reserved_until AS end_date
-      FROM 
-        garden_plots gp
-      LEFT JOIN 
-        gardens g ON gp.garden_id = g.id
-      LEFT JOIN 
-        users u ON gp.user_id = u.id
-      LEFT JOIN 
-        groups gr ON gp.group_id = gr.id
-      LEFT JOIN 
-        plot_history ph ON gp.id = ph.plot_id
-      WHERE 
-        ph.reserved_until >= CURRENT_DATE
+    SELECT 
+      gp.id, gp.length, gp.width, gp.garden_id, gp.user_id, gp.group_id, 
+      g.name AS garden_name, u.email AS user_email, gr.name AS group_name,
+      ph.reserved_at AS start_date, 
+      ph.reserved_until AS end_date
+    FROM 
+      garden_plots gp
+    LEFT JOIN 
+      gardens g ON gp.garden_id = g.id
+    LEFT JOIN 
+      users u ON gp.user_id = u.id
+    LEFT JOIN 
+      groups gr ON gp.group_id = gr.id
+    LEFT JOIN (
+      SELECT plot_id, MAX(reserved_until) AS reserved_until, MAX(reserved_at) AS reserved_at
+      FROM plot_history
+      WHERE reserved_until > NOW()
+      GROUP BY plot_id
+    ) ph ON gp.id = ph.plot_id
+    WHERE 1=1
+  `;
+  const values = [];
+  let index = 1;
+  
+  if (userInfo && userRole !== "admin") {
+    plotQuery += ` AND gp.user_id = $${index}`;
+    if (user_id){
+      values.push(user_id)
+    } else {
+      values.push(userId);
+    }
+    index++;
+  } else if (userRole === "admin") {
+    plotQuery += ` AND u.role = 'event_admin'`;
+  }
+  
+  if (groupId) {
+    plotQuery += ` AND gp.group_id = $${index}`;
+    values.push(groupId);
+    index++;
+  }
+  
+  if (gardenId) {
+    plotQuery += ` AND gp.garden_id = $${index}`;
+    values.push(gardenId);
+    index++;
+  }
+  
+  if (startDate && endDate) {
+    plotQuery += `
+      AND gp.id NOT IN (
+        SELECT plot_id FROM plot_history 
+        WHERE reserved_at < $${index + 1} 
+        AND reserved_until > $${index}
+      )
     `;
-    const values = [];
-    let index = 1;
-    console.log("Made it here plots 1")
-    if (userInfo && userRole !== "admin") {
-      plotQuery += ` AND gp.user_id = $${index}`;
-      if (user_id){
-        values.push(user_id)
-      } else {
-        values.push(userId);
-      }
-      
-      index++;
-    } else if (userRole === "admin") {
-      plotQuery += ` AND u.role = 'event_admin'`;
-    }
+    values.push(endDate, startDate);
+  }
 
-    if (groupId) {
-      plotQuery += ` OR gp.group_id = $${index}`;
-      values.push(groupId);
-      index++;
-    }
+    
 
-    if (gardenId) {
-      plotQuery += ` AND gp.garden_id = $${index}`;
-      values.push(gardenId);
-      index++;
-    }
-
-    if (startDate && endDate) {
-      plotQuery += `
-        AND gp.id NOT IN (
-          SELECT plot_id FROM plot_history 
-          WHERE reserved_at < $${index + 1} 
-          AND reserved_until > $${index}
-        )
-      `;
-      values.push(endDate, startDate);
-    }
-    console.log(values)
-    console.log(plotQuery)
     const plotResult = await client.query(plotQuery, values);
 
     client.release();
