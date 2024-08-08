@@ -9,7 +9,11 @@ const CreateEvent = ({ gardenId }) => {
   const [plots, setPlots] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState('');
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    today.setHours(12, 0, 0, 0); // Set time to noon
+    return today.toISOString().substring(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+  });
   const [duration, setDuration] = useState({ value: '', unit: 'hours' });
   const [error, setError] = useState('');
   const [plotId, setPlotId] = useState('');
@@ -130,6 +134,7 @@ const CreateEvent = ({ gardenId }) => {
           <input
             type="datetime-local"
             value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             required
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           />
