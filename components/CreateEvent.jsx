@@ -53,17 +53,7 @@ const CreateEvent = ({ gardenId }) => {
     }
   };
 
-  const handleStartDateChange = (e) => {
-    const value = e.target.value;
-    const date = new Date(value);
 
-    // Round to the nearest 15 minutes
-    const minutes = date.getMinutes();
-    const roundedMinutes = Math.ceil(minutes / 15) * 15;
-    date.setMinutes(roundedMinutes);
-
-    setStartDate(date.toISOString().slice(0, 16));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -140,7 +130,6 @@ const CreateEvent = ({ gardenId }) => {
           <input
             type="datetime-local"
             value={startDate}
-            onChange={handleStartDateChange}
             required
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           />
