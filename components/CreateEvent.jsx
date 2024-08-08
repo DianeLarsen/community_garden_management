@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { BasicContext } from '@/context/BasicContext';
 import { useRouter } from "next/navigation";
-import Link from 'next/link';
+
 
 const CreateEvent = ({ gardenId }) => {
   const { user, userGroups } = useContext(BasicContext);
@@ -12,7 +12,10 @@ const CreateEvent = ({ gardenId }) => {
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
     today.setHours(12, 0); // Set time to noon
-    return today.toISOString().substring(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+    const offset = today.getTimezoneOffset();
+    const localNoon = new Date(today.getTime() - (offset * 60 * 1000));
+    return localNoon.toISOString().substring(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+
   });
   const [duration, setDuration] = useState({ value: '', unit: 'hours' });
   const [error, setError] = useState('');
