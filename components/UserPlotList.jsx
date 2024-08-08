@@ -285,13 +285,13 @@ console.log(plots)
         <>
           <table className="w-full table-auto border-collapse">
             <thead>
-              <tr>
-                <th className="border px-2 py-2">Plot Size(ft.)</th>
-                <th className="border px-2 py-2">Garden Name</th>
-                <th className="border px-2 py-2">End Date</th>
-                <th className="border px-2 py-2">Days Left</th>
-                <th className="border px-2 py-2">Actions</th>
-              </tr>
+            <tr>
+    <th className="border px-2 py-2 min-w-[100px] max-w-[200px]">Plot Size(ft.)</th>
+    <th className="border px-2 py-2 min-w-[150px] max-w-[300px]">Garden Name</th>
+    <th className="border px-2 py-2 min-w-[100px] max-w-[200px]">End Date</th>
+    <th className="border px-2 py-2 min-w-[100px] max-w-[200px]">Days Left</th>
+    <th className="border px-2 py-2 min-w-[150px] max-w-[300px]">Actions</th>
+  </tr>
             </thead>
             <tbody>
               {paginatedPlots.map((plot) => (
