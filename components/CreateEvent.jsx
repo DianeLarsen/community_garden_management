@@ -18,7 +18,6 @@ const CreateEvent = ({ gardenId }) => {
   const [error, setError] = useState('');
   const [plotId, setPlotId] = useState('');
   const [groupId, setGroupId] = useState('');
-  const [selectedGardenId, setSelectedGardenId] = useState(gardenId || '');
   const [isPublic, setIsPublic] = useState(false);
   const router = useRouter();
 
@@ -29,8 +28,8 @@ const CreateEvent = ({ gardenId }) => {
         if (groupId) {
           url += `&groupId=${groupId}`;
         }
-        if (selectedGardenId) {
-          url += `&gardenId=${selectedGardenId}`;
+        if (gardenId) {
+          url += `&gardenId=${gardenId}`;
         }
         const response = await fetch(url);
         const data = await response.json();
@@ -41,7 +40,7 @@ const CreateEvent = ({ gardenId }) => {
     };
 
     fetchPlots();
-  }, [user?.id, groupId, selectedGardenId]);
+  }, [user?.id, groupId, gardenId]);
 
   const calculateEndDate = () => {
     const start = new Date(startDate);
