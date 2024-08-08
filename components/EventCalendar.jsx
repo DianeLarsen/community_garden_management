@@ -245,7 +245,7 @@ const EventCalendar = () => {
       </div>
 
       {view === "calendar" ? (
-        <div className="calendar-grid grid grid-cols-7 gap-2 max-w-6xl">
+        <div className="calendar-grid grid grid-cols-7 gap-2 max-w-[85%]">
           {Array.from({ length: startDay }).map((_, index) => (
             <div key={index} className="calendar-day empty"></div>
           ))}
