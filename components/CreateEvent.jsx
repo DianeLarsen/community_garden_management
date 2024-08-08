@@ -11,7 +11,7 @@ const CreateEvent = ({ gardenId }) => {
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
-    today.setHours(12, 0, 0); // Set time to noon
+    today.setHours(12, 0); // Set time to noon
     return today.toISOString().substring(0, 16); // Format as "YYYY-MM-DDTHH:MM"
   });
   const [duration, setDuration] = useState({ value: '', unit: 'hours' });
