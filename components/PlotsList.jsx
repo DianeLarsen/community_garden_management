@@ -4,9 +4,19 @@ import Link from "next/link";
 import { BasicContext } from "@/context/BasicContext";
 import { differenceInDays } from "date-fns";
 
-const PlotsList = ({ plots = [], message = "" }) => {
+const PlotsList = ({
+  gardenId = "",
+  groupId = "",
+  userInfo = false,
+  groupInfo = false,
+  message = "",
+  plots = []
+}) => {
+  const [loading, setLoading] = useState(false);
   const { user } = useContext(BasicContext);
   const [groupLegend, setGroupLegend] = useState({});
+
+
 
   useEffect(() => {
     const legend = {};
@@ -16,6 +26,7 @@ const PlotsList = ({ plots = [], message = "" }) => {
       }
     });
     setGroupLegend(legend);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plots]);
 
   const calculateRemainingTime = (endDate) => {
