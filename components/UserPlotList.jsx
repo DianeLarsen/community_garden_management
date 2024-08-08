@@ -328,10 +328,10 @@ const UserPlotsList = ({
                     {formatDate(plot.start_date)}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {formatDate(plot.end_date)}
+                    {formatDate(plot.reserved_until)}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {calculateRemainingTime(plot.end_date)}
+                  {calculateRemainingTime(plot.reserved_until)}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     <Link
