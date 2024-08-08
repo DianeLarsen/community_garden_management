@@ -133,7 +133,7 @@ const PlotsList = ({
       ) : (
         <div>{message}</div>
       )}
-      <div>{returnMessage}</div>
+ 
     </div>
   );
 };

@@ -144,7 +144,6 @@ const GardenDetails = () => {
       <div className="mb-6 p-4 bg-white shadow-md rounded">
         <h3 className="text-lg font-bold mb-4">Existing Plots</h3>
         <PlotsList
-          setError={setError}
           plots={gardenPlots}
           gardenId={id}
           message={"No Plots associated with this garden."}
