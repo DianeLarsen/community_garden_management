@@ -37,7 +37,14 @@ export async function GET(request, { params }) {
     );
 
     const plotResult = await client.query(
-      `SELECT * FROM garden_plots
+      `SELECT gp.*, ph.reserved_until 
+      FROM garden_plots gp
+      LEFT JOIN (
+      SELECT plot_id, MAX(reserved_until) AS reserved_until
+      FROM plot_history
+      WHERE reserved_until > NOW()
+      GROUP BY plot_id
+    ) ph ON gp.id = ph.plot_id
        WHERE garden_id = $1`,
       [id]
     );
