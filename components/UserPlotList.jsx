@@ -286,11 +286,11 @@ console.log(plots)
           <table className="w-full table-auto border-collapse">
             <thead>
             <tr>
-    <th className="border px-2 py-2 min-w-[100px] max-w-[200px]">Plot Size(ft.)</th>
-    <th className="border px-2 py-2 min-w-[150px] max-w-[300px]">Garden Name</th>
-    <th className="border px-2 py-2 min-w-[100px] max-w-[200px]">End Date</th>
-    <th className="border px-2 py-2 min-w-[100px] max-w-[200px]">Days Left</th>
-    <th className="border px-2 py-2 min-w-[150px] max-w-[300px]">Actions</th>
+    <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">Plot Size(ft.)</th>
+    <th className="border px-2 py-2 min-w-[150px] max-w-[35%]">Garden Name</th>
+    <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">End Date</th>
+    <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">Days Left</th>
+    <th className="border px-2 py-2 min-w-[150px] max-w-[20%]">Actions</th>
   </tr>
             </thead>
             <tbody>
