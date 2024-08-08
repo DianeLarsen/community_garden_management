@@ -62,7 +62,8 @@ const EventCalendar = () => {
       );
       router.push("/profile");
     }
-  }, [user, isUserLoaded, showBanner, router, setLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isUserLoaded, showBanner, router]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -121,6 +122,7 @@ const EventCalendar = () => {
     if (eventView === "filtered") {
       filterEvents();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventView, distance, selectedGroup, allEvents, currentDate]);
 
   const formatTime = (date) => {
@@ -170,7 +172,7 @@ const EventCalendar = () => {
   }
 
   return (
-    <div className="w-[85%] min-h-96">
+    <div className="w-[95%] min-h-96">
       <div className="filters flex flex-wrap gap-4 mb-4">
         <label>
           Distance:
@@ -270,6 +272,12 @@ const EventCalendar = () => {
                       (event) =>
                         isSameDay(new Date(event.start_date), day) &&
                         (event.is_public ||
+                          userEvents.some(
+                            (userEvent) => userEvent.id === event.id
+                          ) ||
+                          userInvites.some(
+                            (invite) => invite.event_id === event.id
+                          ) ||
                           userGroups.some(
                             (group) => group.id === event.group_id
                           ))
@@ -298,83 +306,81 @@ const EventCalendar = () => {
                             userEvents.some(
                               (userEvent) => userEvent.id === event.id
                             )
-                            ? "bg-blue-100"
-                            : ""
-                        } ${
-                          isBefore(new Date(event.start_date), new Date())
-                            ? "text-gray-500 line-through"
-                            : ""
-                        }`}
-                      >
-                        <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
-                          {event.name} {statusText} - {distanceText}
-                          {adminText}
-                        </h3>
-                        <p className="text-xs sm:text-xs md:text-xs lg:text-sm">
-                          {formatTime(event.start_date)} to{" "}
-                          {formatTime(event.end_date)}
-                        </p>
-                      </Link>
-                    );
-                  })}
+                              ? "bg-blue-100"
+                              : ""
+                          } ${
+                            isBefore(new Date(event.start_date), new Date())
+                              ? "text-gray-500 line-through"
+                              : ""
+                          }`}
+                        >
+                          <h3 className="font-semibold text-xs sm:text-xs md:text-sm lg:text-base">
+                            {event.name} {statusText} - {distanceText}
+                            {adminText}
+                          </h3>
+                          <p className="text-xs sm:text-xs md:text-xs lg:text-sm">
+                            {formatTime(event.start_date)} to{" "}
+                            {formatTime(event.end_date)}
+                          </p>
+                        </Link>
+                      );
+                    })}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <ul className="list-disc pl-5">
-        {!eventsToDisplay || eventsToDisplay.length === 0 ? (
-          <p>
-            No events listed within {distance} miles, {selectedGroup}
-          </p>
-        ) : (
-          eventsToDisplay
-            .filter(
-              (event) =>
-                event.is_public ||
-                (allGroups &&
-                  allGroups.some((group) => group.id === event.group_id))
-            )
-            .map((event) => {
-              const inviteStatus = userInvites.find(
-                (invite) => invite.event_id === event.id
-              );
-              let statusText = "";
-              if (inviteStatus) {
-                if (inviteStatus.status === "requested") {
-                  statusText = " (pending)";
-                } else if (inviteStatus.status === "invited") {
-                  statusText = " (requires attention)";
+          ))}
+        </div>
+      ) : (
+        <ul className="list-disc pl-5">
+          {!eventsToDisplay || eventsToDisplay.length === 0 ? (
+            <p>
+              No events listed within {distance} miles, {selectedGroup}
+            </p>
+          ) : (
+            eventsToDisplay
+              .filter(
+                (event) =>
+                  event.is_public ||
+                  (allGroups &&
+                    allGroups.some((group) => group.id === event.group_id))
+              )
+              .map((event) => {
+                const inviteStatus = userInvites.find(
+                  (invite) => invite.event_id === event.id
+                );
+                let statusText = "";
+                if (inviteStatus) {
+                  if (inviteStatus.status === "requested") {
+                    statusText = " (pending)";
+                  } else if (inviteStatus.status === "invited") {
+                    statusText = " (requires attention)";
+                  }
                 }
-              }
-              const distanceText = `${Math.round(event.distance)} miles`;
-              const adminText =
-                event.user_id === user.id ? " (admin)" : "";
-              return (
-                <li key={event.id} className="mb-2">
-                  <Link
-                    href={`/events/${event.id}`}
-                    className={`text-blue-500 hover:underline ${
-                      userEvents &&
-                      userEvents.some(
-                        (userEvent) => userEvent.id === event.id
-                      )
-                        ? "font-bold"
-                        : ""
-                    }`}
-                  >
-                    {event.name} {statusText} - {distanceText} {adminText} -{" "}
-                    {new Date(event.start_date).toLocaleDateString()}
-                  </Link>
-                </li>
-              );
-            })
-        )}
-      </ul>
-    )}
-  </div>
-);
+                const distanceText = `${Math.round(event.distance)} miles`;
+                const adminText = event.user_id === user.id ? " (admin)" : "";
+                return (
+                  <li key={event.id} className="mb-2">
+                    <Link
+                      href={`/events/${event.id}`}
+                      className={`text-blue-500 hover:underline ${
+                        userEvents &&
+                        userEvents.some(
+                          (userEvent) => userEvent.id === event.id
+                        )
+                          ? "font-bold"
+                          : ""
+                      }`}
+                    >
+                      {event.name} {statusText} - {distanceText} {adminText} -{" "}
+                      {new Date(event.start_date).toLocaleDateString()}
+                    </Link>
+                  </li>
+                );
+              })
+          )}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default EventCalendar;
-

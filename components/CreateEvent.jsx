@@ -6,7 +6,6 @@ import Link from 'next/link';
 
 const CreateEvent = ({ gardenId }) => {
   const { user, userGroups } = useContext(BasicContext);
-  // const [gardens, setGardens] = useState([]);
   const [plots, setPlots] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -52,6 +51,18 @@ const CreateEvent = ({ gardenId }) => {
       default:
         return start;
     }
+  };
+
+  const handleStartDateChange = (e) => {
+    const value = e.target.value;
+    const date = new Date(value);
+
+    // Round to the nearest 15 minutes
+    const minutes = date.getMinutes();
+    const roundedMinutes = Math.ceil(minutes / 15) * 15;
+    date.setMinutes(roundedMinutes);
+
+    setStartDate(date.toISOString().slice(0, 16));
   };
 
   const handleSubmit = async (e) => {
@@ -129,7 +140,7 @@ const CreateEvent = ({ gardenId }) => {
           <input
             type="datetime-local"
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={handleStartDateChange}
             required
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           />
@@ -232,4 +243,3 @@ const CreateEvent = ({ gardenId }) => {
 };
 
 export default CreateEvent;
-

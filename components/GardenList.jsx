@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext } from "react";
 import { BasicContext } from "@/context/BasicContext";
 import { useRouter } from "next/navigation";
-import useReloadOnLoading from "@/hooks/useReloadOnLoading";
+
 
 const GardenList = () => {
   const [gardens, setGardens] = useState([]);
@@ -12,8 +12,7 @@ const GardenList = () => {
 
   const [isUserLoaded, setIsUserLoaded] = useState(false);
 
-  // Call the custom hook unconditionally
-  // useReloadOnLoading(loading, isUserLoaded);
+
 
   useEffect(() => {
     if (user.id) {
