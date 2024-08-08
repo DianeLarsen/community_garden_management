@@ -12,7 +12,7 @@ export async function GET(request, { params }) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
     const result = await client.query(`SELECT id, email, role, verified FROM users WHERE id = $1`, [userId]);
-    console.log(result)
+
     client.release();
     return NextResponse.json(result, { status: 200 });
   } catch (error) {

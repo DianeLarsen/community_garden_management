@@ -286,7 +286,7 @@ console.log(plots)
           <table className="w-full table-auto border-collapse">
             <thead>
             <tr>
-    <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">Plot Size(ft.)</th>
+    <th className="border px-2 py-2 min-w-[50px] max-w-[15%]">Plot Size(ft.)</th>
     <th className="border px-2 py-2 min-w-[150px] max-w-[35%]">Garden Name</th>
     <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">End Date</th>
     <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">Days Left</th>

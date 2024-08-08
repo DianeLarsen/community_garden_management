@@ -26,7 +26,7 @@ export async function GET(request) {
     }
 
     const client = await pool.connect();
-    console.log("Made it here plots")
+
     let plotQuery = `
     SELECT 
       gp.id, gp.length, gp.width, gp.garden_id, gp.user_id, gp.group_id, 
@@ -92,13 +92,13 @@ export async function GET(request) {
     const plotResult = await client.query(plotQuery, values);
 
     client.release();
-// console.log(plotResult.rows)
+
     if (plotResult.rows.length === 0) {
       return NextResponse.json({
         message: "No plots found for the given criteria",
       });
     }
-    console.log("Made it here plots 3")
+
     return NextResponse.json(plotResult.rows);
   } catch (error) {
     console.error("Error fetching plots:", error);

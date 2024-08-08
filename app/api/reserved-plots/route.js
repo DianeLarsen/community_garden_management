@@ -12,7 +12,7 @@ export async function GET(request) {
   const gardenId = searchParams.get("gardenId");
   const token = request.cookies.get("token")?.value;
 
-  console.log({ page, limit, groupId, userId, days, gardenId });
+
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,8 +48,6 @@ export async function GET(request) {
     const filterQuery = filters.length ? `AND ${filters.join(" AND ")}` : "";
 
     const client = await pool.connect();
-    console.log(filterQuery);
-    console.log(`Executing query with values: ${values}`);
 
     const result = await client.query(
       `

@@ -72,7 +72,7 @@ export async function GET(request) {
     }
 
     const userCoordinates = await getCoordinatesFromZip(userZip);
-console.log(userCoordinates.longitude, userCoordinates.latitude)
+
     const userQuery = `
       SELECT id, email, username, street_address, city, state, zip, phone, role, profile_photo
       FROM users
