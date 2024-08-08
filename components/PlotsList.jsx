@@ -127,7 +127,7 @@ console.log(filteredPlots)
                     {plot.name}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {plot.end_date ? calculateRemainingTime(plot.end_date) : "Available"}
+                    {!(plot.user_id == null) ? calculateRemainingTime(plot.end_date) : "Available"}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     {plot.user_id == null && (
