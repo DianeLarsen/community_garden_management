@@ -4,11 +4,24 @@ import Link from "next/link";
 import { BasicContext } from "@/context/BasicContext";
 import { differenceInDays } from "date-fns";
 
-const PlotsList = ({ plots = [], message = "" }) => {
+const AdminPlotsList = ({ plots = [], message = "" }) => {
+  const [filteredPlots, setFilteredPlots] = useState([]);
+  const [returnMessage, setReturnMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const { user } = useContext(BasicContext);
   const [groupLegend, setGroupLegend] = useState({});
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [groupId, setGroupId] = useState("");
+  const [gardenId, setGardenId] = useState("");
+  const [userInfo, setUserInfo] = useState("");
 
   useEffect(() => {
+    setLoading(true);
+    const result = filterPlots(plots, { groupId, gardenId, userInfo, startDate, endDate });
+    setFilteredPlots(result);
+    setLoading(false);
+
     const legend = {};
     plots.forEach((plot) => {
       if (plot.group_id && !legend[plot.group_id]) {
@@ -16,7 +29,7 @@ const PlotsList = ({ plots = [], message = "" }) => {
       }
     });
     setGroupLegend(legend);
-  }, [plots]);
+  }, [groupId, gardenId, userInfo, startDate, endDate, plots]);
 
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
@@ -33,6 +46,17 @@ const PlotsList = ({ plots = [], message = "" }) => {
     } else {
       return `${days} day${days !== 1 ? "s" : ""}`;
     }
+  };
+
+  const filterPlots = (plots, { groupId, gardenId, userInfo, startDate, endDate }) => {
+    return plots.filter((plot) => {
+      if (groupId && plot.group_id !== parseInt(groupId)) return false;
+      if (gardenId && plot.garden_id !== parseInt(gardenId)) return false;
+      if (userInfo && plot.user_id !== parseInt(userInfo)) return false;
+      if (startDate && new Date(plot.start_date) < new Date(startDate)) return false;
+      if (endDate && new Date(plot.end_date) > new Date(endDate)) return false;
+      return true;
+    });
   };
 
   const formatDate = (date) => {
@@ -59,7 +83,54 @@ const PlotsList = ({ plots = [], message = "" }) => {
 
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
-      {plots.length > 0 ? (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Start Date</label>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">End Date</label>
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Group</label>
+        <input
+          type="text"
+          value={groupId}
+          onChange={(e) => setGroupId(e.target.value)}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Garden</label>
+        <input
+          type="text"
+          value={gardenId}
+          onChange={(e) => setGardenId(e.target.value)}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">User Info</label>
+        <input
+          type="text"
+          value={userInfo}
+          onChange={(e) => setUserInfo(e.target.value)}
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : filteredPlots.length > 0 ? (
         <>
           <table className="w-full table-auto border-collapse">
             <thead>
@@ -71,7 +142,7 @@ const PlotsList = ({ plots = [], message = "" }) => {
               </tr>
             </thead>
             <tbody>
-              {plots.map((plot) => (
+              {filteredPlots.map((plot) => (
                 <tr key={plot.id}>
                   <td className="border px-4 py-2 text-center">
                     {plot.length}X{plot.width}
@@ -127,4 +198,5 @@ const PlotsList = ({ plots = [], message = "" }) => {
   );
 };
 
-export default PlotsList;
+export default AdminPlotsList;
+
