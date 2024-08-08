@@ -33,6 +33,8 @@ const UserPlotsList = ({
   useEffect(() => {
     if (!user.id) {
       setLoading(true);
+    } else {
+      setLoading(false);
     }
   }, [user]);
 

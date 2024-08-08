@@ -29,7 +29,7 @@ const ProfileDetails = () => {
     } else {
       setLoading(false)
     }
-  }, [user?.id])
+  }, [user])
 
   useEffect(() => {
     const checkUsernameAvailability = async () => {

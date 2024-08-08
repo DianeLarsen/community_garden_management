@@ -258,7 +258,7 @@ const EventCalendar = () => {
                   : isBefore(day, new Date())
                   ? "bg-gray-200"
                   : "bg-white"
-              } h-24 sm:h-24 md:h-32 lg:h-40`}
+              } sm:h-32 md:h-40 lg:h-44`}
             >
               <div className="date font-bold mb-1 text-xs sm:text-sm md:text-base lg:text-lg">
                 {format(day, "d")}
