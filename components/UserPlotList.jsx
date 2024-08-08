@@ -323,7 +323,7 @@ console.log(plots)
                           (group) =>
                             group.id === plot.group_id && group.role === "admin"
                         ))) && (
-                      <div className="flex justify-center">
+                      <div className="flex flex-wrap justify-center">
                         <button
                           onClick={() => handleRemovePlot(plot.id)}
                           className="text-red-600 ml-4"
