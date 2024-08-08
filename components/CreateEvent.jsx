@@ -11,6 +11,9 @@ const CreateEvent = ({ gardenId }) => {
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState(() => {
     const today = new Date();
+    if (today.getHours() >= 12) {
+      today.setDate(today.getDate() + 1); // Move to the next day
+    }
     today.setHours(12, 0); // Set time to noon
     const offset = today.getTimezoneOffset();
     const localNoon = new Date(today.getTime() - (offset * 60 * 1000));

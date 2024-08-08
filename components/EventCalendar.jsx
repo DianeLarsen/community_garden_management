@@ -113,7 +113,8 @@ const EventCalendar = () => {
         start: startOfMonth(currentDate),
         end: endOfMonth(currentDate),
       });
-      return withinDistance && withinGroup && withinMonth;
+      const isUserEvent = event.user_id === user.id;
+      return (withinDistance && withinGroup && withinMonth) || isUserEvent;
     });
     setFilteredEvents(filtered);
   };
@@ -272,6 +273,7 @@ const EventCalendar = () => {
                       (event) =>
                         isSameDay(new Date(event.start_date), day) &&
                         (event.is_public ||
+                          event.user_id === user.id ||
                           userEvents.some(
                             (userEvent) => userEvent.id === event.id
                           ) ||
@@ -340,6 +342,7 @@ const EventCalendar = () => {
               .filter(
                 (event) =>
                   event.is_public ||
+                  event.user_id === user.id ||
                   (allGroups &&
                     allGroups.some((group) => group.id === event.group_id))
               )
