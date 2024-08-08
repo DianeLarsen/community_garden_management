@@ -13,7 +13,7 @@ const Profile = () => {
       
         <div className="mt-8">
           <h2 className="text-2xl mb-4">Your Plots</h2>
-          <UserPlotList userInfo={true} status="reserved"/>
+          <UserPlotList userInfo={true}/>
         </div>
         <div className="mt-8">
           <h2 className="text-2xl mb-4">Your Groups</h2>

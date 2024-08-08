@@ -10,7 +10,7 @@ const securityHeaders = [
     img-src 'self' https://res.cloudinary.com https://*.googleapis.com https://*.gstatic.com https://lh3.ggpht.com data:;
     connect-src 'self' https://maps.googleapis.com https://*.googleapis.com https://*.gstatic.com;
     font-src 'self' https://fonts.gstatic.com data:;
-    frame-src https://*.google.com;
+    frame-src https://*.google.com https://upload-widget.cloudinary.com;
     worker-src blob:;
   `.replace(/\n/g, ' '),
   },
