@@ -4,7 +4,6 @@ import { useEffect, useState, useContext } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import { BasicContext } from "@/context/BasicContext";
-import useReloadOnLoading from "@/hooks/useReloadOnLoading";
 import { differenceInDays } from "date-fns";
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
@@ -12,9 +11,7 @@ const fetcher = (url) => fetch(url).then((res) => res.json());
 const AdminPage = () => {
   const maxDistance = 1000;
   const limit = 1000;
-  const [error, setError] = useState("");
-  const { token, loading } = useContext(BasicContext);
-  useReloadOnLoading(loading);
+  const { token } = useContext(BasicContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [reservedPlots, setReservedPlots] = useState([]);
   const [totalPlots, setTotalPlots] = useState(0);
@@ -22,37 +19,15 @@ const AdminPage = () => {
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedDays, setSelectedDays] = useState(10);
   const [selectedGarden, setSelectedGarden] = useState("");
+  const [error, setError] = useState("");
   const plotsPerPage = 10;
 
-  const {
-    data: users,
-    error: usersError,
-    isLoading: usersLoading,
-  } = useSWR(token ? ["/api/users"] : null, fetcher);
-  const {
-    data: events,
-    error: eventsError,
-    isLoading: eventsLoading,
-  } = useSWR(token ? ["/api/events"] : null, fetcher);
-  const {
-    data: gardens,
-    error: gardensError,
-    isLoading: gardensLoading,
-  } = useSWR(
-    token ? [`/api/gardens?maxDistance=${maxDistance}&limit=${limit}`] : null,
-    fetcher
-  );
-  const {
-    data: allGroups,
-    error: groupsError,
-    isLoading: groupsLoading,
-  } = useSWR(token ? ["/api/groups"] : null, fetcher);
-console.log(allGroups)
-  const {
-    data: plotsData,
-    error: reservedPlotsError,
-    isLoading: reservedPlotsLoading,
-  } = useSWR(
+  const { data: users, error: usersError, isLoading: usersLoading } = useSWR(token ? "/api/users" : null, fetcher);
+  const { data: events, error: eventsError, isLoading: eventsLoading } = useSWR(token ? "/api/events" : null, fetcher);
+  const { data: gardens, error: gardensError, isLoading: gardensLoading } = useSWR(token ? `/api/gardens?maxDistance=${maxDistance}&limit=${limit}` : null, fetcher);
+  const { data: allGroups, error: groupsError, isLoading: groupsLoading } = useSWR(token ? "/api/groups" : null, fetcher);
+  
+  const { data: plotsData, error: reservedPlotsError, isLoading: reservedPlotsLoading } = useSWR(
     token
       ? `/api/reserved-plots?page=${currentPage}&limit=${plotsPerPage}&groupId=${selectedGroup}&userId=${selectedUser}&days=${selectedDays}&gardenId=${selectedGarden}`
       : null,
@@ -80,7 +55,7 @@ console.log(allGroups)
 
   const handleRoleChange = async (id, newRole) => {
     try {
-      const response = await fetch("/api/community-garden/users", {
+      const response = await fetch("/api/users", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +69,7 @@ console.log(allGroups)
         throw new Error(`Network response was not ok: ${text}`);
       }
 
-      const data = await response.json();
+      // Refetch users data after updating role
       mutate(["/api/users", token]);
     } catch (error) {
       console.error("Error updating user role:", error);
@@ -120,6 +95,7 @@ console.log(allGroups)
       return `${days} day${days !== 1 ? "s" : ""}`;
     }
   };
+
   return (
     <div className="max-w-7xl mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Admin Page</h1>
@@ -274,7 +250,7 @@ console.log(allGroups)
               onChange={(e) => setSelectedDays(e.target.value)}
               className="ml-2 p-1 border rounded"
             />
-          </label>{" "}
+          </label>
           <label>
             Garden:
             <select
@@ -313,29 +289,36 @@ console.log(allGroups)
                 </tr>
               </thead>
               <tbody>
-                {reservedPlots && reservedPlots.length > 0 ? reservedPlots.map((plot) => (
-                  <tr key={plot.id} className="border-t">
-                    <td className="py-2 px-4">{plot.name}</td>
-                    <td className="py-2 px-4">
-                      {plot.user_id
-                        ? users?.users.find((user) => user.id === plot.user_id)
-                            ?.email
-                        : "N/A"}
-                    </td>
-                    <td className="py-2 px-4">
-                      {plot.group_id
-                        ? allGroups.find((group) => group.id === plot.group_id)
-                            ?.name
-                        : "N/A"}
-                    </td>
-                    <td className="py-2 px-4">
-                      {new Date(plot.reserved_at).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-4">{calculateRemainingTime(plot.end_date)}</td>
-                  </tr>
-                )): (
+                {reservedPlots && reservedPlots.length > 0 ? (
+                  reservedPlots.map((plot) => (
+                    <tr key={plot.id} className="border-t">
+                      <td className="py-2 px-4">{plot.name}</td>
+                      <td className="py-2 px-4">
+                        {plot.user_id
+                          ? users?.users.find(
+                              (user) => user.id === plot.user_id
+                            )?.email
+                          : "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {plot.group_id
+                          ? allGroups.find((group) => group.id === plot.group_id)
+                              ?.name
+                          : "N/A"}
+                      </td>
+                      <td className="py-2 px-4">
+                        {new Date(plot.reserved_at).toLocaleString()}
+                      </td>
+                      <td className="py-2 px-4">
+                        {calculateRemainingTime(plot.end_date)}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
-                    <td colSpan="5" className="text-center py-4">No reserved plots found</td>
+                    <td colSpan="5" className="text-center py-4">
+                      No reserved plots found
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -367,3 +350,5 @@ console.log(allGroups)
 };
 
 export default AdminPage;
+
+             
