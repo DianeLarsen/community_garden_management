@@ -47,3 +47,23 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a202c; /* Tailwind's gray-900 */
+    color: #cbd5e0; /* Tailwind's gray-400 */
+  }
+
+  table {
+    background-color: #2d3748; /* Tailwind's gray-800 */
+    color: #e2e8f0; /* Tailwind's gray-300 */
+  }
+
+  th, td {
+    border-color: #4a5568; /* Tailwind's gray-700 */
+  }
+
+  a {
+    color: #63b3ed; /* Tailwind's blue-400 */
+  }
+}
