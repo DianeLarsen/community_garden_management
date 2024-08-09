@@ -19,7 +19,7 @@ export async function POST(request, { params }) {
     }
 
     const { new_end_date } = await request.json();
-
+console.log(new_end_date)
     const client = await pool.connect();
 
     const checkConflictQuery = `
