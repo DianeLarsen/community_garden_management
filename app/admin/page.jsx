@@ -47,7 +47,7 @@ const AdminPage = () => {
     error: groupsError,
     isLoading: groupsLoading,
   } = useSWR(token ? ["/api/groups"] : null, fetcher);
-
+console.log(allGroups)
   const {
     data: plotsData,
     error: reservedPlotsError,
