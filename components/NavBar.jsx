@@ -2,7 +2,7 @@
 import Link from "next/link";
 import AuthLinks from "@/components/AuthLinks";
 import { IoMdMenu } from "react-icons/io";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { BasicContext } from "@/context/BasicContext";
 
 const NavBar = () => {
@@ -16,6 +16,20 @@ const NavBar = () => {
     setUser, 
     showBanner
   } = useContext(BasicContext);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMenuToggle("menu");
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const navLinks = isAuthenticated
     ? [
