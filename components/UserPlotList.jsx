@@ -144,11 +144,11 @@ const UserPlotsList = ({
     try {
       const plotToRenew = plots.find((plot) => plot.id === plotId);
       console.log(plotToRenew)
-      if (!plotToRenew || !plotToRenew.end_date) {
+      if (!plotToRenew || !plotToRenew.reserved_until) {
         throw new Error("Plot or end date not found.");
       }
   
-      const parsedEndDate = new Date(plotToRenew.end_date);
+      const parsedEndDate = new Date(plotToRenew.reserved_until);
       if (isNaN(parsedEndDate.getTime())) {
         throw new Error("Invalid end date.");
       }
