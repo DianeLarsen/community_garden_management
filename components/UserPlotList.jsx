@@ -142,11 +142,18 @@ const UserPlotsList = ({
   const handleRenewPlot = async (plotId, extensionWeeks) => {
     try {
       const plotToRenew = plots.find((plot) => plot.id === plotId);
-      const newEndDate = addWeeks(
-        new Date(plotToRenew.end_date),
-        extensionWeeks
-      ).toISOString();
-
+  
+      if (!plotToRenew || !plotToRenew.end_date) {
+        throw new Error("Plot or end date not found.");
+      }
+  
+      const parsedEndDate = new Date(plotToRenew.end_date);
+      if (isNaN(parsedEndDate.getTime())) {
+        throw new Error("Invalid end date.");
+      }
+  
+      const newEndDate = addWeeks(parsedEndDate, extensionWeeks).toISOString();
+  
       const response = await fetch(`/api/plots/${plotId}/extend`, {
         method: "POST",
         headers: {
@@ -155,22 +162,22 @@ const UserPlotsList = ({
         },
         body: JSON.stringify({ new_end_date: newEndDate }),
       });
-
+  
       if (!response.ok) {
         showBanner("Error renewing plot reservation", "error");
       }
-
+  
       setPlots(
         plots.map((plot) =>
           plot.id === plotId ? { ...plot, end_date: newEndDate } : plot
         )
-        
       );
-      setRenewingPlot(null)
+      setRenewingPlot(null);
     } catch (error) {
       console.log(error.message);
     }
   };
+  
 
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
