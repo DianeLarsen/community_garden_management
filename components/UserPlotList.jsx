@@ -140,6 +140,7 @@ const UserPlotsList = ({
   };
 
   const handleRenewPlot = async (plotId, extensionWeeks) => {
+    console.log(plotId, extensionWeeks)
     try {
       const plotToRenew = plots.find((plot) => plot.id === plotId);
   
