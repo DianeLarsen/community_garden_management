@@ -154,7 +154,7 @@ const AdminPage = () => {
                       onChange={(e) =>
                         handleRoleChange(user.id, e.target.value)
                       }
-                      className="p-2 border rounded-md"
+                      className="p-2 border rounded-md text-gray-600"
                     >
                       <option value="member">Member</option>
                       <option value="admin">Admin</option>
