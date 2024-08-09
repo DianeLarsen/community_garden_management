@@ -50,7 +50,7 @@ export async function GET(request) {
     const result = await client.query(
       `
       SELECT 
-        gp.id, gp.name, gp.status, gp.user_id, gp.group_id, 
+        gp.id, gp.name, gp.user_id, gp.group_id, 
         ph.reserved_at, ph.reserved_until,
         u.email, g.name as group_name
       FROM 
@@ -62,7 +62,6 @@ export async function GET(request) {
       LEFT JOIN 
         groups g ON gp.group_id = g.id
       WHERE 
-        gp.status = 'reserved' 
         AND ph.reserved_until >= NOW()
         ${filterQuery}
       ORDER BY 
@@ -81,8 +80,7 @@ export async function GET(request) {
       JOIN 
         plot_history ph ON gp.id = ph.plot_id
       WHERE 
-        gp.status = 'reserved' 
-        AND ph.reserved_until >= NOW()
+        ph.reserved_until >= NOW()
         ${filterQuery}
     `,
       values
