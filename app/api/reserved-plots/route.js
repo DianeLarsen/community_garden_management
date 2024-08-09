@@ -62,7 +62,7 @@ export async function GET(request) {
       LEFT JOIN 
         groups g ON gp.group_id = g.id
       WHERE 
-        AND ph.reserved_until >= NOW()
+        ph.reserved_until >= NOW()
         ${filterQuery}
       ORDER BY 
         ph.reserved_at ASC
