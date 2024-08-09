@@ -8,11 +8,9 @@ export async function GET(request) {
   const limit = parseInt(searchParams.get("limit")) || 10;
   const groupId = searchParams.get("groupId");
   const userId = searchParams.get("userId");
-  const days = searchParams.get("days");
+  const days = parseInt(searchParams.get("days")) || null;
   const gardenId = searchParams.get("gardenId");
   const token = request.cookies.get("token")?.value;
-
-
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -34,9 +32,9 @@ export async function GET(request) {
       values.push(parseInt(userId, 10));
       index++;
     }
-    if (days) {
+    if (days !== null) {
       filters.push(
-        `(ph.reserved_at + interval '1 week' * ph.duration) <= (NOW() + interval '${days} days')`
+        `(ph.reserved_until <= (NOW() + interval '${days} days'))`
       );
     }
     if (gardenId) {
@@ -53,9 +51,8 @@ export async function GET(request) {
       `
       SELECT 
         gp.id, gp.name, gp.status, gp.user_id, gp.group_id, 
-        ph.reserved_at, ph.duration,
-        (ph.reserved_at + interval '1 week' * ph.duration) AS reservation_end,
-        u.username, u.email, g.name as group_name
+        ph.reserved_at, ph.reserved_until,
+        u.email, g.name as group_name
       FROM 
         garden_plots gp
       JOIN 
@@ -66,7 +63,7 @@ export async function GET(request) {
         groups g ON gp.group_id = g.id
       WHERE 
         gp.status = 'reserved' 
-        AND (ph.reserved_at + interval '1 week' * ph.duration) >= NOW()
+        AND ph.reserved_until >= NOW()
         ${filterQuery}
       ORDER BY 
         ph.reserved_at ASC
@@ -85,7 +82,7 @@ export async function GET(request) {
         plot_history ph ON gp.id = ph.plot_id
       WHERE 
         gp.status = 'reserved' 
-        AND (ph.reserved_at + interval '1 week' * ph.duration) >= NOW()
+        AND ph.reserved_until >= NOW()
         ${filterQuery}
     `,
       values
