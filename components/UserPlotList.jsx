@@ -31,7 +31,7 @@ const UserPlotsList = ({
   console.log(plots);
 
   useEffect(() => {
-    if ((user && user.id) && userPlots) {
+    if (user && user.id && userPlots) {
       setLoading(false);
     } else {
       setLoading(true);
@@ -73,11 +73,11 @@ const UserPlotsList = ({
     const confirmRemoval = window.confirm(
       "Are you sure you want to cancel the reservation for this plot?"
     );
-  
+
     if (!confirmRemoval) {
       return; // If the user clicks "Cancel", do nothing
     }
-  
+
     try {
       const response = await fetch(`/api/plots/${plotId}/remove`, {
         method: "POST",
@@ -86,11 +86,11 @@ const UserPlotsList = ({
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Error removing plot reservation");
       }
-  
+
       setPlots(
         plots.map((plot) =>
           plot.id === plotId
@@ -102,7 +102,6 @@ const UserPlotsList = ({
       console.log(error.message);
     }
   };
-  
 
   const handleEditPlot = (plot) => {
     setEditingPlot(plot);
@@ -140,21 +139,20 @@ const UserPlotsList = ({
   };
 
   const handleRenewPlot = async (plotId, extensionWeeks) => {
-   
     try {
       const plotToRenew = plots.find((plot) => plot.id === plotId);
-      console.log(plotToRenew)
+      console.log(plotToRenew);
       if (!plotToRenew || !plotToRenew.reserved_until) {
         throw new Error("Plot or end date not found.");
       }
-  
+
       const parsedEndDate = new Date(plotToRenew.reserved_until);
       if (isNaN(parsedEndDate.getTime())) {
         throw new Error("Invalid end date.");
       }
-  
+
       const newEndDate = addWeeks(parsedEndDate, extensionWeeks).toISOString();
-  
+
       const response = await fetch(`/api/plots/${plotId}/extend`, {
         method: "POST",
         headers: {
@@ -163,23 +161,25 @@ const UserPlotsList = ({
         },
         body: JSON.stringify({ new_end_date: newEndDate }),
       });
-  
+
       if (!response.ok) {
         showBanner("Error renewing plot reservation", "error");
       }
-  
+
       setPlots(
         plots.map((plot) =>
           plot.id === plotId ? { ...plot, reserved_until: newEndDate } : plot
         )
       );
-      showBanner(`You have extended your plot reservation by ${extensionWeeks} weeks!`, "success");
+      showBanner(
+        `You have extended your plot reservation by ${extensionWeeks} weeks!`,
+        "success"
+      );
       setRenewingPlot(null);
     } catch (error) {
       console.log(error.message);
     }
   };
-  
 
   const calculateRemainingTime = (endDate) => {
     const now = new Date();
@@ -306,19 +306,22 @@ const UserPlotsList = ({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
-                <th className="border px-2 py-2 min-w-[50px] max-w-[15%]">
-                  Plot Size(ft.)
-                </th>
+                {/* Only show these two columns on small screens */}
                 <th className="border px-2 py-2 min-w-[150px] max-w-[35%]">
                   Garden Name
                 </th>
                 <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">
                   End Date
                 </th>
-                <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">
+
+                {/* Show these columns on medium screens and above */}
+                <th className="border px-2 py-2 min-w-[50px] max-w-[15%] hidden md:table-cell">
+                  Plot Size(ft.)
+                </th>
+                <th className="border px-2 py-2 min-w-[100px] max-w-[15%] hidden lg:table-cell">
                   Days Left
                 </th>
-                <th className="border px-2 py-2 min-w-[150px] max-w-[20%]">
+                <th className="border px-2 py-2 min-w-[150px] max-w-[20%] hidden xl:table-cell">
                   Actions
                 </th>
               </tr>
@@ -326,20 +329,24 @@ const UserPlotsList = ({
             <tbody>
               {paginatedPlots.map((plot) => (
                 <tr key={plot.id} className={getBackgroundColor(plot.end_date)}>
+                  {/* Always show these two columns */}
                   <td className="border px-4 py-2 text-center">
-                    {plot.length}X{plot.width}
+                    <Link href={`/plots/${plot.id}`} className="text-blue-600">
+                      {plot.garden_name}
+                    </Link>
                   </td>
-                  <td className="border px-4 py-2 text-center">
-                    {plot.garden_name}
-                  </td>
-
                   <td className="border px-4 py-2 text-center">
                     {formatDate(plot.reserved_until)}
                   </td>
-                  <td className="border px-4 py-2 text-center">
+
+                  {/* Conditionally render these columns based on screen size */}
+                  <td className="border px-4 py-2 text-center hidden md:table-cell">
+                    {plot.length}X{plot.width}
+                  </td>
+                  <td className="border px-4 py-2 text-center hidden lg:table-cell">
                     {calculateRemainingTime(plot.reserved_until)}
                   </td>
-                  <td className="border px-4 py-2 text-center">
+                  <td className="border px-4 py-2 text-center hidden xl:table-cell">
                     <Link
                       href={`/plots/${plot.id}`}
                       className="text-blue-600 ml-4"
@@ -379,6 +386,7 @@ const UserPlotsList = ({
               ))}
             </tbody>
           </table>
+
           <div className="flex justify-between mt-4">
             <button
               onClick={handlePrevPage}
