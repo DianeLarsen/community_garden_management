@@ -106,24 +106,24 @@ const AdminPage = () => {
         {usersLoading || usersError || !users ? (
           <p>Loading...</p>
         ) : (
-          <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
-            <thead className="bg-gray-200">
+          <table className="w-full shadow-md rounded-lg overflow-hidden">
+            <thead className="">
               <tr>
-                <th className="py-2 px-4">ID</th>
+                <th className="hidden md:table-cell py-2 px-4">ID</th>
                 <th className="py-2 px-4">Email</th>
-                <th className="hidden md:table-cell py-2 px-4">Role</th>
+                <th className="py-2 px-4">Role</th>
                 <th className="hidden lg:table-cell py-2 px-4">Verified</th>
-                <th className="hidden xl:table-cell py-2 px-4">Action</th>
+                <th className="py-2 px-4">Action</th>
               </tr>
             </thead>
             <tbody>
               {users?.users?.map((user) => (
                 <tr key={user.id} className="border-t">
-                  <td className="py-2 px-4">{user.id}</td>
+                  <td className="hidden md:table-cell py-2 px-4">{user.id}</td>
                   <td className="py-2 px-4">{user.email}</td>
-                  <td className="hidden md:table-cell py-2 px-4">{user.role}</td>
+                  <td className="py-2 px-4">{user.role}</td>
                   <td className="hidden lg:table-cell py-2 px-4">{user.verified ? "Yes" : "No"}</td>
-                  <td className="hidden xl:table-cell py-2 px-4">
+                  <td className="py-2 px-4">
                     <select
                       value={user.role}
                       onChange={(e) =>
