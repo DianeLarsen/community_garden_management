@@ -28,15 +28,15 @@ const UserPlotsList = ({
   const plotsPerPage = 10;
   const [renewingPlot, setRenewingPlot] = useState(null);
   const [renewWeeks, setRenewWeeks] = useState(1);
-console.log(plots)
+  console.log(plots);
 
   useEffect(() => {
-    if (!user.id) {
-      setLoading(true);
-    } else {
+    if ((user && user.id) && userPlots) {
       setLoading(false);
+    } else {
+      setLoading(true);
     }
-  }, [user]);
+  }, [user, userPlots]);
 
   useEffect(() => {
     setLoading(true);
@@ -46,13 +46,12 @@ console.log(plots)
     } else {
       let filteredUserPlots;
 
-        filteredUserPlots = userPlots.filter(
-          (plot) => plot.user_id === user.id
-        );
+      filteredUserPlots = userPlots.filter((plot) => plot.user_id === user.id);
 
-      filteredUserPlots && filteredUserPlots.sort(
-        (a, b) => new Date(a.end_date) - new Date(b.end_date)
-      );
+      filteredUserPlots &&
+        filteredUserPlots.sort(
+          (a, b) => new Date(a.end_date) - new Date(b.end_date)
+        );
       setPlots(filteredUserPlots);
     }
 
@@ -68,7 +67,7 @@ console.log(plots)
     setLoading(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, userPlots]);
+  }, [user, userPlots]);
 
   const handleRemovePlot = async (plotId) => {
     try {
@@ -285,13 +284,23 @@ console.log(plots)
         <>
           <table className="w-full table-auto border-collapse">
             <thead>
-            <tr>
-    <th className="border px-2 py-2 min-w-[50px] max-w-[15%]">Plot Size(ft.)</th>
-    <th className="border px-2 py-2 min-w-[150px] max-w-[35%]">Garden Name</th>
-    <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">End Date</th>
-    <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">Days Left</th>
-    <th className="border px-2 py-2 min-w-[150px] max-w-[20%]">Actions</th>
-  </tr>
+              <tr>
+                <th className="border px-2 py-2 min-w-[50px] max-w-[15%]">
+                  Plot Size(ft.)
+                </th>
+                <th className="border px-2 py-2 min-w-[150px] max-w-[35%]">
+                  Garden Name
+                </th>
+                <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">
+                  End Date
+                </th>
+                <th className="border px-2 py-2 min-w-[100px] max-w-[15%]">
+                  Days Left
+                </th>
+                <th className="border px-2 py-2 min-w-[150px] max-w-[20%]">
+                  Actions
+                </th>
+              </tr>
             </thead>
             <tbody>
               {paginatedPlots.map((plot) => (
@@ -307,7 +316,7 @@ console.log(plots)
                     {formatDate(plot.reserved_until)}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                  {calculateRemainingTime(plot.reserved_until)}
+                    {calculateRemainingTime(plot.reserved_until)}
                   </td>
                   <td className="border px-4 py-2 text-center">
                     <Link
@@ -421,4 +430,3 @@ console.log(plots)
 };
 
 export default UserPlotsList;
-
