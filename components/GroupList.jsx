@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
 import { useState, useEffect, useContext } from "react";
+import Link from "next/link";
 
 const GroupList = ({groups, error}) => {
   const router = useRouter();
