@@ -45,11 +45,11 @@ console.log(plots)
       setLoading(false);
     } else {
       let filteredUserPlots;
-      if (user.role !== "admin") {
+
         filteredUserPlots = userPlots.filter(
           (plot) => plot.user_id === user.id
         );
-      }
+
       filteredUserPlots && filteredUserPlots.sort(
         (a, b) => new Date(a.end_date) - new Date(b.end_date)
       );
