@@ -31,3 +31,19 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Tailwind dark mode support */
+@layer components {
+  .bg-gradient {
+    @apply bg-gradient-to-b from-[var(--background-start-rgb)] to-[var(--background-end-rgb)];
+  }
+}
+
+.dark body {
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
