@@ -170,9 +170,10 @@ const UserPlotsList = ({
   
       setPlots(
         plots.map((plot) =>
-          plot.id === plotId ? { ...plot, end_date: newEndDate } : plot
+          plot.id === plotId ? { ...plot, reserved_until: newEndDate } : plot
         )
       );
+      showBanner(`You have extended your plot reservation by ${extensionWeeks} weeks!`, "success");
       setRenewingPlot(null);
     } catch (error) {
       console.log(error.message);
