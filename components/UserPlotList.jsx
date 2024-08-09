@@ -28,7 +28,7 @@ const UserPlotsList = ({
   const plotsPerPage = 10;
   const [renewingPlot, setRenewingPlot] = useState(null);
   const [renewWeeks, setRenewWeeks] = useState(1);
-console.log(userPlots)
+console.log(plots)
 
   useEffect(() => {
     if (!user.id) {
