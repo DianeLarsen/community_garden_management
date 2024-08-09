@@ -29,7 +29,7 @@ const UserPlotsList = ({
   const [renewingPlot, setRenewingPlot] = useState(null);
   const [renewWeeks, setRenewWeeks] = useState(1);
 
-console.log(plots)
+
   useEffect(() => {
     if (!user.id) {
       setLoading(true);

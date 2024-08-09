@@ -22,7 +22,7 @@ const ProfileDetails = () => {
   const [changePasswordToggle, setChangePasswordToggle] = useState(false)
   const router = useRouter();
 
-  console.log(user)
+
   useEffect(() => {
     if (!user?.id) {
       setLoading(true)
