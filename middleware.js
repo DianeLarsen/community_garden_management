@@ -5,9 +5,9 @@ export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
   const publicPaths = ["/", "/about", "/register", "/verify", "/password-reset-request"];
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
-console.log("ispublicpath:", isPublicPath)
+
   if (!token) {
-    console.log("token:", token)
+
     if (isPublicPath) {
       return NextResponse.next();
     } else {
@@ -19,7 +19,7 @@ console.log("ispublicpath:", isPublicPath)
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     await jwtVerify(token, secret);
-    console.log("No problems here")
+
     return NextResponse.next();
   } catch (err) {
     console.log(err)

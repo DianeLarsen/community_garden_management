@@ -45,7 +45,8 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
-
+console.log("made it here userId:", userId)
+const userRole = decoded.role;
     const client = await pool.connect();
 
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
@@ -102,7 +103,7 @@ export async function GET(request) {
 
 
     const groupsQuery =
-      user.role === "admin"
+    userRole === "admin"
         ? `
         SELECT 
           g.id, g.name, g.description, g.location, g.accepting_members,
