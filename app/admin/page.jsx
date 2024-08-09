@@ -22,12 +22,35 @@ const AdminPage = () => {
   const [error, setError] = useState("");
   const plotsPerPage = 10;
 
-  const { data: users, error: usersError, isLoading: usersLoading } = useSWR(token ? "/api/users" : null, fetcher);
-  const { data: events, error: eventsError, isLoading: eventsLoading } = useSWR(token ? "/api/events" : null, fetcher);
-  const { data: gardens, error: gardensError, isLoading: gardensLoading } = useSWR(token ? `/api/gardens?maxDistance=${maxDistance}&limit=${limit}` : null, fetcher);
-  const { data: allGroups, error: groupsError, isLoading: groupsLoading } = useSWR(token ? "/api/groups" : null, fetcher);
-  
-  const { data: plotsData, error: reservedPlotsError, isLoading: reservedPlotsLoading } = useSWR(
+  const {
+    data: users,
+    error: usersError,
+    isLoading: usersLoading,
+  } = useSWR(token ? "/api/users" : null, fetcher);
+  const {
+    data: events,
+    error: eventsError,
+    isLoading: eventsLoading,
+  } = useSWR(token ? "/api/events" : null, fetcher);
+  const {
+    data: gardens,
+    error: gardensError,
+    isLoading: gardensLoading,
+  } = useSWR(
+    token ? `/api/gardens?maxDistance=${maxDistance}&limit=${limit}` : null,
+    fetcher
+  );
+  const {
+    data: allGroups,
+    error: groupsError,
+    isLoading: groupsLoading,
+  } = useSWR(token ? "/api/groups" : null, fetcher);
+
+  const {
+    data: plotsData,
+    error: reservedPlotsError,
+    isLoading: reservedPlotsLoading,
+  } = useSWR(
     token
       ? `/api/reserved-plots?page=${currentPage}&limit=${plotsPerPage}&groupId=${selectedGroup}&userId=${selectedUser}&days=${selectedDays}&gardenId=${selectedGarden}`
       : null,
@@ -122,7 +145,9 @@ const AdminPage = () => {
                   <td className="hidden md:table-cell py-2 px-4">{user.id}</td>
                   <td className="py-2 px-4">{user.email}</td>
                   <td className="py-2 px-4">{user.role}</td>
-                  <td className="hidden lg:table-cell py-2 px-4">{user.verified ? "Yes" : "No"}</td>
+                  <td className="hidden lg:table-cell py-2 px-4">
+                    {user.verified ? "Yes" : "No"}
+                  </td>
                   <td className="py-2 px-4">
                     <select
                       value={user.role}
@@ -211,143 +236,152 @@ const AdminPage = () => {
 
       <section className="mb-8">
         <h2 className="text-2xl font-bold mb-4">Reserved Plots</h2>
-        <div className="filters flex gap-4 mb-4">
-          <label>
+        <div className="filters flex flex-col sm:flex-col md:flex-row lg:flex-row gap-4 mb-4">
+          <label className="w-full md:w-auto">
             Group:
             <select
               value={selectedGroup}
               onChange={(e) => setSelectedGroup(e.target.value)}
-              className="ml-2 p-1 border rounded"
-              >
-                <option value="">All</option>
-                {allGroups?.map((group) => (
-                  <option key={group.id} value={group.id}>
-                    {group.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              User:
-              <select
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
-                className="ml-2 p-1 border rounded"
-              >
-                <option value="">All</option>
-                {users?.users?.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.email}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Days:
-              <input
-                type="number"
-                value={selectedDays}
-                onChange={(e) => setSelectedDays(e.target.value)}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Garden:
-              <select
-                value={selectedGarden}
-                onChange={(e) => setSelectedGarden(e.target.value)}
-                className="ml-2 p-1 border rounded"
-              >
-                <option value="">All</option>
-                {gardens?.map((garden) => (
-                  <option key={garden.id} value={garden.id}>
-                    {garden.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-  
-          {reservedPlotsLoading ? (
-            <p>Loading...</p>
-          ) : reservedPlotsError ? (
-            <p className="text-red-500 mb-4">Error: {reservedPlotsError}</p>
-          ) : plotsData?.message || plotsData?.error ? (
-            <p className="text-red-500 mb-4">
-              Error: {plotsData?.message || plotsData?.error}
-            </p>
-          ) : (
-            <section className="mb-8">
-              <table className="w-full bg-white shadow-md rounded-lg overflow-hidden">
-                <thead className="bg-gray-200">
-                  <tr>
-                    <th className="py-2 px-4">Plot Name</th>
-                    <th className="hidden md:table-cell py-2 px-4">Reserved By</th>
-                    <th className="hidden lg:table-cell py-2 px-4">Group</th>
-                    <th className="hidden xl:table-cell py-2 px-4">Reservation Start</th>
-                    <th className="hidden xl:table-cell py-2 px-4">Duration (weeks)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservedPlots && reservedPlots.length > 0 ? (
-                    reservedPlots.map((plot) => (
-                      <tr key={plot.id} className="border-t">
-                        <td className="py-2 px-4">{plot.name}</td>
-                        <td className="hidden md:table-cell py-2 px-4">
-                          {plot.user_id
-                            ? users?.users.find(
-                                (user) => user.id === plot.user_id
-                              )?.email
-                            : "N/A"}
-                        </td>
-                        <td className="hidden lg:table-cell py-2 px-4">
-                          {plot.group_id
-                            ? allGroups.find((group) => group.id === plot.group_id)
-                                ?.name
-                            : "N/A"}
-                        </td>
-                        <td className="hidden xl:table-cell py-2 px-4">
-                          {new Date(plot.reserved_at).toLocaleString()}
-                        </td>
-                        <td className="hidden xl:table-cell py-2 px-4">
-                          {calculateRemainingTime(plot.end_date)}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="5" className="text-center py-4">
-                        No reserved plots found
+              className="w-full md:w-auto ml-2 p-1 border rounded"
+            >
+              <option value="">All</option>
+              {allGroups?.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="w-full md:w-auto">
+            User:
+            <select
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+              className="w-full md:w-auto ml-2 p-1 border rounded"
+            >
+              <option value="">All</option>
+              {users?.users?.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.email}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="w-full md:w-auto">
+            Days:
+            <input
+              type="number"
+              value={selectedDays}
+              onChange={(e) => setSelectedDays(e.target.value)}
+              className="w-full md:w-auto ml-2 p-1 border rounded"
+            />
+          </label>
+
+          <label className="w-full md:w-auto">
+            Garden:
+            <select
+              value={selectedGarden}
+              onChange={(e) => setSelectedGarden(e.target.value)}
+              className="w-full md:w-auto ml-2 p-1 border rounded"
+            >
+              <option value="">All</option>
+              {gardens?.map((garden) => (
+                <option key={garden.id} value={garden.id}>
+                  {garden.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {reservedPlotsLoading ? (
+          <p>Loading...</p>
+        ) : reservedPlotsError ? (
+          <p className="text-red-500 mb-4">Error: {reservedPlotsError}</p>
+        ) : plotsData?.message || plotsData?.error ? (
+          <p className="text-red-500 mb-4">
+            Error: {plotsData?.message || plotsData?.error}
+          </p>
+        ) : (
+          <section className="mb-8">
+            <table className="w-full  shadow-md rounded-lg overflow-hidden">
+              <thead className="">
+                <tr>
+                  <th className="py-2 px-4">Plot Name</th>
+                  <th className="hidden md:table-cell py-2 px-4">
+                    Reserved By
+                  </th>
+                  <th className="hidden lg:table-cell py-2 px-4">Group</th>
+                  <th className="hidden xl:table-cell py-2 px-4">
+                    Reservation Start
+                  </th>
+                  <th className="hidden xl:table-cell py-2 px-4">
+                    Duration (weeks)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {reservedPlots && reservedPlots.length > 0 ? (
+                  reservedPlots.map((plot) => (
+                    <tr key={plot.id} className="border-t">
+                      <td className="py-2 px-4">{plot.name}</td>
+                      <td className="hidden md:table-cell py-2 px-4">
+                        {plot.user_id
+                          ? users?.users.find(
+                              (user) => user.id === plot.user_id
+                            )?.email
+                          : "N/A"}
+                      </td>
+                      <td className="hidden lg:table-cell py-2 px-4">
+                        {plot.group_id
+                          ? allGroups.find(
+                              (group) => group.id === plot.group_id
+                            )?.name
+                          : "N/A"}
+                      </td>
+                      <td className="hidden xl:table-cell py-2 px-4">
+                        {new Date(plot.reserved_at).toLocaleString()}
+                      </td>
+                      <td className="hidden xl:table-cell py-2 px-4">
+                        {calculateRemainingTime(plot.end_date)}
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-              <div className="flex justify-between mt-4">
-                <button
-                  onClick={handlePrevPage}
-                  className="p-2  rounded"
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </button>
-                <span>
-                  Page {currentPage} of {Math.ceil(totalPlots / plotsPerPage)}
-                </span>
-                <button
-                  onClick={handleNextPage}
-                  className="p-2  rounded"
-                  disabled={currentPage === Math.ceil(totalPlots / plotsPerPage)}
-                >
-                  Next
-                </button>
-              </div>
-            </section>
-          )}
-        </section>
-      </div>
-    );
-  };
-  
-  export default AdminPage;
-  
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-4">
+                      No reserved plots found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handlePrevPage}
+                className="p-2  rounded"
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage} of {Math.ceil(totalPlots / plotsPerPage)}
+              </span>
+              <button
+                onClick={handleNextPage}
+                className="p-2  rounded"
+                disabled={currentPage === Math.ceil(totalPlots / plotsPerPage)}
+              >
+                Next
+              </button>
+            </div>
+          </section>
+        )}
+      </section>
+    </div>
+  );
+};
+
+export default AdminPage;
