@@ -118,47 +118,46 @@ const FindPlot = () => {
       <h1 className="text-2xl font-bold mb-4">Find a Community Garden</h1>
       {error && <p className="text-red-500">{error}</p>}
       {message && <p className="text-yellow-500">{message}</p>}
-      <form onSubmit={handleSearch} className="mb-4 flex flex-col md:flex-row">
-        <div className="flex items-center gap-2">
-          <div className="flex flex-col">
-            <label className="mb-1">Search Term:</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Enter Zip Code, Address, or City"
-              className="border p-2 rounded"
-              required
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1">Max Distance (miles):</label>
-            <input
-              type="number"
-              value={maxDistance}
-              onChange={(e) => setMaxDistance(e.target.value)}
-              placeholder="Max Distance (miles)"
-              className="border p-2 rounded"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1">Limit:</label>
-            <input
-              type="number"
-              value={limit}
-              onChange={(e) => setLimit(e.target.value)}
-              placeholder="Limit"
-              className="border p-2 rounded"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white p-2 rounded mt-4"
-          >
-            Search
-          </button>
-        </div>
-      </form>
+      <form onSubmit={handleSearch} className="mb-4 flex flex-col gap-4 md:flex-row md:items-end">
+  <div className="flex flex-col">
+    <label className="mb-1">Search Term:</label>
+    <input
+      type="text"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      placeholder="Enter Zip Code, Address, or City"
+      className="border p-2 rounded"
+      required
+    />
+  </div>
+  <div className="flex flex-col">
+    <label className="mb-1">Max Distance (miles):</label>
+    <input
+      type="number"
+      value={maxDistance}
+      onChange={(e) => setMaxDistance(e.target.value)}
+      placeholder="Max Distance (miles)"
+      className="border p-2 rounded"
+    />
+  </div>
+  <div className="flex flex-col">
+    <label className="mb-1">Limit:</label>
+    <input
+      type="number"
+      value={limit}
+      onChange={(e) => setLimit(e.target.value)}
+      placeholder="Limit"
+      className="border p-2 rounded"
+    />
+  </div>
+  <button
+    type="submit"
+    className="bg-blue-500 text-white p-2 rounded"
+  >
+    Search
+  </button>
+</form>
+
       <table className="w-full table-auto border-collapse">
         <thead>
           <tr>
