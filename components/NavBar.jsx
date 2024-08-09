@@ -8,7 +8,6 @@ import { BasicContext } from "@/context/BasicContext";
 const NavBar = () => {
   const [menuToggle, setMenuToggle] = useState("menu");
 
-
   const {
     isAuthenticated,
     setIsAuthenticated,
@@ -18,14 +17,10 @@ const NavBar = () => {
     showBanner
   } = useContext(BasicContext);
 
-
-
   const navLinks = isAuthenticated
     ? [
         { href: "/", label: "Home" },
-
         { href: "/events", label: "Events" },
-
         { href: "/gardens", label: "Gardens" },
         { href: "/groups", label: "Groups" },
         { href: "/about", label: "About" },
@@ -41,7 +36,7 @@ const NavBar = () => {
         <div className="container mx-auto flex justify-between items-center">
           <Link
             href="/"
-            className="hidden md:hidden lg:hidden xl:flex text-white  font-bold"
+            className="hidden md:hidden lg:hidden xl:flex text-white font-bold"
           >
             Community Garden Management
           </Link>
@@ -54,20 +49,20 @@ const NavBar = () => {
           </Link>
         </div>
         <div
-          className={`nav-links md:static absolute bg-gray-800 duration-500  md:min-h-fit min-h-[40vh] md:right-0 ${
-            menuToggle == "menu"
+          className={`nav-links md:static absolute bg-gray-800 duration-500 md:min-h-fit min-h-[40vh] md:right-0 ${
+            menuToggle === "menu"
               ? "top-[-100%] right-0"
               : "top-[7%] right-0 w-half"
           } md:w-auto w-6/12 flex items-center px-6`}
         >
-          <ul
-            className={`flex md:flex-row flex-col md:items-center text-white  font-bold md:gap=[4vw] gap-7`}
-          >
+          <ul className={`flex md:flex-row flex-col md:items-center text-white font-bold md:gap=[4vw] gap-7`}>
             {navLinks.map((link) => (
               <li key={link.href}>
-                <Link href={link.href}          onClick={() =>
-              setMenuToggle(menuToggle == "menu" ? "close" : "menu")
-            } className="px-4">
+                <Link
+                  href={link.href}
+                  onClick={() => setMenuToggle("menu")}
+                  className="px-4"
+                >
                   {link.label}
                 </Link>
               </li>
@@ -80,7 +75,7 @@ const NavBar = () => {
             className="text-3xl cursor-pointer md:hidden"
             name={menuToggle}
             onClick={() =>
-              setMenuToggle(menuToggle == "menu" ? "close" : "menu")
+              setMenuToggle(menuToggle === "menu" ? "close" : "menu")
             }
           />
           <AuthLinks
@@ -98,10 +93,10 @@ const NavBar = () => {
         >
           {banner.message}{" "}
           {banner.link && (
-          <Link href={banner.link} className="text-black underline">
-            Click here to fix
-          </Link>
-        )}
+            <Link href={banner.link} className="text-black underline">
+              Click here to fix
+            </Link>
+          )}
           <button
             onClick={() => setBanner({ message: "", type: "" })}
             className="ml-4"
