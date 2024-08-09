@@ -28,7 +28,7 @@ const UserPlotsList = ({
   const plotsPerPage = 10;
   const [renewingPlot, setRenewingPlot] = useState(null);
   const [renewWeeks, setRenewWeeks] = useState(1);
-
+console.log(userPlots)
 
   useEffect(() => {
     if (!user.id) {
@@ -50,7 +50,7 @@ const UserPlotsList = ({
           (plot) => plot.user_id === user.id
         );
       }
-      filteredUserPlots.sort(
+      filteredUserPlots && filteredUserPlots.sort(
         (a, b) => new Date(a.end_date) - new Date(b.end_date)
       );
       setPlots(filteredUserPlots);
