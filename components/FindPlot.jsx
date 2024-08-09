@@ -118,7 +118,7 @@ const FindPlot = () => {
       <h1 className="text-2xl font-bold mb-4">Find a Community Garden</h1>
       {error && <p className="text-red-500">{error}</p>}
       {message && <p className="text-yellow-500">{message}</p>}
-      <form onSubmit={handleSearch} className="mb-4">
+      <form onSubmit={handleSearch} className="mb-4 flex flex-col md:flex-row">
         <div className="flex items-center gap-2">
           <div className="flex flex-col">
             <label className="mb-1">Search Term:</label>
