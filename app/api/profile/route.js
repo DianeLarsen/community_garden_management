@@ -26,14 +26,13 @@ async function getCoordinatesFromZip(zip) {
     const place = data.places[0];
     return {
       latitude: parseFloat(place.latitude),
-      longitude: parseFloat(place.longitude)
+      longitude: parseFloat(place.longitude),
     };
   } catch (error) {
     console.error("Error fetching coordinates from zip code:", error);
     return null;
   }
 }
-
 
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;
@@ -45,8 +44,8 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
-console.log("made it here userId:", userId)
-const userRole = decoded.role;
+    console.log("made it here userId:", userId);
+    const userRole = decoded.role;
     const client = await pool.connect();
 
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
@@ -99,27 +98,13 @@ const userRole = decoded.role;
           SELECT event_id FROM event_registrations WHERE user_id = $1
       );
     `;
-    const userEventsResult = await client.query(userEventsQuery, [userId, userCoordinates.longitude, userCoordinates.latitude]);
+    const userEventsResult = await client.query(userEventsQuery, [
+      userId,
+      userCoordinates.longitude,
+      userCoordinates.latitude,
+    ]);
 
-
-    const groupsQuery =
-    userRole === "admin"
-        ? `
-        SELECT 
-          g.id, g.name, g.description, g.location, g.accepting_members,
-          (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count,
-          COALESCE(json_agg(json_build_object('user_id', u.id, 'username', u.username, 'email', u.email, 'role', gm.role)) FILTER (WHERE gm.user_id IS NOT NULL), '[]') AS members,
-          COALESCE(json_agg(json_build_object('invite_id', gi.id, 'user_id', iu.id, 'username', iu.username, 'email', iu.email, 'status', gi.status)) FILTER (WHERE gi.id IS NOT NULL), '[]') AS invitations,
-          COUNT(gp.id) FILTER (WHERE gp.group_id = g.id) AS reserved_plots
-        FROM groups g
-        LEFT JOIN group_memberships gm ON g.id = gm.group_id
-        LEFT JOIN users u ON gm.user_id = u.id
-        LEFT JOIN group_invitations gi ON g.id = gi.group_id
-        LEFT JOIN users iu ON gi.user_id = iu.id
-        LEFT JOIN garden_plots gp ON g.id = gp.group_id
-        GROUP BY g.id
-      `
-        : `
+    const groupsQuery = `
         SELECT 
           g.id, g.name, g.description, g.location, gm.role, g.accepting_members,
           (SELECT COUNT(*) FROM group_memberships WHERE group_id = g.id) AS members_count,
@@ -158,8 +143,7 @@ const userRole = decoded.role;
     ) ph ON gp.id = ph.plot_id
     WHERE gp.user_id = $1
   `;
-  const plotsResult = await client.query(plotsQuery, [userId]);
-  
+    const plotsResult = await client.query(plotsQuery, [userId]);
 
     for (let group of groupsResult.rows) {
       group.city = await getCityFromZip(group.location);
