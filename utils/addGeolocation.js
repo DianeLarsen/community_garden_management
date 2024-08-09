@@ -8,7 +8,7 @@ async function getLatLonFromAddress(address) {
   const apiKey = process.env.GOOGLE_KEY;
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-  // console.log(url)
+
   try {
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(url);
