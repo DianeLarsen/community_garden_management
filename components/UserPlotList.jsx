@@ -21,7 +21,7 @@ const UserPlotsList = ({
     width: "",
     group_id: "",
   });
-  const { user, userPlots } = useContext(BasicContext);
+  const { user, userPlots, showBanner } = useContext(BasicContext);
 
   const [groupLegend, setGroupLegend] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,6 +70,14 @@ const UserPlotsList = ({
   }, [user, userPlots]);
 
   const handleRemovePlot = async (plotId) => {
+    const confirmRemoval = window.confirm(
+      "Are you sure you want to cancel the reservation for this plot?"
+    );
+  
+    if (!confirmRemoval) {
+      return; // If the user clicks "Cancel", do nothing
+    }
+  
     try {
       const response = await fetch(`/api/plots/${plotId}/remove`, {
         method: "POST",
@@ -78,10 +86,11 @@ const UserPlotsList = ({
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-
+  
       if (!response.ok) {
         throw new Error("Error removing plot reservation");
       }
+  
       setPlots(
         plots.map((plot) =>
           plot.id === plotId
@@ -93,6 +102,7 @@ const UserPlotsList = ({
       console.log(error.message);
     }
   };
+  
 
   const handleEditPlot = (plot) => {
     setEditingPlot(plot);
@@ -147,14 +157,16 @@ const UserPlotsList = ({
       });
 
       if (!response.ok) {
-        throw new Error("Error renewing plot reservation");
+        showBanner("Error renewing plot reservation", "error");
       }
 
       setPlots(
         plots.map((plot) =>
           plot.id === plotId ? { ...plot, end_date: newEndDate } : plot
         )
+        
       );
+      setRenewingPlot(null)
     } catch (error) {
       console.log(error.message);
     }
