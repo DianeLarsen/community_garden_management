@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 export async function DELETE(request, { params }) {
     const { id } = params; // event id
     const { memberId } = await request.json();
-    console.log(memberId)
+
     const token = request.cookies.get('token')?.value;
   
     if (!token) {

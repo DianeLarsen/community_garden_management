@@ -109,7 +109,7 @@ export const BasicProvider = ({ children }) => {
         if (response.ok) {
 
 
-          console.log(data)
+          // console.log(data)
           setGarden(data.garden)
           setGardenGroups(data.groups);
           setGardenEvents(data.events);

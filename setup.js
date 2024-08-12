@@ -12,11 +12,12 @@ async function setupDatabase() {
     console.log("PostGIS extension created or already exists.");
 
 
-    // Drop tables if they exist for fresh setup
+    // // Drop tables if they exist for fresh setup
     await client.query(
       "DROP TABLE IF EXISTS plot_history, event_registrations, events, garden_plots, group_memberships, groups, users, gardens CASCADE"
     );
-    //  // Check if the users table already exists
+    console.log("Cleared Tables.");
+     // Check if the users table already exists
     //  const tableExists = await client.query(`
     //   SELECT EXISTS (
     //     SELECT FROM information_schema.tables 

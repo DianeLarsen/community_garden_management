@@ -55,7 +55,7 @@ export async function POST(request, { params }) {
       group_invitations.user_id = $1 AND group_invitations.group_id = $2
   `;
   
-    console.log(inviteQuery)
+
     const inviteResult = await client.query(inviteQuery, [userId, id]);
     
     const invite = inviteResult.rows[0];

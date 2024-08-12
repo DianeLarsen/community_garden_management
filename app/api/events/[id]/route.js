@@ -6,7 +6,7 @@ export async function GET(request, { params }) {
   const { id } = params;
   const token = request.cookies.get("token")?.value;
   if (!token) {
-    console.log("no token");
+
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 },
@@ -42,7 +42,7 @@ export async function GET(request, { params }) {
       (!groupAdmins.includes(userId) && role != "admin") &&
       eventResult.rows[0]?.is_public == "false" && event?.user_id != userId
     ) {
-      console.log("not public, not group admin or admin");
+
 
 
 

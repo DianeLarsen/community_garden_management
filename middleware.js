@@ -22,7 +22,7 @@ export async function middleware(request) {
 
     return NextResponse.next();
   } catch (err) {
-    console.log(err)
+    console.error(err)
     const response = NextResponse.redirect(new URL("/", request.url));
     response.cookies.delete("token");
     return response;

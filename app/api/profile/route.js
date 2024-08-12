@@ -44,8 +44,6 @@ export async function GET(request) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = parseInt(decoded.userId, 10);
-    console.log("made it here userId:", userId);
-    const userRole = decoded.role;
     const client = await pool.connect();
 
     const userZipQuery = "SELECT zip FROM users WHERE id = $1";
