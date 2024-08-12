@@ -16,7 +16,7 @@ const InvitesList = () => {
       <h2 className="text-xl font-bold mb-4">Invites</h2>
       {userInvites.length > 0 ? (
         <ul className="list-disc pl-5">
-          {invites.map((invite) => (
+          {userInvites.map((invite) => (
             <li key={invite.id} className="text-gray-700 mb-2">
               <Link
                 href={`/groups/${invite.group_id}`}
