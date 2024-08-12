@@ -33,7 +33,8 @@ export const BasicProvider = ({ children }) => {
   const [message, setMessage] = useState("");
   const [group, setGroup] = useState("");
   const [events, setEvents] = useState([]);
-  const [allEvents, setAllEvents] = useState([]); // Added state for all events
+  const [allEvents, setAllEvents] = useState([]);
+  const [allInvites, setAllInvites] = useState([]); 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState("");
