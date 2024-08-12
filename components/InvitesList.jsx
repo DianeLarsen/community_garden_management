@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { BasicContext } from "@/context/BasicContext";
 import { useState, useEffect, useContext } from "react";
 
 const InvitesList = () => {
   const router = useRouter();
   const { userInvites } = useContext(BasicContext);
-
-
+  const thisParams = useParams()
+console.log(thisParams)
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
