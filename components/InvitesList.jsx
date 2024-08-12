@@ -36,7 +36,7 @@ console.log(allInvites)
                   href={`/groups/${invite.group_id}`}
                   className="text-blue-500 hover:underline"
                 >
-                  {invite.name}
+                  {invite.group_name}
                 </Link>{" "}
                 - {invite.status}
               </li>
@@ -55,7 +55,7 @@ console.log(allInvites)
                   href={`/events/${invite.event_id}`}
                   className="text-blue-500 hover:underline"
                 >
-                  {invite.name}
+                  {invite.event_name}
                 </Link>{" "}
                 - {invite.status}
               </li>
