@@ -65,6 +65,7 @@ async function setupDatabase() {
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         group_id INTEGER REFERENCES groups(id),
+        invited_by_id INTEGER REFERENCES users(id),
         role VARCHAR(50) DEFAULT 'member',
         joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -177,6 +178,8 @@ await client.query(`
     user_id INTEGER REFERENCES users(id),
     event_id INTEGER REFERENCES events(id),
     group_id INTEGER REFERENCES groups(id),
+    invited_by_id INTEGER REFERENCES users(id),
+    approved_by_id INTEGER REFERENCES users(id),
     role VARCHAR(50) DEFAULT 'member',
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )

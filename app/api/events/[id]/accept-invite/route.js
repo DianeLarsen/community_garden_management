@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(request, { params }) {
   const { id } = params; // event id
-  const token = request.headers.get('authorization')?.split(' ')[1];
+  const token = request.cookies.get('token')?.value;
 
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -16,10 +16,8 @@ export async function POST(request, { params }) {
 
     const client = await pool.connect();
     const acceptInviteQuery = `
-      UPDATE event_invitations
-      SET status = 'accepted'
-      WHERE event_id = $1 AND user_id = $2
-      RETURNING *
+      DELETE FROM event_invitations
+      WHERE event_id = $1 AND user_id = $2    
     `;
     const result = await client.query(acceptInviteQuery, [id, userId]);
 

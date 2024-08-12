@@ -43,20 +43,19 @@ export async function POST(request, { params }) {
 
     await client.query('BEGIN');
 
-
-    // Remove from event_invitations
-    const deleteInviteQuery = `
-      DELETE FROM event_invitations WHERE id = $1
-    `;
-    await client.query(deleteInviteQuery, [inviteId]);
-    console.log("made it here1")
     // Add to event_registrations
     const insertRegistrationQuery = `
-      INSERT INTO event_registrations (event_id, user_id)
-      VALUES ($1, $2)
+      INSERT INTO event_registrations (event_id, user_id, approved_by_id)
+      VALUES ($1, $2, $3)
     `;
-    await client.query(insertRegistrationQuery, [id, inviteUserId]);
-    console.log("made it here2")
+    await client.query(insertRegistrationQuery, [id, inviteUserId, userId]);
+
+        // Remove from event_invitations
+        const deleteInviteQuery = `
+        DELETE FROM event_invitations WHERE id = $1
+      `;
+      await client.query(deleteInviteQuery, [inviteId]);
+
     await client.query('COMMIT');
     client.release();
 
