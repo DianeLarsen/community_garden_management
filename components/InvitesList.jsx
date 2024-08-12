@@ -17,7 +17,8 @@ const InvitesList = () => {
       setInvites(allInvites);
     }
   }, [pathname, userInvites, allInvites]);
-
+console.log(userInvites)
+console.log(allInvites)
   const groupInvites = invites.filter((invite) => invite.type === "group");
   const eventInvites = invites.filter((invite) => invite.type === "event");
 
