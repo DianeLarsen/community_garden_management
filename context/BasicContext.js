@@ -193,6 +193,24 @@ export const BasicProvider = ({ children }) => {
     if (isAuthenticated) fetchAllEvents();
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        const response = await fetch('/api/invitations');
+        if (!response.ok) {
+          throw new Error('Failed to fetch invitations');
+        }
+        const data = await response.json();
+        setAllInvites(data.invites);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated) fetchInvitations();
+  }, []);
 
   useEffect(() => {
     const fetchAllPlots = async () => {
@@ -372,6 +390,7 @@ export const BasicProvider = ({ children }) => {
     gardenEvents,
     gardenPlotReservations,
     gardenPlots,
+    allInvites
   };
 
   return (

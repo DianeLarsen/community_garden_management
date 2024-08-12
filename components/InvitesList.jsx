@@ -7,9 +7,17 @@ import { useState, useEffect, useContext } from "react";
 
 const InvitesList = () => {
   const router = useRouter();
-  const { userInvites } = useContext(BasicContext);
+  const { userInvites, allInvites } = useContext(BasicContext);
+  const [invites, setInvites] = useState([])
   const pathname = usePathname ()
-console.log(pathname)
+  useEffect(() => {
+    if (pathname == "/profile"){
+      setInvites(userInvites)
+    } else {
+      setInvites(allInvites)
+    }
+  }, [pathname, userInvites, allInvites])
+
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
