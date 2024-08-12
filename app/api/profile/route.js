@@ -122,13 +122,58 @@ export async function GET(request) {
       `;
     const groupsResult = await client.query(groupsQuery, [userId]);
 
-    const invitesQuery = `
-      SELECT g.id, g.name, g.description, g.location, gi.status
-      FROM groups g
-      JOIN group_invitations gi ON g.id = gi.group_id
-      WHERE gi.user_id = $1
-    `;
-    const invitesResult = await client.query(invitesQuery, [userId]);
+    const groupInvitesQuery = `
+    SELECT 
+      gi.id AS invite_id, 
+      gi.group_id, 
+      gi.user_id, 
+      gi.requester_id, 
+      gi.status, 
+      'group' AS type,
+      g.name AS group_name,
+      u.email AS user_email,
+      r.email AS requester_email
+    FROM 
+      group_invitations gi
+    JOIN 
+      groups g ON gi.group_id = g.id
+    JOIN 
+      users u ON gi.user_id = u.id
+    JOIN 
+      users r ON gi.requester_id = r.id
+    WHERE 
+      gi.user_id = $1
+  `;
+  
+  const groupInvitesResult = await client.query(groupInvitesQuery, [userId]);
+
+  const eventInvitesQuery = `
+  SELECT 
+    ei.id AS invite_id, 
+    ei.event_id, 
+    ei.user_id, 
+    ei.requester_id, 
+    ei.status, 
+    'event' AS type,
+    e.name AS event_name,
+    u.email AS user_email,
+    r.email AS requester_email
+  FROM 
+    event_invitations ei
+  JOIN 
+    events e ON ei.event_id = e.id
+  JOIN 
+    users u ON ei.user_id = u.id
+  JOIN 
+    users r ON ei.requester_id = r.id
+  WHERE 
+    ei.user_id = $1
+`;
+
+const eventInvitesResult = await client.query(eventInvitesQuery, [userId]);
+
+const allInvites = [...groupInvitesResult.rows, ...eventInvitesResult.rows];
+ 
 
     const plotsQuery = `
     SELECT gp.id, gp.name, gp.location, gp.length, gp.width, gp.user_id, gp.group_id, gp.garden_id, g.name as garden_name,
@@ -158,7 +203,7 @@ export async function GET(request) {
     return NextResponse.json({
       profile: user,
       groups: groupsResult.rows,
-      invites: invitesResult.rows,
+      invites: allInvites,
       plots: plotsResult.rows,
       events: userEventsResult.rows,
     });
