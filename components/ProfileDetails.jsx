@@ -9,10 +9,10 @@ import ChangePassword from "@/components/ChangePassword";
 const ProfileDetails = () => {
   const {
     user, setUser,
-    groups, message, setMessage
+    groups, message, setMessage, loading, setLoading
   } = useContext(BasicContext);
   const [localProfileData, setLocalProfileData] = useState({});
-  const [loading, setLoading] = useState(false);
+
   const [photo, setPhoto] = useState(
     user?.profile_photo ||
     "https://res.cloudinary.com/dqjh46sk5/image/upload/v1677786781/zpoquv2r7p88ahgupk0d.jpg"
@@ -24,10 +24,10 @@ const ProfileDetails = () => {
 
 
   useEffect(() => {
-    if (!user?.id) {
-      setLoading(true)
+    if (user && user.id) {
+      setLoading(false);
     } else {
-      setLoading(false)
+      setLoading(true);
     }
   }, [user])
 

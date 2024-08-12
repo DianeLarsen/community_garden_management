@@ -14,14 +14,14 @@ const UserPlotsList = ({
 }) => {
   const [plots, setPlots] = useState([]);
   const [returnMessage, setReturnMessage] = useState("");
-  const [loading, setLoading] = useState(true);
+
   const [editingPlot, setEditingPlot] = useState(null);
   const [editForm, setEditForm] = useState({
     length: "",
     width: "",
     group_id: "",
   });
-  const { user, userPlots, showBanner } = useContext(BasicContext);
+  const { user, userPlots, showBanner, loading, setLoading } = useContext(BasicContext);
 
   const [groupLegend, setGroupLegend] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,7 +36,7 @@ const UserPlotsList = ({
     } else {
       setLoading(true);
     }
-  }, [user, userPlots]);
+  }, [user, user.id, userPlots]);
 
   useEffect(() => {
     setLoading(true);

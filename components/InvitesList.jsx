@@ -7,14 +7,14 @@ import { useState, useEffect, useContext } from "react";
 
 const InvitesList = () => {
   const router = useRouter();
-  const { invites } = useContext(BasicContext);
+  const { userInvites } = useContext(BasicContext);
 
 
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-md shadow-md mt-6">
-      <h2 className="text-xl font-bold mb-4">Group Invites</h2>
-      {invites.length > 0 ? (
+      <h2 className="text-xl font-bold mb-4">Invites</h2>
+      {userInvites.length > 0 ? (
         <ul className="list-disc pl-5">
           {invites.map((invite) => (
             <li key={invite.id} className="text-gray-700 mb-2">
