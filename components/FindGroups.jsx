@@ -60,7 +60,7 @@ const FindGroups = ({ userInfo = false }) => {
         setError(data.error);
       }
     } catch (err) {
-      console.log(err)
+      console.error(err)
       setError('Failed to fetch groups.');
     }
   };

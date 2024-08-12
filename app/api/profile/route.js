@@ -194,8 +194,12 @@ const allInvites = [...groupInvitesResult.rows, ...eventInvitesResult.rows];
       group.city = await getCityFromZip(group.location);
     }
 
-    for (let invite of invitesResult.rows) {
-      invite.city = await getCityFromZip(invite.location);
+    for (let invite of allInvites) {
+      if (invite.location) {
+        invite.city = await getCityFromZip(invite.location);
+      } else {
+        invite.city = 'Unknown';
+      }
     }
 
     client.release();

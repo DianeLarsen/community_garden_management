@@ -28,7 +28,7 @@ const UserPlotsList = ({
   const plotsPerPage = 10;
   const [renewingPlot, setRenewingPlot] = useState(null);
   const [renewWeeks, setRenewWeeks] = useState(1);
-  console.log(plots);
+
 
   useEffect(() => {
     if (user && user.id && userPlots) {
@@ -99,7 +99,7 @@ const UserPlotsList = ({
         )
       );
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 
@@ -134,14 +134,14 @@ const UserPlotsList = ({
       );
       setEditingPlot(null);
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 
   const handleRenewPlot = async (plotId, extensionWeeks) => {
     try {
       const plotToRenew = plots.find((plot) => plot.id === plotId);
-      console.log(plotToRenew);
+
       if (!plotToRenew || !plotToRenew.reserved_until) {
         throw new Error("Plot or end date not found.");
       }
@@ -177,7 +177,7 @@ const UserPlotsList = ({
       );
       setRenewingPlot(null);
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 

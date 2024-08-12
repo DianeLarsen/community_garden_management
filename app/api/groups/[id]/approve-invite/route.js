@@ -36,7 +36,7 @@ export async function POST(request, { params }) {
     `;
     const groupAdminResult = await client.query(groupAdminQuery, [id]);
     const isGroupAdmin = groupAdminResult.rows.some(row => row.user_id === userId);
- console.log(groupAdminResult.rows)
+
     if (!isAdmin && !isGroupAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
@@ -49,7 +49,7 @@ export async function POST(request, { params }) {
       DELETE FROM group_invitations WHERE id = $1
     `;
     await client.query(deleteInviteQuery, [inviteId]);
-    console.log("made it here1")
+
     // Add to event_registrations
     const insertRegistrationQuery = `
       INSERT INTO group_memberships (group_id, user_id)

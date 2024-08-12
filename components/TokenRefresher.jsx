@@ -43,13 +43,10 @@ const TokenRefresher = () => {
           document.cookie = `token=${data.token}; path=/;`;
         } else {
           if (isPublicPath) return;
-          console.log("Shouldnt be here4")
-          console.log("Token refresh failed, redirecting to home");
           router.push("/"); // Redirect to home if token refresh fails
         }
       } catch (error) {
         if (isPublicPath) return;
-        console.log("Shouldnt be here5")
         console.error("Failed to refresh token:", error);
         router.push("/"); // Redirect to home if there's an error
       }
