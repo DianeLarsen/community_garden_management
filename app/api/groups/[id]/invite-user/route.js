@@ -58,11 +58,11 @@ export async function POST(request, { params }) {
     }
 
     const inviteQuery = `
-      INSERT INTO group_invitations (group_id, user_id, status)
-      VALUES ($1, $2, 'invited')
+      INSERT INTO group_invitations (group_id, user_id, requester_id, status)
+      VALUES ($1, $2, $3, 'invited')
       RETURNING *
     `;
-    await client.query(inviteQuery, [id, inviteUserId]);
+    await client.query(inviteQuery, [id, inviteUserId, userId]);
 
     client.release();
 
