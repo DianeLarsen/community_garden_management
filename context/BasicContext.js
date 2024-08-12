@@ -196,7 +196,7 @@ export const BasicProvider = ({ children }) => {
   useEffect(() => {
     const fetchInvitations = async () => {
       try {
-        const response = await fetch('/api/invitations');
+        const response = await fetch('/api/invites');
         if (!response.ok) {
           throw new Error('Failed to fetch invitations');
         }
