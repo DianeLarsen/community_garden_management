@@ -16,32 +16,20 @@ export async function POST(request, { params }) {
 
     const client = await pool.connect();
 
-    // Check if the user is already invited
+    // Check if the user is already invited or is a member of the group
     const checkQuery = `
-      SELECT * FROM group_invitations WHERE group_id = $1 AND user_id = $2
+      SELECT 1 FROM group_invitations WHERE group_id = $1 AND user_id = $2
+      UNION
+      SELECT 1 FROM group_memberships WHERE group_id = $1 AND user_id = $2
     `;
     const checkResult = await client.query(checkQuery, [id, userId]);
 
-    
-
     if (checkResult.rows.length > 0) {
       client.release();
-      return NextResponse.json({ message: 'Already invited' }, { status: 400 });
+      return NextResponse.json({ message: 'Already invited or a member' }, { status: 400 });
     }
 
-    const checkMemberQuery = `
-    SELECT * FROM group_memberships WHERE group_id = $1 AND user_id = $2
-  `;
-  const checkMemberResult = await client.query(checkMemberQuery, [id, userId]);
-
-  
-
-  if (checkMemberResult.rows.length > 0) {
-    client.release();
-    return NextResponse.json({ message: 'Already a member' }, { status: 400 });
-  }
-
-    // Insert new invitation if not already invited
+    // Insert new invitation if not already invited or a member
     const insertQuery = `
       INSERT INTO group_invitations (group_id, user_id, requester_id, status)
       VALUES ($1, $2, $2, 'pending')
@@ -56,4 +44,3 @@ export async function POST(request, { params }) {
     return NextResponse.json({ error: 'Error requesting invite' }, { status: 500 });
   }
 }
-

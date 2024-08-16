@@ -55,15 +55,12 @@ export async function POST(request, { params }) {
       // Check if the user is already invited or attending
       const checkInviteQuery = `
         SELECT 1 FROM event_invitations WHERE event_id = $1 AND user_id = $2
+        UNION
+        SELECT 1 FROM event_registrations WHERE event_id = $1 AND user_id = $2
       `;
       const checkInviteResult = await client.query(checkInviteQuery, [id, inviteUserId]);
 
-      const checkRegistrationQuery = `
-        SELECT 1 FROM event_registrations WHERE event_id = $1 AND user_id = $2
-      `;
-      const checkRegistrationResult = await client.query(checkRegistrationQuery, [id, inviteUserId]);
-
-      if (checkInviteResult.rows.length > 0 || checkRegistrationResult.rows.length > 0) {
+      if (checkInviteResult.rows.length > 0) {
         return NextResponse.json({ error: 'User already invited or attending' }, { status: 400 });
       }
     } else {

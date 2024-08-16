@@ -1,85 +1,97 @@
 # Community Garden Management System
 
 ## Project Overview
-The Community Garden Management System is a web application designed to streamline the coordination of garden activities, manage plot reservations, and facilitate communication among garden members. By integrating weather and Google Maps APIs, the system provides timely weather updates and a visual representation of garden plots to enhance gardening efficiency and planning.
+The Community Garden Management System (CGMS) is a web application designed to streamline garden activities, manage plot reservations, and facilitate communication among garden members. It provides a user-friendly interface with interactive maps and secure authentication, making it easier for users to manage their garden plots and participate in community events.
 
 ## Features
-- **Plot Reservation System**: Easily reserve garden plots and check availability.
-- **Weather Updates**: Receive real-time weather updates and gardening tips.
-- **Visual Garden Layout**: View garden layout and plot status with Google Maps integration.
+- **Plot Reservation System**: Users can reserve garden plots, check availability, and manage their reservations.
+- **Visual Garden Layout**: Integration with Google Maps allows users to view the garden layout and the status of available plots.
+- **User Authentication**: Secure login and registration with JWT-based authentication and role-based access control.
+- **Profile Management**: Users can update personal information, manage group memberships, and upload profile photos.
 
 ## Setup and Installation
 Follow these steps to set up and run the project locally:
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/DianeLarsen/community_garden_management.git
-Navigate to the project directory:
+### Prerequisites
+- **Node.js**: Ensure Node.js is installed on your system.
+- **PostgreSQL**: Install PostgreSQL and create a database.
 
-bash
-Copy code
+### 1. Clone the Repository
+
+git clone https://github.com/DianeLarsen/community_garden_management.git
 cd community_garden_management
-Install dependencies:
 
-bash
-Copy code
+### 2. Install Dependencies
 npm install
-Run the development server:
 
-bash
-Copy code
-npm start
-Build for production (optional):
+### 3. Configure Environment Variables
+Create a .env file in the root directory and add the following configurations:
 
-bash
-Copy code
-npm run build
-Usage
+PGUSER=your_postgres_username
+PGHOST=localhost
+PGDATABASE=community_garden_management
+PGPASSWORD=your_postgres_password
+PGPORT=5432
+JWT_SECRET=your_jwt_secret
+EMAIL_USER=your_email@example.com
+EMAIL_PASS=your_email_password
+BASE_URL=http://localhost:3000
+
+
+### 4. Set Up the Database
+If PostgreSQL is not installed, follow the instructions for your operating system to install it, and then create the database:
+
+# For Windows:
+
+Download and install PostgreSQL from PostgreSQL Downloads.
+Create a new database named community_garden_management using pgAdmin.
+
+# For macOS:
+
+brew install postgresql
+brew services start postgresql
+createdb community_garden_management
+
+# For Linux:
+
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo service postgresql start
+sudo -i -u postgres
+createdb community_garden_management
+
+After setting up the database, run the setup script to initialize the database and tables:
+
+node utils/setup.js
+
+### 5. Start the Development Server
 Access the application in your browser at http://localhost:3000.
-Register a new account or log in if you already have an account.
-Navigate through the interface to reserve plots, check weather updates, and view the garden layout.
-Deployment on Netlify
-To deploy the project on Netlify:
 
-Sign Up/Login: Create an account or log in to Netlify.
-New Site: Click on "New site from Git" on the Netlify dashboard.
-Connect Repository: Connect your GitHub repository to Netlify.
-Build Settings: Set the build command to npm run build and the publish directory to build.
-Deploy Site: Netlify will build and deploy your site automatically.
-Add a netlify.toml file for configuration settings:
+# Usage
+Register a new account or log in with your existing account.
+Navigate through the interface to reserve plots, view the garden layout, and manage your profile.
 
+# System Requirements
+Node.js: Version 14.x or later.
+PostgreSQL: Version 12.x or later.
 
-[build]
-  command = "npm run build"
-  publish = "build"
+# Deployment
+The project is live and can be accessed at [Heroku Deployment](https://community-garden-management-975d65cae5d8.herokuapp.com/).
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-Contributing
-Contributions are welcome! Follow these steps to contribute:
+# Documentation
+Operation Guide: Detailed instructions on how to operate and configure the application.
 
-Fork the repository.
-Create a new branch for your feature or bug fix:
+# Known Issues and Future Directions
+Pending Features: Group management, event handling, and advanced weather integration.
+Known Issues: The current version may have minor UI inconsistencies that will be addressed in future updates.
+Status
+This is the release version of the Community Garden Management System. All core functionalities are operational and have been thoroughly tested. The program is stable, with no significant known errors. Future updates will focus on adding more features and improving user experience.
 
-git checkout -b feature-name
-Make your changes and commit them:
-
-git commit -m "Description of feature or fix"
-Push to the branch:
-
-git push origin feature-name
-Submit a pull request with a detailed description of your changes.
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-Acknowledgements
-Netlify for deployment services.
-Google Maps API for garden layout visualization.
-Weather API for real-time weather updates.
-Contact
-For any questions or suggestions, please feel free to contact Diane Larsen.
-
-
-
+# References
+[Auth0](https://auth0.com/docs): Auth0 Documentation
+[Google Developers](https://developers.google.com/maps/documentation): Google Maps Platform Documentation
+[Okta](https://developer.okta.com/docs/concepts/role-based-access-control/): Role-Based Access Control
+[PostgreSQL Documentation](https://www.postgresql.org/docs/): PostgreSQL
+[DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-20-04): How to Install and Use PostgreSQL on Ubuntu
+[MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API): Fetch API
+[Express.js](https://expressjs.com/): Express Documentation

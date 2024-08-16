@@ -25,19 +25,19 @@ export async function POST(request, { params }) {
     const group = groupResult.rows[0];
 
     if (!group) {
-      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+      client.release();
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 });
     }
 
     const isAdmin = role === 'admin';
-
     const groupAdminQuery = `
-    SELECT user_id FROM group_memberships WHERE group_id = $1 AND role = 'admin'
-  `;
-  const groupAdminResult = await client.query(groupAdminQuery, [id]);
-  const isGroupAdmin = groupAdminResult.rows.some(row => row.user_id === userId);
-   
+      SELECT user_id FROM group_memberships WHERE group_id = $1 AND role = 'admin'
+    `;
+    const groupAdminResult = await client.query(groupAdminQuery, [id]);
+    const isGroupAdmin = groupAdminResult.rows.some(row => row.user_id === userId);
 
     if (!isAdmin && !isGroupAdmin) {
+      client.release();
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -51,6 +51,19 @@ export async function POST(request, { params }) {
     if (userResult.rows.length > 0) {
       // User exists
       inviteUserId = userResult.rows[0].id;
+
+      // Check if the user is already invited or is a member of the group
+      const checkQuery = `
+        SELECT 1 FROM group_invitations WHERE group_id = $1 AND user_id = $2
+        UNION
+        SELECT 1 FROM group_memberships WHERE group_id = $1 AND user_id = $2
+      `;
+      const checkResult = await client.query(checkQuery, [id, inviteUserId]);
+
+      if (checkResult.rows.length > 0) {
+        client.release();
+        return NextResponse.json({ error: 'User already invited or a member' }, { status: 400 });
+      }
     } else {
       // User does not exist, send invite email
       await sendEmail(email, `You have been invited to join the group ${group.name}!`, `Click here to join: ${process.env.NEXT_PUBLIC_BASE_URL}/join/${id}`);

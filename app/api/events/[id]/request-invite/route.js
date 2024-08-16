@@ -15,6 +15,23 @@ export async function POST(request, { params }) {
     const userId = decoded.userId;
 
     const client = await pool.connect();
+
+    // Check if the user is already invited or attending the event
+    const checkQuery = `
+      SELECT * FROM event_invitations 
+      WHERE event_id = $1 AND user_id = $2
+      UNION
+      SELECT * FROM event_registrations 
+      WHERE event_id = $1 AND user_id = $2
+    `;
+    const checkResult = await client.query(checkQuery, [id, userId]);
+
+    if (checkResult.rows.length > 0) {
+      client.release();
+      return NextResponse.json({ error: 'User is already invited or attending this event' }, { status: 400 });
+    }
+
+    // If not already invited or attending, proceed to insert the new invitation
     const insertQuery = `
       INSERT INTO event_invitations (event_id, user_id, requester_id, status)
       VALUES ($1, $2, $2, 'pending')

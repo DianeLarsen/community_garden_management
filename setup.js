@@ -12,24 +12,25 @@ async function setupDatabase() {
     console.log("PostGIS extension created or already exists.");
 
 
-    // // Drop tables if they exist for fresh setup
-    await client.query(
-      "DROP TABLE IF EXISTS plot_history, event_registrations, events, garden_plots, group_memberships, groups, users, gardens CASCADE"
-    );
-    console.log("Cleared Tables.");
-     // Check if the users table already exists
-    //  const tableExists = await client.query(`
-    //   SELECT EXISTS (
-    //     SELECT FROM information_schema.tables 
-    //     WHERE table_schema = 'public' 
-    //     AND table_name = 'users'
-    //   );
-    // `);
+    // Drop tables if they exist for fresh setup
+    // await client.query(
+    //   "DROP TABLE IF EXISTS plot_history, event_registrations, events, garden_plots, group_memberships, groups, users, gardens CASCADE"
+    // );
+    // console.log("Cleared Tables.");
 
-    // if (tableExists.rows[0].exists) {
-    //   console.log("Tables already exist. Skipping setup.");
-    //   return;
-    // }
+     // Check if the users table already exists
+     const tableExists = await client.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'users'
+      );
+    `);
+
+    if (tableExists.rows[0].exists) {
+      console.log("Tables already exist. Skipping setup.");
+      return;
+    }
 
     // Create users table
     await client.query(`
